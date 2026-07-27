@@ -1,0 +1,58 @@
+{
+  "trendingMaterials": [
+    {
+      "category": "Cement",
+      "name": "Ambuja PPC Cement",
+      "detail": "Bag Size : 50KG",
+      "image": "assets/images/home_cement.png"
+    },
+    {
+      "category": "Steel",
+      "name": "Sugna TMT Fe-550",
+      "detail": "Size : 12mm",
+      "image": "assets/images/home_steel.png"
+    }
+  ],
+  "skilledWorkers": [
+    {
+      "name": "Raj Kumar",
+      "trade": "Plumber",
+      "image": "assets/images/home_worker.png",
+      "rating": 3.8
+    },
+    {
+      "name": "Raj Kumar",
+      "trade": "Plumber",
+      "image": "assets/images/home_worker.png",
+      "rating": 3.8
+    },
+        {
+      "name": "Raj Kumar",
+      "trade": "Plumber",
+      "image": "assets/images/home_worker.png",
+      "rating": 3.8
+    }
+  ],
+  "materialCategories": [
+    {
+      "name": "Cement",
+      "image": "assets/images/home_cement.png"
+    },
+    {
+      "name": "Sand",
+      "image": "assets/images/home_sand.png"
+    },
+    {
+      "name": "Bricks",
+      "image": "assets/images/home_bricks.png"
+    },
+        {
+      "name": "Sand",
+      "image": "assets/images/home_sand.png"
+    },
+    {
+      "name": "Bricks",
+      "image": "assets/images/home_bricks.png"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "project_info": {
+    "project_number": "1041337404730",
+    "project_id": "constructo-400209",
+    "storage_bucket": "constructo-400209.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041337404730:android:3068b90bcbec26959ad403",
+        "android_client_info": {
+          "package_name": "com.constructo.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1041337404730-1l2g8ejbmmbouj4brs37sbaqsdcglu7o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.constructo.app",
+            "certificate_hash": "de4692ddc4542418bbb0f74090c3c2ee34e98e90"
+          }
+        },
+        {
+          "client_id": "1041337404730-62730q3pa4rlogh3a2ldokp77hrbj0jl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.constructo.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "1041337404730-7aam44dq7e9k59il8uq8d8du79tphblr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.constructo.app",
+            "certificate_hash": "d29f756b2d31ac29f6116925cce46b24b46f49a5"
+          }
+        },
+        {
+          "client_id": "1041337404730-94hst55vhe8msvj0huc9gbog3o3rrmrg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.constructo.app",
+            "certificate_hash": "6b0e5aadafd3401ecc9bb0d406cd8215278dbfc1"
+          }
+        },
+        {
+          "client_id": "1041337404730-e9ptqhm2ru9kv7mbuta5vrfsp6838ae1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.constructo.app",
+            "certificate_hash": "d48cf718e5d0ad1eb9b6460ab5e3e712442ae5e9"
+          }
+        },
+        {
+          "client_id": "1041337404730-ee7mru659nbb9gsl649ov9vbmjufn9uq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.constructo.app",
+            "certificate_hash": "4795ddfb94ded8a73ce3c468ec65d5eb2af4251b"
+          }
+        },
+        {
+          "client_id": "1041337404730-jdli48ctt0fqaq4t9jpcjor4b2ia919r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.constructo.app",
+            "certificate_hash": "1a636c935444783772260bc359cb13e0c672154a"
+          }
+        },
+        {
+          "client_id": "1041337404730-a3q63i1lnqqlbbucteu9hgli7s1r80su.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3DaTiKlVTvs9R2Uu4R4kNwfosOYsSlnk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1041337404730-9crum8ictd9nf4p1h92oc5v4sb9j0qtj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1041337404730-jf0um3vs8ep8co9sm1um9mkdc3u4eq5i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.constructo.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

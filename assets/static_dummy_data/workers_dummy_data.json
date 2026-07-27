@@ -1,0 +1,71 @@
+{
+  "categories": ["All", "Mason", "Painter", "Plumber", "Electrician"],
+  "workers": [
+    {
+      "name": "Raj Kumar",
+      "category": "Plumber",
+      "image": "assets/dummy_images/worker_profile.png",
+      "experience": "7+ Exp",
+      "price": "₹425.00",
+      "location": "Patna Nearby Areas",
+      "availability": "Today Available",
+      "rating": 3.8,
+      "verified": true
+    },
+    {
+      "name": "Amit Kumar",
+      "category": "Mason",
+      "image": "assets/dummy_images/worker_profile.png",
+      "experience": "8+ Exp",
+      "price": "₹500.00",
+      "location": "Patna Nearby Areas",
+      "availability": "Today Available",
+      "rating": 4.2,
+      "verified": true
+    },
+    {
+      "name": "Sonu Sharma",
+      "category": "Painter",
+      "image": "assets/dummy_images/worker_profile.png",
+      "experience": "5+ Exp",
+      "price": "₹400.00",
+      "location": "Patna Nearby Areas",
+      "availability": "Today Available",
+      "rating": 4.0,
+      "verified": true
+    },
+    {
+      "name": "Ravi Verma",
+      "category": "Electrician",
+      "image": "assets/dummy_images/worker_profile.png",
+      "experience": "6+ Exp",
+      "price": "₹450.00",
+      "location": "Patna Nearby Areas",
+      "availability": "Today Available",
+      "rating": 4.1,
+      "verified": true
+    },
+    {
+      "name": "Deepak Kumar",
+      "category": "Plumber",
+      "image": "assets/dummy_images/worker_profile.png",
+      "experience": "4+ Exp",
+      "price": "₹375.00",
+      "location": "Patna Nearby Areas",
+      "availability": "Today Available",
+      "rating": 3.9,
+      "verified": true
+    },
+    {
+      "name": "Manoj Singh",
+      "category": "Mason",
+      "image": "assets/dummy_images/worker_profile.png",
+      "experience": "9+ Exp",
+      "price": "₹550.00",
+      "location": "Patna Nearby Areas",
+      "availability": "Today Available",
+      "rating": 4.5,
+      "verified": true
+    }
+  ]
+}
