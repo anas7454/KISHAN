@@ -1,8 +1,8 @@
-import 'package:constructo/screens/auth/splash/splash_controller.dart';
-import 'package:constructo/utils/images/image_utility/background_images_utility.dart';
-import 'package:constructo/utils/images/image_utility/image_utility.dart';
-import 'package:constructo/utils/theme/decorations/decoration_utils.dart';
-import 'package:constructo/utils/theme/sizes/responsive_size_utils.dart';
+import 'package:constructo_worker/screens/auth/splash/splash_controller.dart';
+import 'package:constructo_worker/utils/images/image_utility/background_images_utility.dart';
+import 'package:constructo_worker/utils/images/image_utility/image_utility.dart';
+import 'package:constructo_worker/utils/theme/decorations/decoration_utils.dart';
+import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

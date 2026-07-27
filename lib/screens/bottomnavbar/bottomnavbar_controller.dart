@@ -1,11 +1,11 @@
-import 'package:constructo/screens/bottomnavbar/custom_bottomnavbar/custom_bottomnavbar.dart';
-import 'package:constructo/screens/bottomnavbar/tabs/bnb1_workers/bnb1_workers_screen.dart';
-import 'package:constructo/screens/bottomnavbar/tabs/bnb2_material/bnb2_material_screen.dart';
-import 'package:constructo/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_screen.dart';
-import 'package:constructo/screens/bottomnavbar/tabs/bnb4_my_order/bnb4_my_order_screen.dart';
-import 'package:constructo/screens/bottomnavbar/tabs/bnb5_myprofile/bnb5_myprofile_screen.dart';
-import 'package:constructo/utils/images/image_utility/icon_utility.dart';
-import 'package:constructo/utils/navigation/double_back_to_exit.dart';
+import 'package:constructo_worker/screens/bottomnavbar/custom_bottomnavbar/custom_bottomnavbar.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb1_workers/bnb1_workers_screen.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb2_material/bnb2_material_screen.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_screen.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb4_my_order/bnb4_my_order_screen.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb5_myprofile/bnb5_myprofile_screen.dart';
+import 'package:constructo_worker/utils/images/image_utility/icon_utility.dart';
+import 'package:constructo_worker/utils/navigation/double_back_to_exit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

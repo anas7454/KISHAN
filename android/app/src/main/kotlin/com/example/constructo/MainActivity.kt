@@ -1,4 +1,4 @@
-package com.constructo.app
+package com.constructo.worker
 
 import io.flutter.embedding.android.FlutterActivity
 

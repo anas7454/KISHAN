@@ -1,5 +1,5 @@
-import 'package:constructo/networking/user/controllers/user_controller.dart';
-import 'package:constructo/routes/app_routes.dart';
+import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
+import 'package:constructo_worker/routes/app_routes.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

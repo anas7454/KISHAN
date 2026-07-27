@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:constructo/networking/extensions/api_helper.dart';
-import 'package:constructo/routes/app_routes.dart';
-import 'package:constructo/utils/common/debug_utils.dart';
+import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/routes/app_routes.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class NotificationNavigationService {

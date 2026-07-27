@@ -1,4 +1,4 @@
-import 'package:constructo/utils/theme/sizes/app_sizes.dart';
+import 'package:constructo_worker/utils/theme/sizes/app_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

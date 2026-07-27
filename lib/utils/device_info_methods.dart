@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:android_id/android_id.dart';
-import 'package:constructo/utils/common/debug_utils.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';

@@ -1,4 +1,4 @@
-import 'package:constructo/utils/common/debug_utils.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';

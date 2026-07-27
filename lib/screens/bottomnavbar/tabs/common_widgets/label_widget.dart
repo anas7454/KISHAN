@@ -1,7 +1,7 @@
-import 'package:constructo/utils/images/cache_network/asset_icon_widget.dart';
-import 'package:constructo/utils/theme/app_colors.dart';
-import 'package:constructo/utils/theme/sizes/responsive_size_utils.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/utils/images/cache_network/asset_icon_widget.dart';
+import 'package:constructo_worker/utils/theme/app_colors.dart';
+import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:flutter/material.dart';
 
 class LabelWidget extends StatelessWidget {

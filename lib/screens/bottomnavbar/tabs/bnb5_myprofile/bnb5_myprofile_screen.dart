@@ -1,5 +1,5 @@
-import 'package:constructo/screens/bottomnavbar/tabs/bnb5_myprofile/bnb5_myprofile_controller.dart';
-import 'package:constructo/screens/bottomnavbar/tabs/bnb5_myprofile/bnb5_myprofile_widgets.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb5_myprofile/bnb5_myprofile_controller.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb5_myprofile/bnb5_myprofile_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

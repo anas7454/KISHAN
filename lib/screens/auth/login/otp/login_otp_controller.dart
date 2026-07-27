@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:constructo/networking/api/endpoints/auth_api_services.dart';
-import 'package:constructo/networking/dialogs/api_error_show_dialogs.dart';
-import 'package:constructo/networking/extensions/api_helper.dart';
-import 'package:constructo/networking/user/controllers/user_controller.dart';
-import 'package:constructo/routes/app_routes.dart';
-import 'package:constructo/routes/arguments.dart';
-import 'package:constructo/screens/auth/login/otp/otp_verified_dialog.dart';
-import 'package:constructo/utils/toast/toast.dart';
+import 'package:constructo_worker/networking/api/endpoints/auth_api_services.dart';
+import 'package:constructo_worker/networking/dialogs/api_error_show_dialogs.dart';
+import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
+import 'package:constructo_worker/routes/app_routes.dart';
+import 'package:constructo_worker/routes/arguments.dart';
+import 'package:constructo_worker/screens/auth/login/otp/otp_verified_dialog.dart';
+import 'package:constructo_worker/utils/toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

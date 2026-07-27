@@ -1,15 +1,15 @@
-import 'package:constructo/bindings/auth_bindings.dart';
-import 'package:constructo/bindings/bottomnavbar_bindings.dart';
-import 'package:constructo/routes/app_routes_name.dart';
-import 'package:constructo/routes/arguments.dart';
-import 'package:constructo/screens/auth/login/login_screen.dart';
-import 'package:constructo/screens/auth/login/otp/login_otp_screen.dart';
-import 'package:constructo/screens/auth/onboarding/onboarding_screen.dart';
-import 'package:constructo/screens/auth/splash/splash_screen.dart';
-import 'package:constructo/screens/bottomnavbar/bottomnavbar_screen.dart';
-import 'package:constructo/screens/home_location_search/home_location_search_controller.dart';
-import 'package:constructo/screens/home_location_search/home_location_search_screen.dart';
-import 'package:constructo/networking/user/models/user_location_model.dart';
+import 'package:constructo_worker/bindings/auth_bindings.dart';
+import 'package:constructo_worker/bindings/bottomnavbar_bindings.dart';
+import 'package:constructo_worker/routes/app_routes_name.dart';
+import 'package:constructo_worker/routes/arguments.dart';
+import 'package:constructo_worker/screens/auth/login/login_screen.dart';
+import 'package:constructo_worker/screens/auth/login/otp/login_otp_screen.dart';
+import 'package:constructo_worker/screens/auth/onboarding/onboarding_screen.dart';
+import 'package:constructo_worker/screens/auth/splash/splash_screen.dart';
+import 'package:constructo_worker/screens/bottomnavbar/bottomnavbar_screen.dart';
+import 'package:constructo_worker/screens/home_location_search/home_location_search_controller.dart';
+import 'package:constructo_worker/screens/home_location_search/home_location_search_screen.dart';
+import 'package:constructo_worker/networking/user/models/user_location_model.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {

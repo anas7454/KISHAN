@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:constructo/networking/api/endpoints/notification_api_services.dart';
-import 'package:constructo/networking/extensions/api_helper.dart';
-import 'package:constructo/networking/firebase/flutter_local_notification.dart';
-import 'package:constructo/networking/user/controllers/user_controller.dart';
-import 'package:constructo/utils/common/debug_utils.dart';
-import 'package:constructo/utils/device_info_methods.dart';
+import 'package:constructo_worker/networking/api/endpoints/notification_api_services.dart';
+import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/firebase/flutter_local_notification.dart';
+import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
+import 'package:constructo_worker/utils/device_info_methods.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 

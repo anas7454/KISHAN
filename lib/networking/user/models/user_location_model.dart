@@ -1,6 +1,6 @@
 // ignore_for_file: unnecessary_getters_setters
 
-import 'package:constructo/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/extensions/api_helper.dart';
 
 class UserLocationModel {
   String _address = "";

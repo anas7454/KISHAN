@@ -1,5 +1,5 @@
-import 'package:constructo/utils/theme/sizes/container_const_funtions.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/utils/theme/sizes/container_const_funtions.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:flutter/material.dart';
 
 class GradientButtonWidget extends StatelessWidget {

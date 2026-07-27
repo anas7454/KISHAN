@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:constructo/networking/user/models/user_model.dart';
-import 'package:constructo/utils/common/debug_utils.dart';
+import 'package:constructo_worker/networking/user/models/user_model.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserDataPref {

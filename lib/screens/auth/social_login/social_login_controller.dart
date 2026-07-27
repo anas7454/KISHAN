@@ -1,12 +1,12 @@
-import 'package:constructo/networking/api/endpoints/auth_api_services.dart';
-import 'package:constructo/networking/dialogs/api_error_show_dialogs.dart';
-import 'package:constructo/networking/extensions/api_helper.dart';
-import 'package:constructo/networking/user/controllers/user_controller.dart';
-import 'package:constructo/routes/app_routes.dart';
-import 'package:constructo/screens/auth/social_login/apple_login/apple_login_controller.dart';
-import 'package:constructo/screens/auth/social_login/google_login/google_login_controller.dart';
-import 'package:constructo/screens/auth/social_login/social_login_model.dart';
-import 'package:constructo/utils/toast/toast.dart';
+import 'package:constructo_worker/networking/api/endpoints/auth_api_services.dart';
+import 'package:constructo_worker/networking/dialogs/api_error_show_dialogs.dart';
+import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
+import 'package:constructo_worker/routes/app_routes.dart';
+import 'package:constructo_worker/screens/auth/social_login/apple_login/apple_login_controller.dart';
+import 'package:constructo_worker/screens/auth/social_login/google_login/google_login_controller.dart';
+import 'package:constructo_worker/screens/auth/social_login/social_login_model.dart';
+import 'package:constructo_worker/utils/toast/toast.dart';
 import 'package:get/get.dart';
 
 class SocialLoginController extends GetxController {

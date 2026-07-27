@@ -1,7 +1,7 @@
-import 'package:constructo/utils/theme/app_theme/build_material_color.dart';
-import 'package:constructo/utils/theme/app_theme/color_scheme.dart';
-import 'package:constructo/utils/theme/app_colors.dart';
-import 'package:constructo/utils/theme/sizes/app_sizes.dart';
+import 'package:constructo_worker/utils/theme/app_theme/build_material_color.dart';
+import 'package:constructo_worker/utils/theme/app_theme/color_scheme.dart';
+import 'package:constructo_worker/utils/theme/app_colors.dart';
+import 'package:constructo_worker/utils/theme/sizes/app_sizes.dart';
 import 'package:flutter/material.dart';
 
 class AppThemes {

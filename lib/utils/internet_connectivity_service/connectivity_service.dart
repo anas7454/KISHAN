@@ -1,5 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:constructo/utils/common/debug_utils.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
 
 class ConnectivityService {
   static Future<bool> hasInternet() async {

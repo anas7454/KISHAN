@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:constructo/networking/core/dio_api.dart';
-import 'package:constructo/utils/common/debug_utils.dart';
-import 'package:constructo/utils/theme/sizes/responsive_size_utils.dart';
+import 'package:constructo_worker/networking/core/dio_api.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
+import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

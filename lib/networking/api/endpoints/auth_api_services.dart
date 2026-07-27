@@ -1,4 +1,4 @@
-import 'package:constructo/networking/api/app_api_services.dart';
+import 'package:constructo_worker/networking/api/app_api_services.dart';
 
 class AuthApiServices {
   static Future<Map> sendOtpLogin(Map<String, dynamic> rawData) async {

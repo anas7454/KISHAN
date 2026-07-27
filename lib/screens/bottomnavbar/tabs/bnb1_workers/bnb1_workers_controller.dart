@@ -1,6 +1,6 @@
-import 'package:constructo/networking/extensions/api_helper.dart';
-import 'package:constructo/screens/bottomnavbar/tabs/bnb1_workers/bnb1_workers_model.dart';
-import 'package:constructo/static_dummy_data/static_dummy_data.dart';
+import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb1_workers/bnb1_workers_model.dart';
+import 'package:constructo_worker/static_dummy_data/static_dummy_data.dart';
 import 'package:get/get.dart';
 
 class Bnb1WorkersController extends GetxController {

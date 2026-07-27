@@ -1,14 +1,14 @@
-import 'package:constructo/networking/firebase/fcm_token_controller.dart';
-import 'package:constructo/networking/firebase/flutter_local_notification.dart';
-import 'package:constructo/routes/app_routes.dart';
-import 'package:constructo/routes/app_routes_name.dart';
-import 'package:constructo/networking/user/controllers/global_controller.dart';
-import 'package:constructo/networking/user/controllers/user_controller.dart';
-import 'package:constructo/utils/common/debug_utils.dart';
-import 'package:constructo/utils/internet_connectivity_service/app_connectivity_controller.dart';
-import 'package:constructo/utils/internet_connectivity_service/app_connectivity_wrapper.dart';
-import 'package:constructo/utils/theme/app_theme/app_theme.dart';
-import 'package:constructo/utils/theme/app_theme/system_ui_overlaystyle_custom.dart';
+import 'package:constructo_worker/networking/firebase/fcm_token_controller.dart';
+import 'package:constructo_worker/networking/firebase/flutter_local_notification.dart';
+import 'package:constructo_worker/routes/app_routes.dart';
+import 'package:constructo_worker/routes/app_routes_name.dart';
+import 'package:constructo_worker/networking/user/controllers/global_controller.dart';
+import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
+import 'package:constructo_worker/utils/internet_connectivity_service/app_connectivity_controller.dart';
+import 'package:constructo_worker/utils/internet_connectivity_service/app_connectivity_wrapper.dart';
+import 'package:constructo_worker/utils/theme/app_theme/app_theme.dart';
+import 'package:constructo_worker/utils/theme/app_theme/system_ui_overlaystyle_custom.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           navigatorKey: rootNavigatorKey,
           debugShowCheckedModeBanner: false,
-          title: 'Constructo',
+          title: 'Constructo Worker',
           builder: (context, child) {
             // WidgetsBinding.instance.addPostFrameCallback((_) {
             //   AppImageCache.precacheAndPinGradientImages(context);

@@ -1,4 +1,4 @@
-import 'package:constructo/networking/user/models/user_location_model.dart';
+import 'package:constructo_worker/networking/user/models/user_location_model.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 

@@ -1,9 +1,9 @@
-import 'package:constructo/networking/preferences/user_data_pref.dart';
-import 'package:constructo/networking/user/controllers/global_controller.dart';
-import 'package:constructo/networking/user/models/user_model.dart';
-import 'package:constructo/routes/app_routes.dart';
-import 'package:constructo/utils/common/debug_utils.dart';
-import 'package:constructo/utils/toast/toast.dart';
+import 'package:constructo_worker/networking/preferences/user_data_pref.dart';
+import 'package:constructo_worker/networking/user/controllers/global_controller.dart';
+import 'package:constructo_worker/networking/user/models/user_model.dart';
+import 'package:constructo_worker/routes/app_routes.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
+import 'package:constructo_worker/utils/toast/toast.dart';
 import 'package:get/get.dart';
 
 class UserController extends GetxController {

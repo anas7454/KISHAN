@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
-import 'package:constructo/utils/theme/app_colors.dart';
-import 'package:constructo/utils/theme/sizes/container_const_funtions.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/utils/theme/app_colors.dart';
+import 'package:constructo_worker/utils/theme/sizes/container_const_funtions.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

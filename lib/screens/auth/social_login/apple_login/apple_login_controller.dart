@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:constructo/screens/auth/social_login/social_login_model.dart';
+import 'package:constructo_worker/screens/auth/social_login/social_login_model.dart';
 import 'package:crypto/crypto.dart';
 import 'package:get/get.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';

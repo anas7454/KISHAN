@@ -1,9 +1,9 @@
-import 'package:constructo/networking/api/endpoints/auth_api_services.dart';
-import 'package:constructo/networking/user/controllers/user_controller.dart';
-import 'package:constructo/utils/buttons/cta_button/button_custom.dart';
-import 'package:constructo/utils/theme/sizes/container_const_funtions.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
-import 'package:constructo/utils/toast/toast.dart';
+import 'package:constructo_worker/networking/api/endpoints/auth_api_services.dart';
+import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
+import 'package:constructo_worker/utils/buttons/cta_button/button_custom.dart';
+import 'package:constructo_worker/utils/theme/sizes/container_const_funtions.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/utils/toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

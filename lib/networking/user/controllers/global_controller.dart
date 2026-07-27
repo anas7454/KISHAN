@@ -1,6 +1,6 @@
-import 'package:constructo/networking/preferences/user_location_pref.dart';
-import 'package:constructo/networking/user/models/user_location_model.dart';
-import 'package:constructo/utils/location/user_location_service.dart';
+import 'package:constructo_worker/networking/preferences/user_location_pref.dart';
+import 'package:constructo_worker/networking/user/models/user_location_model.dart';
+import 'package:constructo_worker/utils/location/user_location_service.dart';
 import 'package:get/get.dart';
 
 class GlobalController extends GetxController {

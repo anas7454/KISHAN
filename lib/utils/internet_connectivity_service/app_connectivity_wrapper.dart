@@ -1,8 +1,8 @@
 import 'dart:ui';
-import 'package:constructo/utils/internet_connectivity_service/app_connectivity_controller.dart';
-import 'package:constructo/utils/theme/app_colors.dart';
-import 'package:constructo/utils/theme/sizes/container_const_funtions.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/utils/internet_connectivity_service/app_connectivity_controller.dart';
+import 'package:constructo_worker/utils/theme/app_colors.dart';
+import 'package:constructo_worker/utils/theme/sizes/container_const_funtions.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

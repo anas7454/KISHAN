@@ -1,4 +1,4 @@
-import 'package:constructo/networking/core/dio_api.dart';
+import 'package:constructo_worker/networking/core/dio_api.dart';
 
 class ServerUrls {
   // --------- 1. TESTING SERVER -----------

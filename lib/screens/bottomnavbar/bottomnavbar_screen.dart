@@ -1,7 +1,7 @@
-import 'package:constructo/screens/bottomnavbar/bottomnavbar_controller.dart';
-import 'package:constructo/screens/bottomnavbar/custom_bottomnavbar/custom_bottomnavbar.dart';
-import 'package:constructo/utils/common/focus_utils.dart';
-import 'package:constructo/utils/theme/sizes/responsive_size_utils.dart';
+import 'package:constructo_worker/screens/bottomnavbar/bottomnavbar_controller.dart';
+import 'package:constructo_worker/screens/bottomnavbar/custom_bottomnavbar/custom_bottomnavbar.dart';
+import 'package:constructo_worker/utils/common/focus_utils.dart';
+import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

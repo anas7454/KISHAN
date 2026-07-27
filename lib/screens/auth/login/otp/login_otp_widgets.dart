@@ -1,7 +1,7 @@
-import 'package:constructo/screens/auth/login/otp/login_otp_controller.dart';
-import 'package:constructo/utils/buttons/text_button_custom.dart';
-import 'package:constructo/utils/theme/app_colors.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/screens/auth/login/otp/login_otp_controller.dart';
+import 'package:constructo_worker/utils/buttons/text_button_custom.dart';
+import 'package:constructo_worker/utils/theme/app_colors.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

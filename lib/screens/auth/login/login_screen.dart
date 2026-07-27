@@ -1,13 +1,13 @@
-import 'package:constructo/screens/auth/login/login_controller.dart';
-import 'package:constructo/screens/auth/login/login_widgets.dart';
-import 'package:constructo/screens/auth/social_login/social_login_controller.dart';
-import 'package:constructo/utils/buttons/cta_button/button_custom.dart';
-import 'package:constructo/utils/images/image_utility/common_icons_utility.dart';
-import 'package:constructo/utils/scafolds/auth_scaffold.dart';
-import 'package:constructo/utils/textfield/phone_num_textfield.dart';
-import 'package:constructo/utils/textfield/textfield_widgets.dart';
-import 'package:constructo/utils/theme/sizes/responsive_size_utils.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/screens/auth/login/login_controller.dart';
+import 'package:constructo_worker/screens/auth/login/login_widgets.dart';
+import 'package:constructo_worker/screens/auth/social_login/social_login_controller.dart';
+import 'package:constructo_worker/utils/buttons/cta_button/button_custom.dart';
+import 'package:constructo_worker/utils/images/image_utility/common_icons_utility.dart';
+import 'package:constructo_worker/utils/scafolds/auth_scaffold.dart';
+import 'package:constructo_worker/utils/textfield/phone_num_textfield.dart';
+import 'package:constructo_worker/utils/textfield/textfield_widgets.dart';
+import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

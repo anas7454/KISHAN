@@ -1,9 +1,9 @@
-import 'package:constructo/utils/common/focus_utils.dart';
-import 'package:constructo/utils/images/image_utility/background_images_utility.dart';
-import 'package:constructo/utils/images/image_utility/image_utility.dart';
-import 'package:constructo/utils/theme/app_colors.dart';
-import 'package:constructo/utils/theme/sizes/app_sizes.dart';
-import 'package:constructo/utils/theme/sizes/responsive_size_utils.dart';
+import 'package:constructo_worker/utils/common/focus_utils.dart';
+import 'package:constructo_worker/utils/images/image_utility/background_images_utility.dart';
+import 'package:constructo_worker/utils/images/image_utility/image_utility.dart';
+import 'package:constructo_worker/utils/theme/app_colors.dart';
+import 'package:constructo_worker/utils/theme/sizes/app_sizes.dart';
+import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
 import 'package:flutter/material.dart';
 
 class AuthScaffold extends StatelessWidget {

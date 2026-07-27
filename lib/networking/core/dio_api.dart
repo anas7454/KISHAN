@@ -1,5 +1,5 @@
 // ignore_for_file: empty_catches
-import 'package:constructo/networking/core/server_urls.dart';
+import 'package:constructo_worker/networking/core/server_urls.dart';
 import 'package:flutter/foundation.dart';
 // import 'package:flutter/foundation.dart';
 
@@ -18,8 +18,8 @@ class DioAPI {
   // static const bool isTestAds = kDebugMode ? true : false;
   static const bool isTestAds = false;
 
-  static String androidPackageId = "com.constructo.app";
-  static String iosBundleId = "com.constructo.app";
+  static String androidPackageId = "com.constructo.worker";
+  static String iosBundleId = "com.constructo.worker";
 
   // ------------------ SERVER URLS -----------------------
 

@@ -1,18 +1,18 @@
 import 'dart:async';
 
-import 'package:constructo/routes/app_routes.dart';
-import 'package:constructo/screens/auth/onboarding/stepers/step1_onboarding_widget.dart';
-import 'package:constructo/screens/auth/onboarding/stepers/step2_onboarding_widget.dart';
-import 'package:constructo/screens/auth/onboarding/stepers/step3_onboarding_widget.dart';
-import 'package:constructo/utils/buttons/cta_button/button_custom.dart';
-import 'package:constructo/utils/buttons/text_button_custom.dart';
-import 'package:constructo/utils/images/image_utility/common_icons_utility.dart';
-import 'package:constructo/utils/theme/app_colors.dart';
-import 'package:constructo/utils/theme/decorations/border_radius_utils.dart';
-import 'package:constructo/utils/theme/decorations/border_utils.dart';
-import 'package:constructo/utils/theme/sizes/app_sizes.dart';
-import 'package:constructo/utils/theme/sizes/responsive_size_utils.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/routes/app_routes.dart';
+import 'package:constructo_worker/screens/auth/onboarding/stepers/step1_onboarding_widget.dart';
+import 'package:constructo_worker/screens/auth/onboarding/stepers/step2_onboarding_widget.dart';
+import 'package:constructo_worker/screens/auth/onboarding/stepers/step3_onboarding_widget.dart';
+import 'package:constructo_worker/utils/buttons/cta_button/button_custom.dart';
+import 'package:constructo_worker/utils/buttons/text_button_custom.dart';
+import 'package:constructo_worker/utils/images/image_utility/common_icons_utility.dart';
+import 'package:constructo_worker/utils/theme/app_colors.dart';
+import 'package:constructo_worker/utils/theme/decorations/border_radius_utils.dart';
+import 'package:constructo_worker/utils/theme/decorations/border_utils.dart';
+import 'package:constructo_worker/utils/theme/sizes/app_sizes.dart';
+import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:flutter/material.dart';
 
 mixin OnboardingWidgets {

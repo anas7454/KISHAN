@@ -1,7 +1,7 @@
-import 'package:constructo/main.dart';
-import 'package:constructo/utils/theme/sizes/app_sizes.dart';
-import 'package:constructo/utils/theme/sizes/container_const_funtions.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/main.dart';
+import 'package:constructo_worker/utils/theme/sizes/app_sizes.dart';
+import 'package:constructo_worker/utils/theme/sizes/container_const_funtions.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:flutter/material.dart';
 
 bool _toastVisible = false;

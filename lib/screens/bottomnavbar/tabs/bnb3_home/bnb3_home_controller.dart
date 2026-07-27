@@ -1,7 +1,7 @@
-import 'package:constructo/networking/extensions/api_helper.dart';
-import 'package:constructo/networking/user/controllers/global_controller.dart';
-import 'package:constructo/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_model.dart';
-import 'package:constructo/static_dummy_data/static_dummy_data.dart';
+import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/user/controllers/global_controller.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_model.dart';
+import 'package:constructo_worker/static_dummy_data/static_dummy_data.dart';
 import 'package:get/get.dart';
 
 class Bnb3HomeController extends GetxController {

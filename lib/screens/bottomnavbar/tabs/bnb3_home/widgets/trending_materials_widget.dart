@@ -1,11 +1,11 @@
-import 'package:constructo/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_controller.dart';
-import 'package:constructo/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_model.dart';
-import 'package:constructo/screens/bottomnavbar/tabs/common_widgets/viewall_heading_widget.dart';
-import 'package:constructo/utils/images/cache_network/cachenetwork_image.dart';
-import 'package:constructo/utils/theme/app_colors.dart';
-import 'package:constructo/utils/theme/decorations/border_utils.dart';
-import 'package:constructo/utils/theme/sizes/responsive_size_utils.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_controller.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_model.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/common_widgets/viewall_heading_widget.dart';
+import 'package:constructo_worker/utils/images/cache_network/cachenetwork_image.dart';
+import 'package:constructo_worker/utils/theme/app_colors.dart';
+import 'package:constructo_worker/utils/theme/decorations/border_utils.dart';
+import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:flutter/material.dart';
 
 mixin TrendingMaterialsWidget {

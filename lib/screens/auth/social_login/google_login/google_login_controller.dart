@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:constructo/screens/auth/social_login/social_login_config.dart';
-import 'package:constructo/screens/auth/social_login/social_login_model.dart';
+import 'package:constructo_worker/screens/auth/social_login/social_login_config.dart';
+import 'package:constructo_worker/screens/auth/social_login/social_login_model.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:constructo/utils/internet_connectivity_service/connectivity_service.dart';
+import 'package:constructo_worker/utils/internet_connectivity_service/connectivity_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 

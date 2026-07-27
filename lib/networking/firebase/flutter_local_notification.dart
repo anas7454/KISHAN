@@ -1,5 +1,5 @@
-import 'package:constructo/networking/firebase/notification_navigation_service.dart';
-import 'package:constructo/utils/common/debug_utils.dart';
+import 'package:constructo_worker/networking/firebase/notification_navigation_service.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 

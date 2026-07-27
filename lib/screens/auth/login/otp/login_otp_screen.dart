@@ -1,11 +1,11 @@
-import 'package:constructo/screens/auth/login/otp/login_otp_controller.dart';
-import 'package:constructo/screens/auth/login/otp/login_otp_widgets.dart';
-import 'package:constructo/utils/buttons/cta_button/button_custom.dart';
-import 'package:constructo/utils/const_helper_methods.dart';
-import 'package:constructo/utils/scafolds/auth_scaffold.dart';
-import 'package:constructo/utils/textfield/common_otp_pinput.dart';
-import 'package:constructo/utils/theme/sizes/responsive_size_utils.dart';
-import 'package:constructo/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/screens/auth/login/otp/login_otp_controller.dart';
+import 'package:constructo_worker/screens/auth/login/otp/login_otp_widgets.dart';
+import 'package:constructo_worker/utils/buttons/cta_button/button_custom.dart';
+import 'package:constructo_worker/utils/const_helper_methods.dart';
+import 'package:constructo_worker/utils/scafolds/auth_scaffold.dart';
+import 'package:constructo_worker/utils/textfield/common_otp_pinput.dart';
+import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
+import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

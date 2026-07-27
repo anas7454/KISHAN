@@ -1,10 +1,10 @@
 // ignore_for_file: avoid_print, prefer_const_constructors
-import 'package:constructo/networking/core/dio_api.dart';
-import 'package:constructo/networking/user/controllers/user_controller.dart';
-import 'package:constructo/utils/common/debug_utils.dart';
-import 'package:constructo/utils/common/focus_utils.dart';
-import 'package:constructo/utils/internet_connectivity_service/connectivity_service.dart';
-import 'package:constructo/utils/toast/toast.dart';
+import 'package:constructo_worker/networking/core/dio_api.dart';
+import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
+import 'package:constructo_worker/utils/common/debug_utils.dart';
+import 'package:constructo_worker/utils/common/focus_utils.dart';
+import 'package:constructo_worker/utils/internet_connectivity_service/connectivity_service.dart';
+import 'package:constructo_worker/utils/toast/toast.dart';
 import 'package:get/instance_manager.dart';
 import 'package:dio/dio.dart';
 
