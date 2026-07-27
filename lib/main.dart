@@ -81,7 +81,7 @@ class MyApp extends StatelessWidget {
               child: MediaQuery(
                 data: MediaQuery.of(context).copyWith(
                   textScaler: const TextScaler.linear(1.0),
-                ), //. mobile font increes pr increse nhi hoga
+                ), //. mobile font increes pr increse nhi hoga //
                 child: AppConnectivityWrapper(
                   child: child ?? const SizedBox.shrink(),
                 ),
