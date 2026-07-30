@@ -1,3 +1,4 @@
+import 'package:constructo_worker/utils/buttons/back_button_custom.dart';
 import 'package:constructo_worker/utils/buttons/icon_button_custom.dart';
 import 'package:constructo_worker/utils/theme/app_colors.dart';
 import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
@@ -20,13 +21,8 @@ PreferredSizeWidget appBarCustom({
     leading: Padding(
       padding: EdgeInsets.only(left: 10.rw),
       child: Center(
-        child: IconButtonCustom(
-          onPressed: onBack ?? () => Get.back<void>(),
-
-          buttonSize: 35.rh,
-          size: 18.rsp,
-          iconData: Icons.arrow_back_ios_new_rounded,
-          color: AppColors.black,
+        child: BackButtonCustom(
+          onTap: onBack,
         ),
       ),
     ),

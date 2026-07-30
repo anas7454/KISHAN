@@ -18,6 +18,8 @@ class LoginOtpScreen extends StatelessWidget with LoginOtpWidgets {
   Widget build(BuildContext context) {
     return AuthScaffold(
       formKey: controller.formKey,
+      showBackButton: true,
+      onBack: () => Get.back(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

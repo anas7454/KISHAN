@@ -1,5 +1,4 @@
 import 'package:constructo_worker/screens/bottomnavbar/custom_bottomnavbar/custom_bottomnavbar.dart';
-import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb1_workers/bnb1_workers_screen.dart';
 import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb2_material/bnb2_material_screen.dart';
 import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_screen.dart';
 import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb4_my_order/bnb4_my_order_screen.dart';
@@ -10,25 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class BottomnavbarController extends GetxController {
-  static const int homeIndex = 2;
+  static const int homeIndex = 0;
   final selectedIndex = homeIndex.obs;
   final DoubleBackToExit _doubleBackToExit = DoubleBackToExit();
 
-  static final List<BottomNavItemData> items = <BottomNavItemData>[
-    (
-      label: 'Workers',
-      icon: IconUtility.bottomNavWorkers,
-      selectedIcon: IconUtility.bottomNavWorkersSelected,
-      fallback: Icons.business_center_outlined,
-      child: Bnb1WorkersScreen(),
-    ),
-    (
-      label: 'Materials',
-      icon: IconUtility.bottomNavMaterials,
-      selectedIcon: IconUtility.bottomNavMaterialsSelected,
-      fallback: Icons.inventory_2_outlined,
-      child: Bnb2MaterialScreen(),
-    ),
+  static List<BottomNavItemData> get items => <BottomNavItemData>[
     (
       label: 'Home',
       icon: IconUtility.bottomNavHome,
@@ -37,11 +22,18 @@ class BottomnavbarController extends GetxController {
       child: Bnb3HomeScreen(),
     ),
     (
-      label: 'My Orders',
+      label: 'Requests',
+      icon: IconUtility.bottomNavMaterials,
+      selectedIcon: IconUtility.bottomNavMaterialsSelected,
+      fallback: Icons.add_box_outlined,
+      child: Bnb2MaterialScreen(mode: RequestsScreenMode.requests),
+    ),
+    (
+      label: 'My Work',
       icon: IconUtility.bottomNavOrders,
       selectedIcon: IconUtility.bottomNavOrdersSelected,
-      fallback: Icons.account_balance_wallet_outlined,
-      child: Bnb4MyOrderScreen(),
+      fallback: Icons.work_history_outlined,
+      child: Bnb2MaterialScreen(mode: RequestsScreenMode.myWork),
     ),
     (
       label: 'Profile',

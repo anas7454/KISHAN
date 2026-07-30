@@ -12,6 +12,13 @@ import 'package:constructo_worker/screens/home_location_search/home_location_sea
 import 'package:constructo_worker/networking/user/models/user_location_model.dart';
 import 'package:get/get.dart';
 
+import 'package:constructo_worker/screens/auth/worker_registration/worker_registration_screen.dart';
+
+import 'package:constructo_worker/screens/edit_profile/edit_profile_screen.dart';
+import 'package:constructo_worker/screens/info_content/info_content_data.dart';
+import 'package:constructo_worker/screens/info_content/info_content_screen.dart';
+import 'package:constructo_worker/screens/request_details/request_details_screen.dart';
+
 class AppRoutes {
   static Transition mytransition =
       Transition.noTransition; // ya Transition.none // Transition.fadeIn
@@ -67,6 +74,41 @@ class AppRoutes {
       transition: mytransition,
       transitionDuration: transitionDuration,
     ),
+    GetPage(
+      name: AppRouteName.workerRegistrationScreen,
+      page: () => WorkerRegistrationScreen(),
+      binding: WorkerRegistrationScreenBindings(),
+      participatesInRootNavigator: true,
+      transition: mytransition,
+      transitionDuration: transitionDuration,
+    ),
+    GetPage(
+      name: AppRouteName.editProfileScreen,
+      page: () => EditProfileScreen(),
+      participatesInRootNavigator: false,
+      transition: mytransition,
+      transitionDuration: transitionDuration,
+    ),
+    GetPage(
+      name: AppRouteName.infoContentScreen,
+      page: () {
+        final Map<String, dynamic> args =
+            Get.arguments as Map<String, dynamic>? ?? {};
+        return InfoContentScreen(
+          title: args['title'] as String? ?? '',
+          sections: (args['sections'] as List?)?.cast() ?? [],
+        );
+      },
+      transition: mytransition,
+      transitionDuration: transitionDuration,
+    ),
+    GetPage(
+      name: AppRouteName.requestDetailsScreen,
+      page: () => RequestDetailsScreen(),
+      participatesInRootNavigator: false,
+      transition: mytransition,
+      transitionDuration: transitionDuration,
+    ),
   ];
 
   static Future<void> onboardingScreen() async {
@@ -93,5 +135,54 @@ class AppRoutes {
       AppRouteName.homeLocationSearchScreen,
     );
     return result is UserLocationModel ? result : null;
+  }
+
+  static Future<void> workerRegistrationScreen() async {
+    return Get.toNamed(AppRouteName.workerRegistrationScreen);
+  }
+
+  static Future<void> editProfileScreen() async {
+    return Get.to<void>(
+      () => EditProfileScreen(),
+      transition: Transition.rightToLeft,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  static Future<void> aboutAppScreen() async {
+    return Get.to<void>(
+      () => InfoContentScreen(
+        title: 'About App',
+        sections: InfoContentData.aboutApp,
+      ),
+      transition: Transition.rightToLeft,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  static Future<void> termsAndConditionsScreen() async {
+    return Get.to<void>(
+      () => InfoContentScreen(
+        title: 'Terms & Conditions',
+        sections: InfoContentData.termsAndConditions,
+      ),
+      transition: Transition.rightToLeft,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  static Future<void> privacyPolicyScreen() async {
+    return Get.to<void>(
+      () => InfoContentScreen(
+        title: 'Privacy Policy',
+        sections: InfoContentData.privacyPolicy,
+      ),
+      transition: Transition.rightToLeft,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  static Future<void> requestDetailsScreen() async {
+    return Get.toNamed(AppRouteName.requestDetailsScreen);
   }
 }

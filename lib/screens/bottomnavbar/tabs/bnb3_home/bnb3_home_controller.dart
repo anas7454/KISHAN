@@ -36,6 +36,15 @@ class Bnb3HomeController extends GetxController {
     );
   }
 
+  final RxBool isUnderReview = false.obs; // Default to false to show Verified screen
+  final RxString workerName = "Ravi Kumar".obs;
+  final RxString workerRole = "Mason".obs;
+  final RxString workerExperience = "4 Years Experience".obs;
+
+  void toggleReviewState() {
+    isUnderReview.value = !isUnderReview.value;
+  }
+
   Future<void> refreshLocation() {
     return globalController.fetchUserLocation(refresh: true);
   }

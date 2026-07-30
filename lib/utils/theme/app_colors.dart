@@ -22,6 +22,7 @@ class AppColors {
   static const Color color1F1F1F = Color(0xff1F1F1F);
   static const Color color7D7D7D = Color(0xff7D7D7D);
   static const Color color5C5C5C = Color(0xff5C5C5C);
+  static const Color color4C4C4C = Color(0xff4C4C4C);
   static const Color color474747 = Color(0xff474747);
   static const Color color808080 = Color(0xff808080);
   static const Color colorBFBFBF = Color(0xffBFBFBF);
@@ -53,6 +54,8 @@ class AppColors {
   static const Color borderF0F0F0 = Color(0xffF0F0F0);
   static const Color borderECEDF1 = Color(0xffECEDF1);
   static const Color borderTextfiled = Color(0xffD7D7D7);
+  static const Color borderDBDBDB = Color(0xffDBDBDB);
+  static const Color colorFFBC07 = Color(0xffFFBC07);
   static const Color homeCardBorder = Color(0xffFFEF9E);
   static const Color colorEDEDED = Color(0xffEDEDED);
   static final Color border = borderE6E6E6;

@@ -16,14 +16,15 @@ class LoginController extends GetxController {
     isLoading.value = true;
     String phoneNumber = phoneController.text.trim();
     final Map<String, dynamic> rawData = {"mobile": phoneNumber};
-    final response = await AuthApiServices.sendOtpLogin(rawData);
+    // final response = await AuthApiServices.sendOtpLogin(rawData);
+    await Future.delayed(const Duration(seconds: 1));
     isLoading.value = false;
 
-    if (apiResponseSuccess(response)) {
-      AppRoutes.loginOtpScreen(phoneNumber, apiPeramMap(response["data"]));
-    } else {
-      showdialogApiError(respMap: response);
-    }
+    // if (apiResponseSuccess(response)) {
+      AppRoutes.loginOtpScreen(phoneNumber, {});
+    // } else {
+    //   showdialogApiError(respMap: response);
+    // }
   }
 
   @override

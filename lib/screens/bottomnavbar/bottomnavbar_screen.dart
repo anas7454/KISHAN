@@ -15,7 +15,7 @@ class BottomNavBarScreen extends StatelessWidget {
     final MediaQueryData mediaQuery = MediaQuery.of(context);
     final bool keyboardOpen = mediaQuery.viewInsets.bottom > 0;
     final double bottomNavHeight =
-        CustomBottomNav.height.rh - barTop + mediaQuery.padding.bottom;
+        CustomBottomNav.height.rh + mediaQuery.padding.bottom;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {

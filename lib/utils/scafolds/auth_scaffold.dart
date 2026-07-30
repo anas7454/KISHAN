@@ -1,3 +1,4 @@
+import 'package:constructo_worker/utils/buttons/back_button_custom.dart';
 import 'package:constructo_worker/utils/common/focus_utils.dart';
 import 'package:constructo_worker/utils/images/image_utility/background_images_utility.dart';
 import 'package:constructo_worker/utils/images/image_utility/image_utility.dart';
@@ -5,12 +6,21 @@ import 'package:constructo_worker/utils/theme/app_colors.dart';
 import 'package:constructo_worker/utils/theme/sizes/app_sizes.dart';
 import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class AuthScaffold extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final Widget child;
+  final bool showBackButton;
+  final VoidCallback? onBack;
 
-  const AuthScaffold({super.key, required this.formKey, required this.child});
+  const AuthScaffold({
+    super.key,
+    required this.formKey,
+    required this.child,
+    this.showBackButton = false,
+    this.onBack,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,28 +42,38 @@ class AuthScaffold extends StatelessWidget {
             ),
           ),
           child: SafeArea(
-            // bottom: false,
-            child: SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: EdgeInsets.symmetric(horizontal: horzontalSpace),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: 59.rh),
-                    Center(
-                      child: Image.asset(
-                        ImageUtility.logoOnboarding,
-                        width: 158.rw,
-                        fit: BoxFit.contain,
-                      ),
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: EdgeInsets.symmetric(horizontal: horzontalSpace),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(height: 59.rh),
+                        Center(
+                          child: Image.asset(
+                            ImageUtility.logoOnboarding,
+                            width: 158.rw,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        SizedBox(height: 66.rh),
+                        child,
+                      ],
                     ),
-                    SizedBox(height: 66.rh),
-                    child,
-                  ],
+                  ),
                 ),
-              ),
+                if (showBackButton)
+                  Positioned(
+                    top: 10.rh,
+                    left: horzontalSpace,
+                    child: BackButtonCustom(onTap: onBack),
+                  ),
+              ],
             ),
           ),
         ),

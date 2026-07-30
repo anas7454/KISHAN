@@ -5,6 +5,7 @@ import 'package:constructo_worker/screens/auth/splash/splash_controller.dart';
 import 'package:constructo_worker/screens/auth/social_login/apple_login/apple_login_controller.dart';
 import 'package:constructo_worker/screens/auth/social_login/google_login/google_login_controller.dart';
 import 'package:constructo_worker/screens/auth/social_login/social_login_controller.dart';
+import 'package:constructo_worker/screens/auth/worker_registration/worker_registration_controller.dart';
 import 'package:get/get.dart';
 
 class SplashScreenBindings implements Bindings {
@@ -36,5 +37,12 @@ class LoginOtpScreenBindings implements Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => LoginOtpController());
+  }
+}
+
+class WorkerRegistrationScreenBindings implements Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut(() => WorkerRegistrationController());
   }
 }

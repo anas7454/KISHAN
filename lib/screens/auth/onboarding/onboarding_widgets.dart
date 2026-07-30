@@ -19,69 +19,63 @@ mixin OnboardingWidgets {
   // footer
   Widget footerWidget() {
     return Container(
-      height: 150.rh,
       padding: EdgeInsets.only(
-        bottom: bottomstatusBarHeight,
+        top: 16.rh,
+        bottom: bottomstatusBarHeight + 12.rh,
         left: horzontalSpace,
         right: horzontalSpace,
       ),
       decoration: BoxDecoration(
         color: AppColors.white,
         border: borderCustomcolorEDEDED(),
-        borderRadius: borderRadiusCardOnlyTop(radius: 20.rr),
+        borderRadius: borderRadiusCardOnlyTop(radius: 24.rr),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          sizedboxHeight(3),
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButtonCustom(
-                  onPressed: () {
-                    AppRoutes.loginScreen();
-                  },
-                  btnName: "Skip",
-                ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButtonCustom(
+                onPressed: () {
+                  AppRoutes.loginScreen();
+                },
+                btnName: "Skip",
+              ),
 
-                Button(
-                  name: "Next",
-                  width: 155.rw,
-                  fontWeight: FontWeight.w500,
-                  isSuffix: true,
-                  imageAsset: CommonIconsUtility.arrowForward,
-                  onPressed: () {},
-                ),
-              ],
-            ),
+              Button(
+                name: "Get Started",
+                width: 165.rw,
+                fontWeight: FontWeight.w600,
+                borderRadiusDouble: 24.rr,
+                isSuffix: true,
+                imageAsset: CommonIconsUtility.arrowForward,
+                onPressed: () {
+                  AppRoutes.loginScreen();
+                },
+              ),
+            ],
           ),
-
-          //
-          RichText(
+          sizedboxHeight(16),
+          Text(
+            "100% Verified & Trusted Platform",
             textAlign: TextAlign.center,
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: "Trusted by ",
-                  style: AppTextStyles.ts12w500color000000(),
-                ),
-                TextSpan(
-                  text: "10,000+ ",
-                  style: AppTextStyles.ts12w500color000000().copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
-                TextSpan(
-                  text: "Construction professionals",
-                  style: AppTextStyles.ts12w500color000000(),
-                ),
-              ],
+            style: AppTextStyles.ts14w600colorBlack().copyWith(
+              fontSize: 13.rsp,
+              fontWeight: FontWeight.w700,
             ),
           ),
-          sizedboxHeight(3),
+          sizedboxHeight(4),
+          Text(
+            "Your Safety, Identity, & Payments Are Fully Secure With Us.",
+            textAlign: TextAlign.center,
+            style: AppTextStyles.ts11w400color808080().copyWith(
+              fontSize: 11.rsp,
+              color: AppColors.color7D7D7D,
+            ),
+          ),
         ],
       ),
     );

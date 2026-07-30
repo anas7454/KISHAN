@@ -26,6 +26,7 @@ class OnboardingScreen extends StatelessWidget with OnboardingWidgets {
     return Scaffold(
       body: Container(
         width: getWidth(),
+        height: getHeight(),
         decoration: BoxDecoration(
           image: decorationImageCustom(BackgroundImagesUtility.onboardingBG),
         ),
@@ -43,7 +44,7 @@ class OnboardingScreen extends StatelessWidget with OnboardingWidgets {
                   child: Image.asset(ImageUtility.logoOnboarding),
                 ),
                 sizedboxHeight(10),
-                const Expanded(child: PageViewOnboardingWidget()),
+                Step1OnboardingWidget.mainContent(),
                 footerWidget(),
               ],
             ),

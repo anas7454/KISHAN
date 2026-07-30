@@ -1,8 +1,5 @@
 import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_controller.dart';
 import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_widgets.dart';
-import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/widgets/material_categories_widget.dart';
-import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/widgets/skilled_workers_widget.dart';
-import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/widgets/trending_materials_widget.dart';
 import 'package:constructo_worker/utils/theme/app_colors.dart';
 import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
 import 'package:flutter/material.dart';
@@ -16,38 +13,44 @@ class Bnb3HomeScreen extends StatelessWidget with Bnb3HomeWidgets {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.scafoldBg,
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: controller.refreshLocation,
         child: SingleChildScrollView(
+          controller: ScrollController(),
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
-              homeHeader(context, controller),
-
-              // strat from banner
-              Obx(
-                () => Container(
-                  width: getWidth(),
-
-                  padding: EdgeInsets.only(left: 12.rw),
-                  child: Column(
+              // Top Location Bar Header
+              workerHomeHeader(context, controller),
+              sizedboxHeight(14),
+              // Body Padding Container
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.rw),
+                child: Obx(() {
+                  final bool isUnderReview = controller.isUnderReview.value;
+                  return Column(
                     children: [
-                      sizedboxHeight(15),
-                      Container(
-                        margin: EdgeInsets.only(right: 12.rw),
-                        child: offerBanner(),
-                      ),
-                      SizedBox(height: 18.rh),
-                      TrendingMaterialsWidget.content(controller),
-                      sizedboxHeight(8),
-                      SkilledWorkersWidget.content(controller),
-
-                      sizedboxHeight(8),
-                      MaterialCategoriesWidget.content(controller),
+                      // 1. Worker Profile Header Card
+                      workerProfileCard(controller),
+                      if (isUnderReview) ...[
+                        sizedboxHeight(12),
+                        workerStatusActionCard(controller),
+                        sizedboxHeight(12),
+                        verificationStepsList(),
+                      ] else ...[
+                        sizedboxHeight(12),
+                        workerKeyStatsGrid(),
+                        sizedboxHeight(12),
+                        ongoingProjectCard(),
+                        sizedboxHeight(16),
+                        newRequestsSection(),
+                      ],
+                      sizedboxHeight(20),
                     ],
-                  ),
-                ),
+                  );
+                }),
               ),
             ],
           ),

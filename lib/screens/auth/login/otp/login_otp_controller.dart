@@ -44,22 +44,23 @@ class LoginOtpController extends GetxController {
       // "name": "",
       "code": apiSendTextController(otpController),
     };
-    final response = await AuthApiServices.verifyOtpLogin(
-      rawData,
-      apiPeramString(otpData["tokenId"]),
-    );
+    // final response = await AuthApiServices.verifyOtpLogin(
+    //   rawData,
+    //   apiPeramString(otpData["tokenId"]),
+    // );
+    await Future.delayed(const Duration(seconds: 1));
     isLoading.value = false;
 
-    if (apiResponseSuccess(response)) {
-      await Get.find<UserController>().setLoginData(
-        apiPeramMap(response['data']),
-      );
+    // if (apiResponseSuccess(response)) {
+    //   await Get.find<UserController>().setLoginData(
+    //     apiPeramMap(response['data']),
+    //   );
       await showOtpVerifiedDialog();
-      AppRoutes.bottomNavBarScreen();
+      AppRoutes.workerRegistrationScreen();
       return;
-    }
+    // }
 
-    showdialogApiError(respMap: response);
+    // showdialogApiError(respMap: response);
   }
 
   Future<void> resendOtp() async {
@@ -67,16 +68,17 @@ class LoginOtpController extends GetxController {
 
     isResending.value = true;
     final Map<String, dynamic> rawData = {"mobile": phoneNumber.value};
-    final response = await AuthApiServices.sendOtpLogin(rawData);
+    // final response = await AuthApiServices.sendOtpLogin(rawData);
+    await Future.delayed(const Duration(seconds: 1));
     isResending.value = false;
 
-    if (apiResponseSuccess(response)) {
-      otpData.value = Map<String, dynamic>.from(apiPeramMap(response["data"]));
+    // if (apiResponseSuccess(response)) {
+    //   otpData.value = Map<String, dynamic>.from(apiPeramMap(response["data"]));
       showToastSuccess('OTP sent again');
       _startTimer();
-    } else {
-      showdialogApiError(respMap: response);
-    }
+    // } else {
+    //   showdialogApiError(respMap: response);
+    // }
   }
 
   void _startTimer() {
