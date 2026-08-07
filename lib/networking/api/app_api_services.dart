@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, prefer_const_constructors
 import 'package:constructo_worker/networking/core/dio_api.dart';
+import 'package:constructo_worker/networking/helper_methods/api_send_helper.dart';
 import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
 import 'package:constructo_worker/utils/common/debug_utils.dart';
 import 'package:constructo_worker/utils/common/focus_utils.dart';
@@ -29,7 +30,7 @@ class AppApiServices {
   static final UserController _authController = Get.find();
 
   // 🔹 API Base URL
-  static String apiBaseURL = DioAPI.apiBaseURL; // apna base URL daalo
+  static String apiBaseURL = DioAPI.baseURL; // apna base URL daalo
   // static String apiBaseURL2 = DioAPI.apiBaseURL2; // apna base URL daalo
 
   // 🔹 Dio instance
@@ -124,7 +125,9 @@ class AppApiServices {
       Map<String, dynamic> header = {
         // "authorization": _authController.userData.value.jwtToken, // carosa
         "Authorization": "Bearer ${_authController.userData.value.jwtToken}",
-        "Content-Type": "application/json",
+        "Content-Type": perms is FormData
+            ? "multipart/form-data"
+            : "application/json",
       }; //  "Content-Type": perms is FormData ? "multipart/form-data"  : "application/json",
       Options basicOptions = Options(
         headers: header,
@@ -139,40 +142,40 @@ class AppApiServices {
       if (apiType == EnumApiType.get) {
         response = await dio.get(
           path,
-          queryParameters: queryParameter,
-          data: perms,
+          queryParameters: cleanMap(queryParameter),
+          data: cleanMap(perms),
           options: basicOptions,
           cancelToken: cancelToken,
         );
       } else if (apiType == EnumApiType.post) {
         response = await dio.post(
           path,
-          queryParameters: queryParameter,
-          data: perms,
+          queryParameters: cleanMap(queryParameter),
+          data: cleanMap(perms),
           options: basicOptions,
           cancelToken: cancelToken,
         );
       } else if (apiType == EnumApiType.put) {
         response = await dio.put(
           path,
-          data: perms,
-          queryParameters: queryParameter,
+          data: cleanMap(perms),
+          queryParameters: cleanMap(queryParameter),
           options: basicOptions,
           cancelToken: cancelToken,
         );
       } else if (apiType == EnumApiType.patch) {
         response = await dio.patch(
           path,
-          data: perms,
-          queryParameters: queryParameter,
+          data: cleanMap(perms),
+          queryParameters: cleanMap(queryParameter),
           options: basicOptions,
           cancelToken: cancelToken,
         );
       } else if (apiType == EnumApiType.delete) {
         response = await dio.delete(
           path,
-          queryParameters: queryParameter,
-          data: perms,
+          queryParameters: cleanMap(queryParameter),
+          data: cleanMap(perms),
           options: basicOptions,
           cancelToken: cancelToken,
         );

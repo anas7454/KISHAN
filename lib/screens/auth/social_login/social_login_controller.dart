@@ -1,6 +1,6 @@
 import 'package:constructo_worker/networking/api/endpoints/auth_api_services.dart';
 import 'package:constructo_worker/networking/dialogs/api_error_show_dialogs.dart';
-import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
 import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
 import 'package:constructo_worker/routes/app_routes.dart';
 import 'package:constructo_worker/screens/auth/social_login/apple_login/apple_login_controller.dart';

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
 import 'package:constructo_worker/routes/app_routes.dart';
 import 'package:constructo_worker/utils/common/debug_utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';

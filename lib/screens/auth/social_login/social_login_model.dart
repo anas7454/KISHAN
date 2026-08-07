@@ -1,6 +1,6 @@
 // ignore_for_file: unnecessary_getters_setters
 
-import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
 
 class SocialLoginModel {
   String _idToken = "";

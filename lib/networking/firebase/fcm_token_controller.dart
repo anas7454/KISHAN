@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:constructo_worker/networking/api/endpoints/notification_api_services.dart';
-import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
+import 'package:constructo_worker/networking/helper_methods/api_send_helper.dart';
 import 'package:constructo_worker/networking/firebase/flutter_local_notification.dart';
 import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
 import 'package:constructo_worker/utils/common/debug_utils.dart';

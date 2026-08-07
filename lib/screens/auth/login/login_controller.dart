@@ -1,6 +1,6 @@
 import 'package:constructo_worker/networking/api/endpoints/auth_api_services.dart';
 import 'package:constructo_worker/networking/dialogs/api_error_show_dialogs.dart';
-import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
 import 'package:constructo_worker/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,16 +15,15 @@ class LoginController extends GetxController {
 
     isLoading.value = true;
     String phoneNumber = phoneController.text.trim();
-    final Map<String, dynamic> rawData = {"mobile": phoneNumber};
-    // final response = await AuthApiServices.sendOtpLogin(rawData);
-    await Future.delayed(const Duration(seconds: 1));
+    final Map<String, dynamic> rawData = {"identifier": phoneNumber};
+    final response = await AuthApiServices.sendOtpLogin(rawData);
     isLoading.value = false;
 
-    // if (apiResponseSuccess(response)) {
-      AppRoutes.loginOtpScreen(phoneNumber, {});
-    // } else {
-    //   showdialogApiError(respMap: response);
-    // }
+    if (apiResponseSuccess(response)) {
+      AppRoutes.loginOtpScreen(phoneNumber);
+    } else {
+      showdialogApiError(respMap: response);
+    }
   }
 
   @override

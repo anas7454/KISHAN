@@ -24,11 +24,13 @@ class DioAPI {
   // ------------------ SERVER URLS -----------------------
 
   static String baseURL = ServerUrls.getBaseUrl();
-  static String apiBaseURL = ServerUrls.getApiBaseUrl();
   static String imageBaseURL = baseURL;
+
+  static const String supportEmail = 'support@Fleetgo';
+
+  static const String supportPhone = '+918770330046';
 
   // ------------------ CONSTANT URLS --------------------------
 
   static String dateformate = "yyyy-MM-dd";
-  static String testingDealerEmail = kDebugMode ? "user@gmail.com" : "";
 }

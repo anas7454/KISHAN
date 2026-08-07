@@ -2,7 +2,7 @@ import 'package:constructo_worker/networking/api/app_api_services.dart';
 
 class AuthApiServices {
   static Future<Map> sendOtpLogin(Map<String, dynamic> rawData) async {
-    const path = "/auth/otp/send";
+    const path = "/api/auth/custom/send-otp";
     return AppApiServices.apiRequest(
       path,
       apiType: EnumApiType.post,
@@ -10,11 +10,17 @@ class AuthApiServices {
     );
   }
 
-  static Future<Map> verifyOtpLogin(
-    Map<String, dynamic> data,
-    String token,
-  ) async {
-    String path = "/auth/otp/verify/$token";
+  static Future<Map> verifyOtpLogin(Map<String, dynamic> data) async {
+    const path = "/api/auth/custom/verify-otp";
+    return AppApiServices.apiRequest(
+      path,
+      apiType: EnumApiType.post,
+      perms: data,
+    );
+  }
+
+  static Future<Map> resendOtpLogin(Map<String, dynamic> data) async {
+    const path = "/api/auth/custom/resend-otp";
     return AppApiServices.apiRequest(
       path,
       apiType: EnumApiType.post,

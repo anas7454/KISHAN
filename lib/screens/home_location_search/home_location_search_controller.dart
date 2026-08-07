@@ -1,5 +1,5 @@
 import 'package:constructo_worker/networking/api/endpoints/location_api_services.dart';
-import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
 import 'package:constructo_worker/networking/user/controllers/global_controller.dart';
 import 'package:constructo_worker/networking/user/models/user_location_model.dart';
 import 'package:constructo_worker/utils/buttons/dropdown_button/dropdown_model.dart';

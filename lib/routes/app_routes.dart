@@ -119,10 +119,10 @@ class AppRoutes {
     return Get.offAllNamed(AppRouteName.loginScreen);
   }
 
-  static Future<void> loginOtpScreen(String phoneNumber, Map data) async {
+  static Future<void> loginOtpScreen(String phoneNumber) async {
     return Get.toNamed(
       AppRouteName.loginOtpScreen,
-      arguments: {Arguments.phoneNumber: phoneNumber, Arguments.data: data},
+      arguments: {Arguments.phoneNumber: phoneNumber},
     );
   }
 

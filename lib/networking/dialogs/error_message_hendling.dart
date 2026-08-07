@@ -1,4 +1,4 @@
-import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
 
 String getRespMessageFromApi(
   dynamic resp, {

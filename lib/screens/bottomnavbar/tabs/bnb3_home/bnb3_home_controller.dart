@@ -1,4 +1,4 @@
-import 'package:constructo_worker/networking/extensions/api_helper.dart';
+import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
 import 'package:constructo_worker/networking/user/controllers/global_controller.dart';
 import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_model.dart';
 import 'package:constructo_worker/static_dummy_data/static_dummy_data.dart';

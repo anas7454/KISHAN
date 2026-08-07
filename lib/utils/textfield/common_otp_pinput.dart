@@ -15,7 +15,7 @@ Widget optTextFieldPinput({
 }) {
   double pinHight = 55.h;
 
-  int pinLength = 4;
+  int pinLength = 6;
   final defaultPinTheme = PinTheme(
     width: 55.w,
     height: pinHight,
@@ -94,8 +94,7 @@ Widget optTextFieldPinput({
   );
 }
 
-
-          // optTextFieldPinput(
-          //   otpEnterString: controller.otpController,
-          //   errorhightAdded: false,
-          // ),
+// optTextFieldPinput(
+//   otpEnterString: controller.otpController,
+//   errorhightAdded: false,
+// ),
