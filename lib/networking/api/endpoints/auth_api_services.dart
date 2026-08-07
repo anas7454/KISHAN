@@ -2,7 +2,7 @@ import 'package:constructo_worker/networking/api/app_api_services.dart';
 
 class AuthApiServices {
   static Future<Map> sendOtpLogin(Map<String, dynamic> rawData) async {
-    const path = "/api/auth/custom/send-otp";
+    const path = "/api/auth/custom/send-otp?role=WORKER";
     return AppApiServices.apiRequest(
       path,
       apiType: EnumApiType.post,
