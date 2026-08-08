@@ -67,6 +67,22 @@ mixin Bnb2MaterialWidgets {
               ),
             ),
           ),
+          // Wallet / Passbook button
+          Container(
+            width: 36.rw,
+            height: 36.rh,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
+            ),
+            child: Icon(
+              Icons.account_balance_wallet_outlined,
+              color: AppColors.black,
+              size: 19.rsp,
+            ),
+          ),
+          sizedboxWidth(8),
           // Notification button
           Container(
             width: 36.rw,

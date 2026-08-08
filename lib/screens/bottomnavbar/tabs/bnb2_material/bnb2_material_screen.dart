@@ -36,31 +36,37 @@ class Bnb2MaterialScreen extends StatelessWidget with Bnb2MaterialWidgets {
     final title = mode == RequestsScreenMode.requests ? 'Requests' : 'My Work';
     return Scaffold(
       backgroundColor: AppColors.scafoldBg,
-      body: SingleChildScrollView(
-        controller: ScrollController(),
-        child: Column(
-          children: [
-            // Top Location Header
-            requestsHeader(context, ctrl, title: title),
-            sizedboxHeight(14),
-            // Body Container
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.rw),
+      body: Column(
+        children: [
+          // Fixed Top Location Header
+          requestsHeader(context, ctrl, title: title),
+          Expanded(
+            child: SingleChildScrollView(
+              controller: ScrollController(),
               child: Column(
                 children: [
-                  // My Work tab gets filter pills (Accepted / Rejected)
-                  if (mode == RequestsScreenMode.myWork) ...([
-                    filterTabsRow(ctrl, showAll: false),
-                    sizedboxHeight(14),
-                  ]),
-                  // Cards List
-                  requestsList(ctrl),
-                  sizedboxHeight(20),
+                  sizedboxHeight(14),
+                  // Body Container
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.rw),
+                    child: Column(
+                      children: [
+                        // My Work tab gets filter pills (Accepted / Rejected)
+                        if (mode == RequestsScreenMode.myWork) ...([
+                          filterTabsRow(ctrl, showAll: false),
+                          sizedboxHeight(14),
+                        ]),
+                        // Cards List
+                        requestsList(ctrl),
+                        sizedboxHeight(20),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

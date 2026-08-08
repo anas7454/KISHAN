@@ -71,7 +71,22 @@ mixin Bnb5MyProfileWidgets {
               ),
             ),
           ),
-          sizedboxWidth(8.rw),
+          // Wallet / Passbook button
+          Container(
+            width: 36.rw,
+            height: 36.rh,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
+            ),
+            child: Icon(
+              Icons.account_balance_wallet_outlined,
+              color: AppColors.black,
+              size: 19.rsp,
+            ),
+          ),
+          sizedboxWidth(8),
           // Notification button
           Container(
             width: 36.rw,
@@ -183,77 +198,80 @@ mixin Bnb5MyProfileWidgets {
       children: [
         // My Orders Card
         Expanded(
-          child: Container(
-            height: 58.24.rh,
-            padding: EdgeInsets.all(10.59.rw),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(12.71.rr),
-              border: Border.all(color: const Color(0x1A614B8B), width: 1.06.rsp),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0x0CF5BD4C),
-                  offset: Offset.zero,
-                  blurRadius: 4.24.rr,
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: 37.06.rw,
-                  height: 37.06.rw,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFAFDFF),
-                    borderRadius: BorderRadius.circular(5.rr),
-                    border: Border.all(color: const Color(0xFFE2EEF5), width: 1.rsp),
+          child: GestureDetector(
+            onTap: AppRoutes.workerVerificationStatusScreen,
+            child: Container(
+              height: 58.24.rh,
+              padding: EdgeInsets.all(10.59.rw),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(12.71.rr),
+                border: Border.all(color: const Color(0x1A614B8B), width: 1.06.rsp),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0x0CF5BD4C),
+                    offset: Offset.zero,
+                    blurRadius: 4.24.rr,
+                    spreadRadius: 0,
                   ),
-                  child: Icon(
-                    Icons.credit_card_rounded,
-                    color: const Color(0xffFFBC07),
-                    size: 20.rsp,
-                  ),
-                ),
-                sizedboxWidth(8.47.rw),
-                Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "My Orders",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.ts12w500color000000().copyWith(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12.rsp,
-                          ),
-                        ),
-                        Text(
-                          "145",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.ts16w600color000000().copyWith(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14.rsp,
-                          ),
-                        ),
-                      ],
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 37.06.rw,
+                    height: 37.06.rw,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFAFDFF),
+                      borderRadius: BorderRadius.circular(5.rr),
+                      border: Border.all(color: const Color(0xFFE2EEF5), width: 1.rsp),
+                    ),
+                    child: Icon(
+                      Icons.credit_card_rounded,
+                      color: const Color(0xffFFBC07),
+                      size: 20.rsp,
                     ),
                   ),
-                ),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  color: AppColors.black,
-                  size: 18.rsp,
-                ),
-              ],
+                  sizedboxWidth(8.47.rw),
+                  Expanded(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "My Orders",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.ts12w500color000000().copyWith(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12.rsp,
+                            ),
+                          ),
+                          Text(
+                            "145",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.ts16w600color000000().copyWith(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14.rsp,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: AppColors.black,
+                    size: 18.rsp,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

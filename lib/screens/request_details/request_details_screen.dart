@@ -15,37 +15,43 @@ class RequestDetailsScreen extends StatelessWidget with RequestDetailsWidgets {
     return Scaffold(
       backgroundColor: AppColors.scafoldBg,
       bottomNavigationBar: stickyBottomActionBar(controller),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Top Yellow Header
-            requestDetailsHeader(context),
-            sizedboxHeight(14),
-            // Body Padding Container
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.rw),
+      body: Column(
+        children: [
+          // Fixed Top Yellow Header
+          requestDetailsHeader(context),
+          Expanded(
+            child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Card 1: Request Header Card
-                  requestHeaderCard(controller),
-                  sizedboxHeight(12),
-                  // Card 2: Customer Info Card
-                  customerInfoCard(controller),
-                  sizedboxHeight(12),
-                  // Card 3: Work Details Card
-                  workDetailsCard(controller),
-                  sizedboxHeight(12),
-                  // Card 4: Order Summary Card
-                  orderSummaryCard(controller),
-                  sizedboxHeight(12),
-                  // Disclaimer Note Container
-                  disclaimerNoteContainer(),
-                  sizedboxHeight(24),
+                  sizedboxHeight(14),
+                  // Body Padding Container
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.rw),
+                    child: Column(
+                      children: [
+                        // Card 1: Request Header Card
+                        requestHeaderCard(controller),
+                        sizedboxHeight(12),
+                        // Card 2: Customer Info Card
+                        customerInfoCard(controller),
+                        sizedboxHeight(12),
+                        // Card 3: Work Details Card
+                        workDetailsCard(controller),
+                        sizedboxHeight(12),
+                        // Card 4: Order Summary Card
+                        orderSummaryCard(controller),
+                        sizedboxHeight(12),
+                        // Disclaimer Note Container
+                        disclaimerNoteContainer(),
+                        sizedboxHeight(24),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -18,6 +18,7 @@ import 'package:constructo_worker/screens/edit_profile/edit_profile_screen.dart'
 import 'package:constructo_worker/screens/info_content/info_content_data.dart';
 import 'package:constructo_worker/screens/info_content/info_content_screen.dart';
 import 'package:constructo_worker/screens/request_details/request_details_screen.dart';
+import 'package:constructo_worker/screens/worker_verification_status/worker_verification_status_screen.dart';
 
 class AppRoutes {
   static Transition mytransition =
@@ -109,6 +110,13 @@ class AppRoutes {
       transition: mytransition,
       transitionDuration: transitionDuration,
     ),
+    GetPage(
+      name: AppRouteName.workerVerificationStatusScreen,
+      page: () => WorkerVerificationStatusScreen(),
+      participatesInRootNavigator: false,
+      transition: mytransition,
+      transitionDuration: transitionDuration,
+    ),
   ];
 
   static Future<void> onboardingScreen() async {
@@ -139,6 +147,10 @@ class AppRoutes {
 
   static Future<void> workerRegistrationScreen() async {
     return Get.toNamed(AppRouteName.workerRegistrationScreen);
+  }
+
+  static Future<void> workerVerificationStatusScreen() async {
+    return Get.toNamed(AppRouteName.workerVerificationStatusScreen);
   }
 
   static Future<void> editProfileScreen() async {

@@ -11,4 +11,5 @@ abstract class AppRouteName {
   static const String editProfileScreen = '/EditProfileScreen';
   static const String infoContentScreen = '/InfoContentScreen';
   static const String requestDetailsScreen = '/RequestDetailsScreen';
+  static const String workerVerificationStatusScreen = '/WorkerVerificationStatusScreen';
 }

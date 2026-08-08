@@ -52,7 +52,7 @@ class LoginOtpController extends GetxController {
         apiPeramMap(response['data']),
       );
       await showOtpVerifiedDialog();
-      AppRoutes.bottomNavBarScreen();
+      AppRoutes.workerRegistrationScreen();
       return;
     }
 
