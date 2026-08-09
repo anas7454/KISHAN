@@ -1,5 +1,10 @@
 import 'dart:io';
 
+import 'package:constructo_worker/networking/api/endpoints/worker_kyc_api_services.dart';
+import 'package:constructo_worker/networking/dialogs/api_error_show_dialogs.dart';
+import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
+import 'package:constructo_worker/networking/helper_methods/multipart_image.dart';
+import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
 import 'package:constructo_worker/routes/app_routes.dart';
 import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_controller.dart';
 import 'package:constructo_worker/utils/theme/app_colors.dart';
@@ -13,6 +18,7 @@ import 'package:intl/intl.dart';
 
 class WorkerRegistrationController extends GetxController {
   final RxInt currentStep = 1.obs;
+  final RxBool isLoading = false.obs;
   final int totalSteps = 8;
   final ImagePicker _picker = ImagePicker();
 
@@ -1865,7 +1871,82 @@ class WorkerRegistrationController extends GetxController {
     return true;
   }
 
-  void nextStep() {
+  Future<bool> _sendCurrentStep() async {
+    final user = Get.find<UserController>().userData.value;
+    final Map response;
+
+    switch (currentStep.value) {
+      case 1:
+        final dob = DateFormat('dd/MM/yyyy').parse(dobController.text.trim());
+        response = await WorkerKycApiServices.personalInfo({
+          'fullName': fullNameController.text.trim(),
+          'dateOfBirth': DateFormat('yyyy-MM-dd').format(dob),
+          'gender': selectedGender.value,
+          'language': languageController.text.trim().split(' ').first,
+          'addressLine1': houseNoController.text.trim(),
+          'addressLine2': fullAddressController.text.trim(),
+          'state': stateController.text.trim(),
+          'city': cityController.text.trim(),
+          'pincode': pincodeController.text.trim(),
+          if (user.mobile.isNotEmpty) 'phone': user.mobile,
+          if (user.email.isNotEmpty) 'email': user.email,
+          'addressProof': await getMultipartFileFromXFile(XFile(addressProofPath.value)),
+        });
+      case 2:
+        response = await WorkerKycApiServices.bankInfo({
+          'bankAccountName': accountHolderNameController.text.trim(),
+          'bankAccountNumber': accountNumberController.text.trim(),
+          'bankIfscCode': ifscCodeController.text.trim(),
+          'bankPassbook': await getMultipartFileFromXFile(XFile(passbookProofPath.value)),
+        });
+      case 3:
+        response = await WorkerKycApiServices.identityDocuments({
+          'identityFront': await getMultipartFileFromXFile(XFile(idFrontPath.value)),
+          'identityBack': await getMultipartFileFromXFile(XFile(idBackPath.value)),
+          'panCard': await getMultipartFileFromXFile(XFile(panCardPath.value)),
+          'policeCertificate': await getMultipartFileFromXFile(XFile(policeCertPath.value)),
+        });
+      case 5:
+        response = await WorkerKycApiServices.liveSelfie({
+          'liveSelfie': await getMultipartFileFromXFile(XFile(liveSelfiePath.value)),
+        });
+      case 6:
+        response = await WorkerKycApiServices.skillsExperience({
+          'skillId': '68cffb64-7914-4569-9a0d-726f7578bcfd',
+          'experienceYears': experienceYearsController.text.trim(),
+          'previousCompany': previousCompanyController.text.trim(),
+          'dailyWageExpectation': dailyWageController.text.trim(),
+          'itiCertificate': await getMultipartFileFromXFile(XFile(itiCertPath.value)),
+          'nsdcCertificate': await getMultipartFileFromXFile(XFile(nsdcCertPath.value)),
+          'govtCertificate': await getMultipartFileFromXFile(XFile(govtCertPath.value)),
+          'otherCertificate': await getMultipartFileFromXFile(XFile(otherCertPath.value)),
+        });
+      case 7:
+        response = await WorkerKycApiServices.availability({
+          'availabilityMode': switch (workTypeController.text) {
+            'Part Time' => 'PART_TIME',
+            'Both (Flexible)' => 'FLEXIBLE',
+            _ => 'FULL_TIME',
+          },
+          'immediateJoining': immediateJoiningController.text == 'Yes (Immediate)',
+          'workingRadiusKm': int.tryParse(
+                workingRadiusController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+              ) ??
+              10,
+        });
+      case 8:
+        response = await WorkerKycApiServices.submit();
+      default:
+        return true;
+    }
+
+    if (apiResponseSuccess(response)) return true;
+    await showdialogApiError(respMap: response);
+    return false;
+  }
+
+  Future<void> nextStep() async {
+    if (isLoading.value) return;
     if (currentStep.value == 1) {
       if (!validateStep1PersonalInfo()) {
         return;
@@ -1883,6 +1964,11 @@ class WorkerRegistrationController extends GetxController {
         return;
       }
     }
+
+    isLoading.value = true;
+    final bool success = await _sendCurrentStep();
+    isLoading.value = false;
+    if (!success) return;
 
     if (returnToStep.value > 0) {
       currentStep.value = returnToStep.value;

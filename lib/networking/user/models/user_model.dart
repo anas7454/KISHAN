@@ -21,7 +21,7 @@ class UserModel {
     _userId = apiPeramIntId(user['id']); // for individual null
     _name = apiPeramString(user['name']);
     _email = apiPeramString(user['email']);
-    _mobile = apiPeramString(user['mobile']);
+    _mobile = apiPeramString(user['phone'], initialValue: apiPeramString(user['mobile']));
     _isVerified = apiPeramBool(user['isVerified']);
     _disabled = apiPeramBool(user['disabled']);
     // _role = apiPeramString(user['role']); // for individual null
