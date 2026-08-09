@@ -5,7 +5,18 @@ import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class WorkerRegistrationScreen extends StatelessWidget with WorkerRegistrationWidgets {
+class WorkerRegistrationScreen extends StatelessWidget
+    with
+        WorkerRegistrationWidgets,
+        Step1PersonalInfoWidgets,
+        Step2BankInfoWidgets,
+        Step3DocumentsUploadWidgets,
+        Step4LiveSelfieWidgets,
+        Step5LiveSelfieWidgets,
+        Step6SkillsExperienceWidgets,
+        Step7AvailabilityWidgets,
+        Step8ReviewWidgets,
+        Step9RegistrationCompleteWidgets {
   WorkerRegistrationScreen({super.key});
 
   final WorkerRegistrationController controller = Get.find();

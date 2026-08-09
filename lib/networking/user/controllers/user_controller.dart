@@ -64,7 +64,7 @@ class UserController extends GetxController {
 
     // AppRoutes.loginScreen(offAll: true);
 
-    AppRoutes.bottomNavBarScreen();
+    AppRoutes.loginScreen();
   }
 
   Future<void> _resetUserSessionData() async {
