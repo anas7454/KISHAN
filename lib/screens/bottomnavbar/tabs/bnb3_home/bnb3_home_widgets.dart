@@ -600,11 +600,12 @@ mixin Bnb3HomeWidgets {
     required Color statusBg,
     required Color statusColor,
     bool showDivider = true,
+    VoidCallback? onTap,
   }) {
     return Column(
       children: [
         InkWell(
-          onTap: () => AppRoutes.requestDetailsScreen(),
+          onTap: onTap ?? () => AppRoutes.requestDetailsScreen(),
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 12.rh),
             child: Row(
@@ -690,7 +691,7 @@ mixin Bnb3HomeWidgets {
   }
 
   // My Vendor Requested Section Widget
-  Widget myVendorRequestedSection() {
+  Widget myVendorRequestedSection(Bnb3HomeController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -702,30 +703,36 @@ mixin Bnb3HomeWidgets {
           ),
         ),
         sizedboxHeight(6),
-        vendorRequestItem(
-          name: "ABC Construction Pvt. Ltd.",
-          date: "30 May, 2026",
-          status: "New",
-          statusBg: const Color(0xffFFF7D0), // matches the light yellow in screenshot
-          statusColor: const Color(0xffE5A93B), // #FFCC00 adjusted color for contrast accessibility
-          showDivider: true,
-        ),
-        vendorRequestItem(
-          name: "XYZ Builder",
-          date: "30 May, 2026",
-          status: "Accepted",
-          statusBg: const Color(0xff35AF30).withValues(alpha: 0.20), // #35AF30 with 20% alpha (#35AF3033) Figma spec
-          statusColor: const Color(0xff35AF30), // #35AF30 text color Figma spec
-          showDivider: true,
-        ),
-        vendorRequestItem(
-          name: "Prime Infra Solution",
-          date: "30 May, 2026",
-          status: "Rejected",
-          statusBg: const Color(0xffFC0400).withValues(alpha: 0.20), // #FC0400 with 20% alpha Figma spec
-          statusColor: const Color(0xffFC0400), // #FC0400 text color Figma spec
-          showDivider: false,
-        ),
+        if (controller.isBookingsLoading.value &&
+            controller.pendingBookings.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: CircularProgressIndicator(color: AppColors.primary),
+          )
+        else if (controller.pendingBookings.isEmpty)
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.rh),
+            child: Text(
+              'No pending requests',
+              style: AppTextStyles.ts12w500color808080(),
+            ),
+          )
+        else
+          ...controller.pendingBookings.indexed.map((entry) {
+            final int index = entry.$1;
+            final booking = entry.$2;
+            return vendorRequestItem(
+              name: booking.customerName,
+              date: booking.requestedOn,
+              status: "New",
+              statusBg: const Color(0xffFFF7D0),
+              statusColor: const Color(0xffE5A93B),
+              showDivider: index != controller.pendingBookings.length - 1,
+              onTap: () => AppRoutes.requestDetailsScreen(
+                bookingId: booking.id,
+              ),
+            );
+          }),
       ],
     );
   }

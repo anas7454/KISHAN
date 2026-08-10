@@ -11,7 +11,11 @@ import 'package:get/get.dart';
 
 mixin Bnb2MaterialWidgets {
   // Top Location Header
-  Widget requestsHeader(BuildContext context, Bnb2MaterialController controller, {String title = 'Requests'}) {
+  Widget requestsHeader(
+    BuildContext context,
+    Bnb2MaterialController controller, {
+    String title = 'Requests',
+  }) {
     return Container(
       color: AppColors.yellowBg,
       padding: EdgeInsets.only(
@@ -38,16 +42,25 @@ mixin Bnb2MaterialWidgets {
                   ),
                   SizedBox(height: 2.rh),
                   Obx(() {
-                    final location = controller.globalController.userLocation.value;
-                    final loading = controller.globalController.isLocationLoading.value;
+                    final location =
+                        controller.globalController.userLocation.value;
+                    final loading =
+                        controller.globalController.isLocationLoading.value;
                     return Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        assetImageWidget(CommonIconsUtility.location, size: 10.rh),
+                        assetImageWidget(
+                          CommonIconsUtility.location,
+                          size: 10.rh,
+                        ),
                         SizedBox(width: 4.rw),
                         Flexible(
                           child: Text(
-                            loading ? 'Finding your location...' : (location.displayAddress.isNotEmpty ? location.displayAddress : 'Patna Bihar, 245768'),
+                            loading
+                                ? 'Finding your location...'
+                                : (location.displayAddress.isNotEmpty
+                                      ? location.displayAddress
+                                      : 'Patna Bihar, 245768'),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTextStyles.ts10w400color7D7D7D().copyWith(
@@ -104,29 +117,83 @@ mixin Bnb2MaterialWidgets {
   }
 
   // Filter Tabs Row
-  Widget filterTabsRow(Bnb2MaterialController controller, {bool showAll = true}) {
+  Widget filterTabsRow(
+    Bnb2MaterialController controller, {
+    bool showAll = true,
+  }) {
     return Obx(() {
       final currentFilter = controller.selectedFilter.value;
       if (showAll) {
         // Requests tab: All, New, Accepted, Rejected
         return Row(
           children: [
-            Expanded(child: _filterPill(controller, "All", RequestFilterTab.all, currentFilter == RequestFilterTab.all)),
+            Expanded(
+              child: _filterPill(
+                controller,
+                "All",
+                RequestFilterTab.all,
+                currentFilter == RequestFilterTab.all,
+              ),
+            ),
             sizedboxWidth(8),
-            Expanded(child: _filterPill(controller, "New", RequestFilterTab.newReq, currentFilter == RequestFilterTab.newReq)),
+            Expanded(
+              child: _filterPill(
+                controller,
+                "New",
+                RequestFilterTab.newReq,
+                currentFilter == RequestFilterTab.newReq,
+              ),
+            ),
             sizedboxWidth(8),
-            Expanded(child: _filterPill(controller, "Accepted", RequestFilterTab.accepted, currentFilter == RequestFilterTab.accepted)),
+            Expanded(
+              child: _filterPill(
+                controller,
+                "Accepted",
+                RequestFilterTab.accepted,
+                currentFilter == RequestFilterTab.accepted,
+              ),
+            ),
             sizedboxWidth(8),
-            Expanded(child: _filterPill(controller, "Rejected", RequestFilterTab.rejected, currentFilter == RequestFilterTab.rejected)),
+            Expanded(
+              child: _filterPill(
+                controller,
+                "Rejected",
+                RequestFilterTab.rejected,
+                currentFilter == RequestFilterTab.rejected,
+              ),
+            ),
           ],
         );
       } else {
-        // My Work tab: Accepted, Rejected only
+        // My Work tab: Accepted, Rejected and Pending history.
         return Row(
           children: [
-            Expanded(child: _filterPill(controller, "Accepted", RequestFilterTab.accepted, currentFilter == RequestFilterTab.accepted)),
+            Expanded(
+              child: _filterPill(
+                controller,
+                "Accepted",
+                RequestFilterTab.accepted,
+                currentFilter == RequestFilterTab.accepted,
+              ),
+            ),
             sizedboxWidth(8),
-            Expanded(child: _filterPill(controller, "Rejected", RequestFilterTab.rejected, currentFilter == RequestFilterTab.rejected)),
+            Expanded(
+              child: _filterPill(
+                controller,
+                "Rejected",
+                RequestFilterTab.rejected,
+                currentFilter == RequestFilterTab.rejected,
+              ),
+            ),
+            sizedboxWidth(8),
+            Expanded(
+              child: _filterPill(
+                controller,
+                "Pending",
+                RequestFilterTab.pending,
+                currentFilter == RequestFilterTab.pending,
+              ),
+            ),
           ],
         );
       }
@@ -155,7 +222,9 @@ mixin Bnb2MaterialWidgets {
           color: isSelected ? const Color(0xffFEFCFA) : AppColors.white,
           borderRadius: BorderRadius.circular(8.rr),
           border: Border.all(
-            color: isSelected ? const Color(0xffFFCC00) : const Color(0xffE6E6E6),
+            color: isSelected
+                ? const Color(0xffFFCC00)
+                : const Color(0xffE6E6E6),
             width: 1.rsp,
           ),
         ),
@@ -166,7 +235,9 @@ mixin Bnb2MaterialWidgets {
             style: AppTextStyles.ts12w500colorBlack().copyWith(
               fontSize: 11.5.rsp,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected ? const Color(0xffFFCC00) : const Color(0xff333333),
+              color: isSelected
+                  ? const Color(0xffFFCC00)
+                  : const Color(0xff333333),
             ),
           ),
         ),
@@ -177,13 +248,21 @@ mixin Bnb2MaterialWidgets {
   // Requests List
   Widget requestsList(Bnb2MaterialController controller) {
     return Obx(() {
+      if (controller.isMyWork && controller.isHistoryLoading.value) {
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 40.rh),
+          child: const Center(child: CircularProgressIndicator()),
+        );
+      }
       final requests = controller.filteredRequests;
       if (requests.isEmpty) {
         return Padding(
           padding: EdgeInsets.symmetric(vertical: 40.rh),
           child: Center(
             child: Text(
-              "No requests found",
+              controller.isMyWork
+                  ? "No work history found"
+                  : "No requests found",
               style: AppTextStyles.ts14w600colorBlack().copyWith(
                 color: AppColors.color7D7D7D,
               ),
@@ -201,7 +280,8 @@ mixin Bnb2MaterialWidgets {
             amount: item.amount,
             address: item.address,
             status: item.status,
-            onTap: () => AppRoutes.requestDetailsScreen(),
+            onTap: () =>
+                AppRoutes.requestDetailsScreen(bookingId: item.bookingId),
             onAccept: () {
               Get.snackbar("Request Accepted", "Accepted ${item.title}");
             },

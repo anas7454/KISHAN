@@ -10,22 +10,15 @@ enum RequestsScreenMode { requests, myWork }
 class Bnb2MaterialScreen extends StatelessWidget with Bnb2MaterialWidgets {
   final RequestsScreenMode mode;
 
-  Bnb2MaterialScreen({
-    super.key,
-    this.mode = RequestsScreenMode.requests,
-  });
+  Bnb2MaterialScreen({super.key, this.mode = RequestsScreenMode.requests});
 
   Bnb2MaterialController get controller {
     final tag = mode == RequestsScreenMode.requests ? 'requests' : 'myWork';
     if (!Get.isRegistered<Bnb2MaterialController>(tag: tag)) {
-      final c = Get.put(Bnb2MaterialController(), tag: tag);
-      // Set initial filter based on mode
-      if (mode == RequestsScreenMode.requests) {
-        c.changeFilter(RequestFilterTab.newReq);
-      } else {
-        c.changeFilter(RequestFilterTab.accepted);
-      }
-      return c;
+      return Get.put(
+        Bnb2MaterialController(isMyWork: mode == RequestsScreenMode.myWork),
+        tag: tag,
+      );
     }
     return Get.find<Bnb2MaterialController>(tag: tag);
   }
@@ -51,11 +44,12 @@ class Bnb2MaterialScreen extends StatelessWidget with Bnb2MaterialWidgets {
                     padding: EdgeInsets.symmetric(horizontal: 16.rw),
                     child: Column(
                       children: [
-                        // My Work tab gets filter pills (Accepted / Rejected)
-                        if (mode == RequestsScreenMode.myWork) ...([
-                          filterTabsRow(ctrl, showAll: false),
-                          sizedboxHeight(14),
-                        ]),
+                        // My Work tab gets history status filters.
+                        if (mode == RequestsScreenMode.myWork)
+                          ...([
+                            filterTabsRow(ctrl, showAll: false),
+                            sizedboxHeight(14),
+                          ]),
                         // Cards List
                         requestsList(ctrl),
                         sizedboxHeight(20),

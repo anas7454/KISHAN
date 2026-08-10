@@ -45,7 +45,7 @@ class Bnb4MyOrderScreen extends StatelessWidget with Bnb4MyOrderWidgets, Bnb3Hom
                       sizedboxHeight(12),
                       ongoingProjectCard(),
                       sizedboxHeight(16),
-                      myVendorRequestedSection(),
+                      myVendorRequestedSection(homeController),
                       sizedboxHeight(20),
                     ],
                   );
