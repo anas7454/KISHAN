@@ -95,7 +95,9 @@ class WorkerRegistrationScreen extends StatelessWidget
           appBar: stepHeader(
             title: _getStepTitle(step),
             currentStep: step,
-            onBack: controller.previousStep,
+            onBack: controller.isPreviewMode.value
+                ? () => Get.back<void>()
+                : controller.previousStep,
           ),
           body: SafeArea(
             child: Column(
@@ -104,16 +106,24 @@ class WorkerRegistrationScreen extends StatelessWidget
                   child: SingleChildScrollView(
                     padding: EdgeInsets.symmetric(horizontal: 16.rw, vertical: 16.rh),
                     physics: const ClampingScrollPhysics(),
-                    child: _buildStepBody(context, step),
+                    child: controller.isPreviewMode.value &&
+                            controller.isLoading.value
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          )
+                        : _buildStepBody(context, step),
                   ),
                 ),
-                stepBottomButtons(
-                  onContinue: controller.nextStep,
-                  onSaveDraft: controller.saveAsDraft,
-                  isContinueEnabled: isContinueEnabled,
-                  continueButtonText: _getContinueButtonText(step),
-                  showSaveDraft: step != 9,
-                ),
+                if (!controller.isPreviewMode.value)
+                  stepBottomButtons(
+                    onContinue: controller.nextStep,
+                    onSaveDraft: controller.saveAsDraft,
+                    isContinueEnabled: isContinueEnabled,
+                    continueButtonText: _getContinueButtonText(step),
+                    showSaveDraft: step != 9,
+                  ),
               ],
             ),
           ),

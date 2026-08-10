@@ -35,7 +35,7 @@ class WorkerVerificationStatusScreen extends StatelessWidget with WorkerVerifica
                           workerProfileCard(controller),
                           sizedboxHeight(12),
                           // 2. Verification Steps List
-                          verificationStepsList(),
+                          Obx(() => verificationStepsList(controller)),
                           sizedboxHeight(20),
                         ],
                       ),

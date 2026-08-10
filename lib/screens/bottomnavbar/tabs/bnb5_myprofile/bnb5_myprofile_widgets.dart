@@ -206,7 +206,10 @@ mixin Bnb5MyProfileWidgets {
               decoration: BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(12.71.rr),
-                border: Border.all(color: const Color(0x1A614B8B), width: 1.06.rsp),
+                border: Border.all(
+                  color: const Color(0x1A614B8B),
+                  width: 1.06.rsp,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0x0CF5BD4C),
@@ -225,7 +228,10 @@ mixin Bnb5MyProfileWidgets {
                     decoration: BoxDecoration(
                       color: const Color(0xFFFAFDFF),
                       borderRadius: BorderRadius.circular(5.rr),
-                      border: Border.all(color: const Color(0xFFE2EEF5), width: 1.rsp),
+                      border: Border.all(
+                        color: const Color(0xFFE2EEF5),
+                        width: 1.rsp,
+                      ),
                     ),
                     child: Icon(
                       Icons.credit_card_rounded,
@@ -284,7 +290,10 @@ mixin Bnb5MyProfileWidgets {
             decoration: BoxDecoration(
               color: AppColors.white,
               borderRadius: BorderRadius.circular(12.71.rr),
-              border: Border.all(color: const Color(0x1A614B8B), width: 1.06.rsp),
+              border: Border.all(
+                color: const Color(0x1A614B8B),
+                width: 1.06.rsp,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: const Color(0x0CF5BD4C),
@@ -303,7 +312,10 @@ mixin Bnb5MyProfileWidgets {
                   decoration: BoxDecoration(
                     color: const Color(0xFFFAFDFF),
                     borderRadius: BorderRadius.circular(5.rr),
-                    border: Border.all(color: const Color(0xFFE2EEF5), width: 1.rsp),
+                    border: Border.all(
+                      color: const Color(0xFFE2EEF5),
+                      width: 1.rsp,
+                    ),
                   ),
                   child: Icon(
                     Icons.hexagon_outlined,
@@ -376,6 +388,13 @@ mixin Bnb5MyProfileWidgets {
           onTap: () {
             AppRoutes.editProfileScreen();
           },
+        ),
+        sizedboxHeight(10),
+        profileOptionTile(
+          icon: Icons.folder_copy_outlined,
+          title: "My Documents",
+          subtitle: "View your KYC details & documents",
+          onTap: AppRoutes.workerVerificationStatusScreen,
         ),
       ],
     );
@@ -467,14 +486,13 @@ mixin Bnb5MyProfileWidgets {
               decoration: BoxDecoration(
                 color: const Color(0xFFFAFDFF),
                 borderRadius: BorderRadius.circular(8.rr),
-                border: Border.all(color: const Color(0xFFE2EEF5), width: 1.rsp),
+                border: Border.all(
+                  color: const Color(0xFFE2EEF5),
+                  width: 1.rsp,
+                ),
               ),
               alignment: Alignment.center,
-              child: Icon(
-                icon,
-                color: const Color(0xffFFBC07),
-                size: 20.rsp,
-              ),
+              child: Icon(icon, color: const Color(0xffFFBC07), size: 20.rsp),
             ),
             sizedboxWidth(10.rw),
             Expanded(

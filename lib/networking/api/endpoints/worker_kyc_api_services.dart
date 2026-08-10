@@ -39,4 +39,35 @@ class WorkerKycApiServices {
       apiType: EnumApiType.post,
     );
   }
+
+  static Future<Map> getPersonalInfo() {
+    return AppApiServices.apiRequest('/api/workers/kyc/personal-info');
+  }
+
+  static Future<Map> getBankInfo() {
+    return AppApiServices.apiRequest('/api/workers/kyc/bank-info');
+  }
+
+  static Future<Map> getIdentityDocuments() {
+    return AppApiServices.apiRequest('/api/workers/kyc/identity-documents');
+  }
+
+  static Future<Map> getLiveSelfie() {
+    return AppApiServices.apiRequest('/api/workers/kyc/live-selfie');
+  }
+
+  static Future<Map> getSkillsExperience() {
+    return AppApiServices.apiRequest('/api/workers/kyc/skills-experience');
+  }
+
+  static Future<Map> getAvailability() {
+    return AppApiServices.apiRequest('/api/workers/kyc/availability');
+  }
+
+  static Future<Map> getSectionStatus(String section) {
+    return AppApiServices.apiRequest(
+      '/api/workers/kyc/status',
+      queryParameter: <String, dynamic>{'section': section},
+    );
+  }
 }

@@ -149,6 +149,16 @@ class AppRoutes {
     return Get.toNamed(AppRouteName.workerRegistrationScreen);
   }
 
+  static Future<void> workerRegistrationPreviewScreen(int step) async {
+    return Get.toNamed(
+      AppRouteName.workerRegistrationScreen,
+      arguments: <String, dynamic>{
+        'previewMode': true,
+        'previewStep': step,
+      },
+    );
+  }
+
   static Future<void> workerVerificationStatusScreen() async {
     return Get.toNamed(AppRouteName.workerVerificationStatusScreen);
   }
@@ -194,7 +204,10 @@ class AppRoutes {
     );
   }
 
-  static Future<void> requestDetailsScreen() async {
-    return Get.toNamed(AppRouteName.requestDetailsScreen);
+  static Future<void> requestDetailsScreen({String bookingId = ''}) async {
+    return Get.toNamed(
+      AppRouteName.requestDetailsScreen,
+      arguments: <String, dynamic>{Arguments.id: bookingId},
+    );
   }
 }

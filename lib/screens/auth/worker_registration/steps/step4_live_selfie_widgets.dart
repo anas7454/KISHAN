@@ -38,12 +38,18 @@ mixin Step4LiveSelfieWidgets on WorkerRegistrationWidgets {
                             child: Padding(
                               padding: EdgeInsets.all(8.rw),
                               child: ClipOval(
-                                child: path.isNotEmpty && File(path).existsSync()
-                                    ? Image.file(
-                                        File(path),
+                                child: path.startsWith('http://') ||
+                                        path.startsWith('https://')
+                                    ? Image.network(
+                                        path,
                                         fit: BoxFit.cover,
                                       )
-                                    : Image.network(
+                                    : path.isNotEmpty && File(path).existsSync()
+                                        ? Image.file(
+                                            File(path),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.network(
                                         'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400',
                                         fit: BoxFit.cover,
                                         errorBuilder: (context, error, stackTrace) => Container(

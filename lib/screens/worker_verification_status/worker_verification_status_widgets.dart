@@ -1,10 +1,12 @@
 import 'package:constructo_worker/routes/app_routes.dart';
 import 'package:constructo_worker/screens/worker_verification_status/worker_verification_status_controller.dart';
 import 'package:constructo_worker/utils/images/cache_network/asset_icon_widget.dart';
+import 'package:constructo_worker/utils/images/cache_network/cachenetwork_image.dart';
 import 'package:constructo_worker/utils/images/image_utility/common_icons_utility.dart';
 import 'package:constructo_worker/utils/theme/app_colors.dart';
 import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
 import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
+import 'package:constructo_worker/utils/url_launchar_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -240,23 +242,81 @@ mixin WorkerVerificationStatusWidgets {
   }
 
   // Verification Steps List
-  Widget verificationStepsList() {
+  Widget verificationStepsList(
+    WorkerVerificationStatusController controller,
+  ) {
     return Column(
       children: [
-        verificationStepTile("Personal Info", isVerified: true),
-        verificationStepTile("Bank Info", isVerified: false, showEdit: true),
-        verificationStepTile("Document's Uploaded", isVerified: false, showEdit: true),
-        verificationStepTile("Document's Uploaded", isVerified: false, showEdit: true),
-        verificationStepTile("Selfie Verification", isVerified: true),
-        verificationStepTile("Skills & Experience / Certificate Info", isVerified: true),
-        verificationStepTile("Availability", isVerified: true),
+        verificationStepTile(
+          "Personal Info",
+          status: controller.sectionStatus(0),
+          onTap: () => AppRoutes.workerRegistrationPreviewScreen(1),
+        ),
+        verificationStepTile(
+          "Bank Info",
+          status: controller.sectionStatus(1),
+          onTap: () => AppRoutes.workerRegistrationPreviewScreen(2),
+        ),
+        verificationStepTile(
+          "Document's Uploaded",
+          status: controller.sectionStatus(2),
+          onTap: () => AppRoutes.workerRegistrationPreviewScreen(3),
+        ),
+        verificationStepTile(
+          "Document's Uploaded",
+          status: controller.sectionStatus(2),
+          onTap: () => AppRoutes.workerRegistrationPreviewScreen(3),
+        ),
+        verificationStepTile(
+          "Selfie Verification",
+          status: controller.sectionStatus(3),
+          onTap: () => AppRoutes.workerRegistrationPreviewScreen(5),
+        ),
+        verificationStepTile(
+          "Skills & Experience / Certificate Info",
+          status: controller.sectionStatus(4),
+          onTap: () => AppRoutes.workerRegistrationPreviewScreen(6),
+        ),
+        verificationStepTile(
+          "Availability",
+          status: controller.sectionStatus(5),
+          onTap: () => AppRoutes.workerRegistrationPreviewScreen(7),
+        ),
       ],
     );
   }
 
   // Individual Verification Step Tile
-  Widget verificationStepTile(String title, {required bool isVerified, bool showEdit = false}) {
-    return Container(
+  Widget verificationStepTile(
+    String title, {
+    required String status,
+    VoidCallback? onTap,
+  }) {
+    final String normalizedStatus = status.toUpperCase();
+    final bool isVerified = normalizedStatus == 'APPROVED' ||
+        normalizedStatus == 'VERIFIED' ||
+        normalizedStatus == 'COMPLETED';
+    final bool isRejected = normalizedStatus == 'REJECTED';
+    final String statusText = switch (normalizedStatus) {
+      'APPROVED' || 'VERIFIED' || 'COMPLETED' => 'Verified',
+      'REJECTED' => 'Rejected',
+      'UNDER_REVIEW' => 'Under Review',
+      'NOT_AVAILABLE' => 'Not Available',
+      _ => 'Pending',
+    };
+    final Color statusColor = isVerified
+        ? const Color(0xff35AF30)
+        : isRejected
+            ? const Color(0xffD32F2F)
+            : const Color(0xff7D7D7D);
+    final Color statusBackground = isVerified
+        ? const Color(0xffE6F5E9)
+        : isRejected
+            ? const Color(0xffFFEBEE)
+            : const Color(0xffF4F4F4);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       margin: EdgeInsets.only(bottom: 10.rh),
       padding: EdgeInsets.symmetric(horizontal: 16.rw, vertical: 14.rh),
       decoration: BoxDecoration(
@@ -264,7 +324,7 @@ mixin WorkerVerificationStatusWidgets {
         borderRadius: BorderRadius.circular(8.rr),
         border: Border.all(color: AppColors.borderDBDBDB, width: 1.rsp),
       ),
-      child: Row(
+        child: Row(
         children: [
           Expanded(
             child: Text(
@@ -275,7 +335,7 @@ mixin WorkerVerificationStatusWidgets {
               ),
             ),
           ),
-          if (showEdit) ...[
+          if (isRejected) ...[
             Icon(
               Icons.mode_edit_outline_outlined,
               color: const Color(0xffD32F2F),
@@ -287,20 +347,211 @@ mixin WorkerVerificationStatusWidgets {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.rw, vertical: 4.rh),
             decoration: BoxDecoration(
-              color: isVerified ? const Color(0xffE6F5E9) : const Color(0xffFFEBEE),
+              color: statusBackground,
               borderRadius: BorderRadius.circular(4.rr),
             ),
             child: Text(
-              isVerified ? "Verified" : "Rejected",
+              statusText,
               style: AppTextStyles.ts10w500colorBlack().copyWith(
                 fontSize: 10.rsp,
                 fontWeight: FontWeight.w600,
-                color: isVerified ? const Color(0xff35AF30) : const Color(0xffD32F2F),
+                color: statusColor,
               ),
             ),
           ),
+          sizedboxWidth(8),
+          Icon(
+            Icons.visibility_outlined,
+            color: const Color(0xffFFBC07),
+            size: 19.rsp,
+          ),
+        ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> openKycSectionPreview(
+    WorkerVerificationStatusController controller,
+    int sectionIndex,
+    String title,
+  ) async {
+    await controller.ensureSectionDataLoaded();
+    final Map<String, dynamic> data = controller.sectionData(sectionIndex);
+    final List<MapEntry<String, dynamic>> details = <MapEntry<String, dynamic>>[];
+    _flattenDetails(data, details);
+
+    Get.bottomSheet<void>(
+      Container(
+        constraints: BoxConstraints(maxHeight: Get.height * 0.86),
+        padding: EdgeInsets.fromLTRB(16.rw, 12.rh, 16.rw, 20.rh),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22.rr)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 38.rw,
+              height: 4.rh,
+              decoration: BoxDecoration(
+                color: AppColors.borderDBDBDB,
+                borderRadius: BorderRadius.circular(4.rr),
+              ),
+            ),
+            sizedboxHeight(12),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '$title Preview',
+                    style: AppTextStyles.ts18w700color000000(),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Get.back<void>(),
+                  icon: const Icon(Icons.close_rounded),
+                ),
+              ],
+            ),
+            _previewStatusRow(
+              controller.sectionStatus(sectionIndex),
+              controller.sectionRemark(sectionIndex),
+            ),
+            Divider(color: AppColors.borderDBDBDB),
+            Flexible(
+              child: details.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No details available',
+                        style: AppTextStyles.ts14w600colorBlack(),
+                      ),
+                    )
+                  : ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: details.length,
+                      separatorBuilder: (_, __) =>
+                          Divider(color: AppColors.borderE6E6E6),
+                      itemBuilder: (_, int index) =>
+                          _previewDetail(details[index]),
+                    ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  Widget _previewStatusRow(String status, String remark) {
+    final String label = status == 'UNDER_REVIEW'
+        ? 'Under Review'
+        : _fieldLabel(status.toLowerCase());
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(10.rw),
+      decoration: BoxDecoration(
+        color: AppColors.yellowBg,
+        borderRadius: BorderRadius.circular(8.rr),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Status: $label',
+            style: AppTextStyles.ts12w500color000000().copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (remark.isNotEmpty) ...[
+            sizedboxHeight(4),
+            Text('Remark: $remark', style: AppTextStyles.ts12w500color808080()),
+          ],
         ],
       ),
     );
+  }
+
+  Widget _previewDetail(MapEntry<String, dynamic> detail) {
+    final String value = detail.value?.toString().trim() ?? '';
+    final bool isUrl = value.startsWith('http://') || value.startsWith('https://');
+    final String cleanUrl = value.split('?').first.toLowerCase();
+    final bool isImage = isUrl &&
+        <String>['.jpg', '.jpeg', '.png', '.webp'].any(cleanUrl.endsWith);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.rh),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(_fieldLabel(detail.key), style: AppTextStyles.ts12w500color808080()),
+          sizedboxHeight(5),
+          if (isImage)
+            clipRRectCustom(
+              value,
+              width: double.infinity,
+              height: 180.rh,
+              borderR: 8.rr,
+              boxfit: BoxFit.cover,
+              ontap: true,
+            )
+          else if (isUrl)
+            InkWell(
+              onTap: () => UrlLaunchMethods.launchStringINAppOrBrowser(value),
+              child: Text(
+                'Preview Document',
+                style: AppTextStyles.ts12w500color000000().copyWith(
+                  color: const Color(0xffFFBC07),
+                  fontWeight: FontWeight.w700,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            )
+          else
+            Text(value, style: AppTextStyles.ts14w600colorBlack()),
+        ],
+      ),
+    );
+  }
+
+  void _flattenDetails(
+    dynamic value,
+    List<MapEntry<String, dynamic>> details, {
+    String parentKey = '',
+  }) {
+    if (value is Map) {
+      value.forEach((dynamic key, dynamic nestedValue) {
+        final String nestedKey = parentKey.isEmpty
+            ? key.toString()
+            : '$parentKey ${key.toString()}';
+        _flattenDetails(nestedValue, details, parentKey: nestedKey);
+      });
+      return;
+    }
+    if (value is List) {
+      for (int index = 0; index < value.length; index++) {
+        _flattenDetails(
+          value[index],
+          details,
+          parentKey: '$parentKey ${index + 1}',
+        );
+      }
+      return;
+    }
+    if (value == null || value.toString().trim().isEmpty) return;
+    details.add(MapEntry<String, dynamic>(parentKey, value));
+  }
+
+  String _fieldLabel(String key) {
+    final String label = key
+        .replaceAllMapped(
+          RegExp(r'([a-z0-9])([A-Z])'),
+          (match) => '${match.group(1)} ${match.group(2)}',
+        )
+        .replaceAll('_', ' ');
+    return label.isEmpty
+        ? 'Detail'
+        : '${label[0].toUpperCase()}${label.substring(1)}';
   }
 }

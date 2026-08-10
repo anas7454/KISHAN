@@ -796,7 +796,7 @@ mixin Bnb3HomeWidgets {
   }
 
   // New Requests Section
-  Widget newRequestsSection() {
+  Widget newRequestsSection(Bnb3HomeController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -808,36 +808,28 @@ mixin Bnb3HomeWidgets {
           ),
         ),
         sizedboxHeight(12),
-        workerRequestCard(
-          title: "Painting Work",
-          requestId: "WRK-54544-5485",
-          date: "24 may 2026 10:15 AM",
-          amount: "₹54,874",
-          address: "Near Union Bank Boring Road Patna Bihar 208547",
-          status: WorkerRequestStatus.newRequest,
-          onAccept: () {
-            Get.snackbar("Request Accepted", "You accepted Painting Work request");
-          },
-          onReject: () {
-            Get.snackbar("Request Rejected", "You rejected Painting Work request");
-          },
-          onViewMap: () {},
-        ),
-        workerRequestCard(
-          title: "Painting Work",
-          requestId: "WRK-54544-5485",
-          date: "24 may 2026 10:15 AM",
-          amount: "₹54,874",
-          address: "Near Union Bank Boring Road Patna Bihar 208547",
-          status: WorkerRequestStatus.newRequest,
-          onAccept: () {
-            Get.snackbar("Request Accepted", "You accepted Painting Work request");
-          },
-          onReject: () {
-            Get.snackbar("Request Rejected", "You rejected Painting Work request");
-          },
-          onViewMap: () {},
-        ),
+        if (controller.isBookingsLoading.value &&
+            controller.pendingBookings.isEmpty)
+          const Center(child: CircularProgressIndicator(color: AppColors.primary))
+        else if (controller.pendingBookings.isEmpty)
+          Text('No pending requests', style: AppTextStyles.ts12w500color808080())
+        else
+          ...controller.pendingBookings.map(
+            (booking) => workerRequestCard(
+              title: booking.title,
+              requestId: booking.requestId,
+              date: booking.requestedOn,
+              amount: booking.amount.startsWith('₹')
+                  ? booking.amount
+                  : '₹${booking.amount}',
+              address: booking.address,
+              status: WorkerRequestStatus.newRequest,
+              onTap: () => AppRoutes.requestDetailsScreen(bookingId: booking.id),
+              onAccept: () => controller.acceptBooking(booking),
+              onReject: () {},
+              onViewMap: () {},
+            ),
+          ),
       ],
     );
   }

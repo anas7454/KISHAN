@@ -48,7 +48,7 @@ class Bnb3HomeScreen extends StatelessWidget with Bnb3HomeWidgets {
                               sizedboxHeight(12),
                               ongoingProjectCard(),
                               sizedboxHeight(16),
-                              newRequestsSection(),
+                              newRequestsSection(controller),
                             ],
                             sizedboxHeight(20),
                           ],

@@ -6,6 +6,7 @@ import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart'
 import 'package:constructo_worker/networking/helper_methods/multipart_image.dart';
 import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
 import 'package:constructo_worker/routes/app_routes.dart';
+import 'package:constructo_worker/routes/route_arguments.dart';
 import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_controller.dart';
 import 'package:constructo_worker/utils/theme/app_colors.dart';
 import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
@@ -21,6 +22,105 @@ class WorkerRegistrationController extends GetxController {
   final RxBool isLoading = false.obs;
   final int totalSteps = 8;
   final ImagePicker _picker = ImagePicker();
+  final RxBool isPreviewMode = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    isPreviewMode.value = RouteArguments.getOrDefault<bool>(
+      'previewMode',
+      false,
+    );
+    if (isPreviewMode.value) {
+      currentStep.value = RouteArguments.getOrDefault<int>(
+        'previewStep',
+        1,
+      );
+      loadPreviewData();
+    }
+  }
+
+  Future<void> loadPreviewData() async {
+    isLoading.value = true;
+    final Map response = switch (currentStep.value) {
+      1 => await WorkerKycApiServices.getPersonalInfo(),
+      2 => await WorkerKycApiServices.getBankInfo(),
+      3 => await WorkerKycApiServices.getIdentityDocuments(),
+      4 || 5 => await WorkerKycApiServices.getLiveSelfie(),
+      6 => await WorkerKycApiServices.getSkillsExperience(),
+      7 => await WorkerKycApiServices.getAvailability(),
+      _ => <String, dynamic>{},
+    };
+    isLoading.value = false;
+    if (!apiResponseSuccess(response)) {
+      await showdialogApiError(respMap: response);
+      return;
+    }
+    _fillPreviewFields(apiPeramMap(response['data']));
+  }
+
+  void _fillPreviewFields(Map data) {
+    switch (currentStep.value) {
+      case 1:
+        fullNameController.text = apiPeramString(data['fullName']);
+        final DateTime? dob = DateTime.tryParse(apiPeramString(data['dateOfBirth']));
+        dobController.text = dob == null
+            ? apiPeramString(data['dateOfBirth'])
+            : DateFormat('dd/MM/yyyy').format(dob);
+        selectedGender.value = apiPeramString(data['gender']);
+        selectedLanguage.value = apiPeramString(data['language']);
+        languageController.text = apiPeramString(data['language']);
+        houseNoController.text = apiPeramString(data['addressLine1']);
+        fullAddressController.text = apiPeramString(data['addressLine2']);
+        stateController.text = apiPeramString(data['state']);
+        cityController.text = apiPeramString(data['city']);
+        pincodeController.text = apiPeramString(data['pincode']);
+        addressProofPath.value = apiPeramString(data['addressProof']);
+      case 2:
+        accountHolderNameController.text = apiPeramString(
+          data['bankAccountName'],
+          initialValue: apiPeramString(data['accountHolderName']),
+        );
+        accountNumberController.text = apiPeramString(data['bankAccountNumber']);
+        confirmAccountNumberController.text = accountNumberController.text;
+        ifscCodeController.text = apiPeramString(data['bankIfscCode']);
+        branchNameController.text = apiPeramString(data['branchName']);
+        passbookProofPath.value = apiPeramString(data['bankPassbook']);
+      case 3:
+        idFrontPath.value = apiPeramString(data['identityFront']);
+        idBackPath.value = apiPeramString(data['identityBack']);
+        panCardPath.value = apiPeramString(data['panCard']);
+        policeCertPath.value = apiPeramString(data['policeCertificate']);
+      case 4:
+      case 5:
+        liveSelfiePath.value = apiPeramString(data['liveSelfie']);
+      case 6:
+        final Map skill = apiPeramMap(data['skill']);
+        selectedSkillCategory.value = apiPeramString(
+          skill['name'],
+          initialValue: apiPeramString(data['skillName']),
+        );
+        experienceYearsController.text = apiPeramString(data['experienceYears']);
+        previousCompanyController.text = apiPeramString(data['previousCompany']);
+        dailyWageController.text = apiPeramString(data['dailyWageExpectation']);
+        itiCertPath.value = apiPeramString(data['itiCertificate']);
+        nsdcCertPath.value = apiPeramString(data['nsdcCertificate']);
+        govtCertPath.value = apiPeramString(data['govtCertificate']);
+        otherCertPath.value = apiPeramString(data['otherCertificate']);
+      case 7:
+        final String mode = apiPeramString(data['availabilityMode']);
+        workTypeController.text = switch (mode) {
+          'PART_TIME' => 'Part Time',
+          'FLEXIBLE' => 'Both (Flexible)',
+          _ => 'Full Time',
+        };
+        immediateJoiningController.text = apiPeramBool(data['immediateJoining'])
+            ? 'Yes (Immediate)'
+            : 'No';
+        workingRadiusController.text =
+            '${apiPeramString(data['workingRadiusKm'])} km';
+    }
+  }
 
   // Step 1: Personal Info
   final TextEditingController fullNameController = TextEditingController();
@@ -1491,6 +1591,8 @@ class WorkerRegistrationController extends GetxController {
   }) {
     FocusManager.instance.primaryFocus?.unfocus();
     final bool isFileExist = fileName.isNotEmpty && File(fileName).existsSync();
+    final bool isNetworkImage = fileName.startsWith('http://') ||
+        fileName.startsWith('https://');
 
     Get.dialog<void>(
       Scaffold(
@@ -1500,17 +1602,24 @@ class WorkerRegistrationController extends GetxController {
             children: [
               // Full Screen Interactive Image View with Zoom & Pan
               Center(
-                child: isFileExist
+                child: isFileExist || isNetworkImage
                     ? InteractiveViewer(
                         panEnabled: true,
                         minScale: 0.5,
                         maxScale: 4.0,
-                        child: Image.file(
-                          File(fileName),
-                          fit: BoxFit.contain,
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
+                        child: isNetworkImage
+                            ? Image.network(
+                                fileName,
+                                fit: BoxFit.contain,
+                                width: double.infinity,
+                                height: double.infinity,
+                              )
+                            : Image.file(
+                                File(fileName),
+                                fit: BoxFit.contain,
+                                width: double.infinity,
+                                height: double.infinity,
+                              ),
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
