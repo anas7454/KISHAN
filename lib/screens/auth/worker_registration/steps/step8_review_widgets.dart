@@ -9,7 +9,9 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
     required Widget summaryContent,
   }) {
     return Obx(() {
-      final bool isExpanded = controller.expandedSections.toList().contains(sectionIndex);
+      final bool isExpanded = controller.expandedSections.toList().contains(
+        sectionIndex,
+      );
 
       return Container(
         width: double.infinity,
@@ -18,7 +20,10 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(8.rr), // 8px radius Figma spec
-          border: Border.all(color: AppColors.borderDBDBDB, width: 1.rsp), // 1px #DBDBDB
+          border: Border.all(
+            color: AppColors.borderDBDBDB,
+            width: 1.rsp,
+          ), // 1px #DBDBDB
         ),
         child: Column(
           children: [
@@ -33,7 +38,8 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => controller.goToStep(targetStep, isFromReview: true),
+                  onTap: () =>
+                      controller.goToStep(targetStep, isFromReview: true),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -211,4 +217,3 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
 
   // Step 9: Registration Complete Illustration (Figma Specs: 133.89 x 133.89px)
 }
-
