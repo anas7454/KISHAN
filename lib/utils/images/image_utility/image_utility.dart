@@ -1,9 +1,9 @@
 class ImageUtility {
   static String logoOnboarding = "assets/images/logo_onboarding.png";
-  static String group1 = "assets/images/group1.png";
-  static String onboarding1 = "assets/images/group1.png";
-  static String onboarding2 = "assets/images/onboarding2.png";
-  static String onboarding3 = "assets/images/onboarding3.png";
+  static String group1 = "assets/images/group1.webp";
+  static String onboarding1 = "assets/images/group1.webp";
+  static String onboarding2 = "assets/images/onboarding2.webp";
+  static String onboarding3 = "assets/images/onboarding3.webp";
 
   // Home images. Replace these files with the final design exports.
   static const String ima1 = "assets/images/ima1.jpg";

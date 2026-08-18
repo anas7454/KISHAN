@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:constructo_worker/networking/api/endpoints/worker_booking_api_services.dart';
 import 'package:constructo_worker/networking/dialogs/api_error_show_dialogs.dart';
 import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
@@ -37,56 +39,48 @@ class Bnb2MaterialController extends GetxController {
   final GlobalController globalController = Get.find();
   final Rx<RequestFilterTab> selectedFilter = RequestFilterTab.all.obs;
   final RxBool isHistoryLoading = false.obs;
+  final RxBool isRequestsLoading = false.obs;
   int _historyRequest = 0;
+  Timer? _requestsPollingTimer;
+  bool _isPendingRequestInFlight = false;
 
-  final RxList<RequestItemModel> allRequests = <RequestItemModel>[
-    // New Request cards (shown in Requests tab)
-    RequestItemModel(
-      title: "Painting Work",
-      requestId: "WRK-54544-5485",
-      date: "24 may 2026 10:15 AM",
-      amount: "₹54,874",
-      address: "Near Union Bank Boring Road Patna Bihar 208547",
-      status: WorkerRequestStatus.newRequest,
-    ),
-    RequestItemModel(
-      title: "Painting Work",
-      requestId: "WRK-54544-5485",
-      date: "24 may 2026 10:15 AM",
-      amount: "₹54,874",
-      address: "Near Union Bank Boring Road Patna Bihar 208547",
-      status: WorkerRequestStatus.newRequest,
-    ),
-    // Accepted card (shown in My Work tab)
-    RequestItemModel(
-      title: "Painting Work",
-      requestId: "WRK-54544-5485",
-      date: "24 may 2026 10:15 AM",
-      startDate: "25 may 2026 10:15 AM",
-      amount: "₹54,874",
-      address: "Near Union Bank Boring Road Patna Bihar 208547",
-      status: WorkerRequestStatus.accepted,
-    ),
-    // Rejected card (shown in My Work tab)
-    RequestItemModel(
-      title: "Painting Work",
-      requestId: "WRK-54544-5485",
-      date: "24 may 2026 10:15 AM",
-      amount: "₹54,874",
-      address: "Near Union Bank Boring Road Patna Bihar 208547",
-      status: WorkerRequestStatus.rejected,
-    ),
-  ].obs;
+  final RxList<RequestItemModel> allRequests = <RequestItemModel>[].obs;
 
   @override
   void onInit() {
     super.onInit();
+    WorkerBookingApiServices.addProcessedListener(removePendingBooking);
     if (isMyWork) {
       selectedFilter.value = RequestFilterTab.accepted;
       getWorkerHistory(RequestFilterTab.accepted);
     } else {
       selectedFilter.value = RequestFilterTab.newReq;
+      getPendingRequests();
+      _startRequestsPolling();
     }
+  }
+
+  void _startRequestsPolling() {
+    _requestsPollingTimer?.cancel();
+    _requestsPollingTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      getPendingRequests(showError: false, showLoading: false);
+    });
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    if (!isMyWork) {
+      _startRequestsPolling();
+      getPendingRequests(showError: false, showLoading: false);
+    }
+  }
+
+  @override
+  void onClose() {
+    WorkerBookingApiServices.removeProcessedListener(removePendingBooking);
+    _requestsPollingTimer?.cancel();
+    super.onClose();
   }
 
   List<RequestItemModel> get filteredRequests {
@@ -116,6 +110,106 @@ class Bnb2MaterialController extends GetxController {
     if (selectedFilter.value == filter) return;
     selectedFilter.value = filter;
     if (isMyWork) getWorkerHistory(filter);
+  }
+
+  /// Reloads only the data shown by this tab. The screen and selected tab stay
+  /// mounted while [RefreshIndicator] displays its pull-to-refresh progress.
+  Future<void> refreshData() async {
+    await globalController.fetchUserLocation(refresh: true);
+    if (isMyWork) {
+      await getWorkerHistory(selectedFilter.value);
+    } else {
+      await getPendingRequests();
+    }
+  }
+
+  Future<void> getPendingRequests({
+    bool showError = true,
+    bool showLoading = true,
+  }) async {
+    if (_isPendingRequestInFlight) return;
+    _isPendingRequestInFlight = true;
+    if (showLoading) isRequestsLoading.value = true;
+    final Map response = await WorkerBookingApiServices.getPendingBookings();
+    _isPendingRequestInFlight = false;
+    if (showLoading) isRequestsLoading.value = false;
+    if (!apiResponseSuccess(response)) {
+      if (showError) await showdialogApiError(respMap: response);
+      return;
+    }
+
+    final dynamic responseData = response['data'];
+    final List bookings = responseData is List
+        ? responseData
+        : apiPeramList(
+            responseData is Map
+                ? responseData['bookings'] ??
+                      responseData['pendingBookings'] ??
+                      responseData['items'] ??
+                      responseData['results'] ??
+                      responseData['data']
+                : null,
+          );
+    allRequests.assignAll(
+      bookings
+          .whereType<Map>()
+          .map((data) {
+            final booking = WorkerBookingModel.fromMap(data);
+            return RequestItemModel(
+              bookingId: booking.id,
+              title: booking.title,
+              requestId: booking.requestId,
+              date: booking.displayRequestedOn,
+              startDate: booking.displayStartDate,
+              amount: _money(booking.amount),
+              address: booking.address,
+              status: _requestStatus(booking.status),
+            );
+          })
+          .where(
+            (request) =>
+                !WorkerBookingApiServices.acceptedBookingIds.contains(
+                  request.bookingId,
+                ) &&
+                !WorkerBookingApiServices.rejectedBookingIds.contains(
+                  request.bookingId,
+                ),
+          ),
+    );
+    allRequests.refresh();
+    Get.log('[REQUEST_POLL] Requests tab received=${allRequests.length}');
+  }
+
+  Future<void> acceptRequest(RequestItemModel request) async {
+    if (request.bookingId.isEmpty) return;
+    final Map response = await WorkerBookingApiServices.acceptBooking(
+      request.bookingId,
+    );
+    if (!apiResponseSuccess(response)) {
+      await showdialogApiError(respMap: response);
+      return;
+    }
+    WorkerBookingApiServices.markAccepted(request.bookingId);
+    allRequests.removeWhere((item) => item.bookingId == request.bookingId);
+    Get.snackbar('Request Accepted', 'You accepted ${request.title} request');
+  }
+
+  Future<void> rejectRequest(RequestItemModel request) async {
+    if (request.bookingId.isEmpty) return;
+    final Map response = await WorkerBookingApiServices.rejectBooking(
+      request.bookingId,
+    );
+    if (!apiResponseSuccess(response)) {
+      await showdialogApiError(respMap: response);
+      return;
+    }
+    WorkerBookingApiServices.markRejected(request.bookingId);
+    allRequests.removeWhere((item) => item.bookingId == request.bookingId);
+    Get.snackbar('Request Rejected', 'You rejected ${request.title} request');
+  }
+
+  void removePendingBooking(String bookingId) {
+    allRequests.removeWhere((item) => item.bookingId == bookingId);
   }
 
   Future<void> getWorkerHistory(RequestFilterTab filter) async {
@@ -158,8 +252,8 @@ class Bnb2MaterialController extends GetxController {
           bookingId: booking.id,
           title: booking.title,
           requestId: booking.requestId,
-          date: booking.requestedOn,
-          startDate: booking.startDate,
+          date: booking.displayRequestedOn,
+          startDate: booking.displayStartDate,
           amount: _money(booking.amount),
           address: booking.address,
           status: _requestStatus(booking.status),

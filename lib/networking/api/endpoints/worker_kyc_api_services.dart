@@ -2,6 +2,15 @@ import 'package:constructo_worker/networking/api/app_api_services.dart';
 import 'package:dio/dio.dart';
 
 class WorkerKycApiServices {
+  static Future<Map> getWorkerKycStatus() {
+    return AppApiServices.apiRequest(
+      '/api/workers/kyc/status',
+      queryParameter: <String, dynamic>{
+        '_ts': DateTime.now().millisecondsSinceEpoch,
+      },
+    );
+  }
+
   static Future<Map> _putFormData(String path, Map<String, dynamic> data) {
     return AppApiServices.apiRequest(
       path,

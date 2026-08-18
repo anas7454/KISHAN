@@ -17,6 +17,7 @@ import 'package:constructo_worker/screens/auth/worker_registration/worker_regist
 import 'package:constructo_worker/screens/edit_profile/edit_profile_screen.dart';
 import 'package:constructo_worker/screens/info_content/info_content_data.dart';
 import 'package:constructo_worker/screens/info_content/info_content_screen.dart';
+import 'package:constructo_worker/screens/notifications/notifications_screen.dart';
 import 'package:constructo_worker/screens/request_details/request_details_screen.dart';
 import 'package:constructo_worker/screens/worker_verification_status/worker_verification_status_screen.dart';
 
@@ -149,23 +150,56 @@ class AppRoutes {
     return Get.toNamed(AppRouteName.workerRegistrationScreen);
   }
 
-  static Future<void> workerRegistrationPreviewScreen(int step) async {
-    return Get.toNamed(
+  static Future<void> resumeWorkerRegistrationScreen({
+    required int step,
+    required String status,
+    required int completedSections,
+    required int totalSections,
+    required List<Map<String, dynamic>> sections,
+  }) async {
+    return Get.offAllNamed(
       AppRouteName.workerRegistrationScreen,
       arguments: <String, dynamic>{
-        'previewMode': true,
-        'previewStep': step,
+        'initialStep': step,
+        'kycStatus': status,
+        'completedSections': completedSections,
+        'totalSections': totalSections,
+        'kycSections': sections,
       },
     );
   }
 
-  static Future<void> workerVerificationStatusScreen() async {
-    return Get.toNamed(AppRouteName.workerVerificationStatusScreen);
+  static Future<void> workerRegistrationPreviewScreen(int step) async {
+    return Get.toNamed(
+      AppRouteName.workerRegistrationScreen,
+      arguments: <String, dynamic>{'previewMode': true, 'previewStep': step},
+    );
+  }
+
+  static Future<void> workerVerificationStatusScreen({
+    bool documentsView = false,
+  }) async {
+    return Get.toNamed(
+      AppRouteName.workerVerificationStatusScreen,
+      arguments: <String, dynamic>{'documentsView': documentsView},
+    );
+  }
+
+  static Future<void> workerVerificationStatusRootScreen() async {
+    return Get.offAllNamed(AppRouteName.workerVerificationStatusScreen);
   }
 
   static Future<void> editProfileScreen() async {
     return Get.to<void>(
       () => EditProfileScreen(),
+      transition: Transition.rightToLeft,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  static Future<void> notificationsScreen() async {
+    return Get.to<void>(
+      () => const NotificationsScreen(),
       transition: Transition.rightToLeft,
       duration: const Duration(milliseconds: 250),
     );
@@ -204,10 +238,13 @@ class AppRoutes {
     );
   }
 
-  static Future<void> requestDetailsScreen({String bookingId = ''}) async {
+  static Future<void> requestDetailsScreen({
+    String bookingId = '',
+    String status = '',
+  }) async {
     return Get.toNamed(
       AppRouteName.requestDetailsScreen,
-      arguments: <String, dynamic>{Arguments.id: bookingId},
+      arguments: <String, dynamic>{Arguments.id: bookingId, 'status': status},
     );
   }
 }

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:constructo_worker/screens/auth/social_login/social_login_controller.dart';
 import 'package:constructo_worker/utils/buttons/cta_button/button_custom.dart';
-import 'package:constructo_worker/utils/buttons/text_button_custom.dart';
 import 'package:constructo_worker/utils/images/image_utility/common_icons_utility.dart';
 import 'package:constructo_worker/utils/theme/app_colors.dart';
 import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
@@ -55,26 +54,6 @@ mixin LoginWidgets {
             ),
           ),
         ],
-      ],
-    );
-  }
-
-  Widget signupText({VoidCallback? onTap}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.baseline,
-      textBaseline: TextBaseline.alphabetic,
-      children: [
-        Text(
-          "Don't have an account? ",
-          style: AppTextStyles.ts14w500colorBlack(),
-        ),
-        TextButtonCustom(
-          onPressed: onTap ?? () {},
-          btnName: 'Sign Up',
-          textColor: AppColors.color5B3BF7,
-          isUnderline: true,
-        ),
       ],
     );
   }

@@ -27,10 +27,7 @@ mixin EditProfileWidgets {
         children: [
           const BackButtonCustom(),
           sizedboxWidth(12.rw),
-          Text(
-            "Edit Profile",
-            style: AppTextStyles.ts18w700color000000(),
-          ),
+          Text("Edit Profile", style: AppTextStyles.ts18w700color000000()),
         ],
       ),
     );
@@ -44,7 +41,9 @@ mixin EditProfileWidgets {
         children: [
           Obx(() {
             final String path = controller.profileImagePath.value;
-            final bool hasCustomImage = path.isNotEmpty && File(path).existsSync();
+            final bool hasCustomImage =
+                path.isNotEmpty && File(path).existsSync();
+            final bool hasNetworkImage = path.startsWith('http');
 
             return Container(
               width: 100.rw,
@@ -55,6 +54,8 @@ mixin EditProfileWidgets {
                 image: DecorationImage(
                   image: hasCustomImage
                       ? FileImage(File(path)) as ImageProvider
+                      : hasNetworkImage
+                      ? NetworkImage(path)
                       : AssetImage(DummyImagesUtility.workerprofile),
                   fit: BoxFit.cover,
                 ),
@@ -130,7 +131,10 @@ mixin EditProfileWidgets {
                 ),
               ],
               borderRadius: BorderRadius.circular(10.rr),
-              border: Border.all(color: AppColors.borderTextfiled, width: 1.rsp),
+              border: Border.all(
+                color: AppColors.borderTextfiled,
+                width: 1.rsp,
+              ),
             ),
             child: Row(
               children: [
@@ -191,18 +195,26 @@ mixin EditProfileWidgets {
                       height: 42.rh,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.yellowBg : AppColors.white,
+                        color: isSelected
+                            ? AppColors.yellowBg
+                            : AppColors.white,
                         borderRadius: BorderRadius.circular(10.rr),
                         border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.borderTextfiled,
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.borderTextfiled,
                           width: isSelected ? 1.5.rsp : 1.rsp,
                         ),
                       ),
                       child: Text(
                         g,
                         style: AppTextStyles.ts14w600colorBlack().copyWith(
-                          color: isSelected ? AppColors.black : AppColors.color7D7D7D,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          color: isSelected
+                              ? AppColors.black
+                              : AppColors.color7D7D7D,
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                           fontSize: 13.rsp,
                         ),
                       ),
@@ -223,7 +235,9 @@ mixin EditProfileWidgets {
       padding: EdgeInsets.all(16.rw),
       decoration: BoxDecoration(
         color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.borderE6E6E6, width: 1.rsp)),
+        border: Border(
+          top: BorderSide(color: AppColors.borderE6E6E6, width: 1.rsp),
+        ),
       ),
       child: SafeArea(
         top: false,

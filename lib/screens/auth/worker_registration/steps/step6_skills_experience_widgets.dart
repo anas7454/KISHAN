@@ -2,19 +2,21 @@ part of '../worker_registration_widgets.dart';
 
 mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
   Widget skillCategoryGrid(WorkerRegistrationController controller) {
-    final List<Map<String, dynamic>> skills = [
-      {'name': 'Mason', 'icon': Icons.construction_rounded},
-      {'name': 'Electrician', 'icon': Icons.electrical_services_rounded},
-      {'name': 'Plumber', 'icon': Icons.plumbing_rounded},
-      {'name': 'Painter', 'icon': Icons.format_paint_rounded},
-      {'name': 'Carpenter', 'icon': Icons.handyman_rounded},
-      {'name': 'Welder', 'icon': Icons.hardware_rounded},
-      {'name': 'Helper', 'icon': Icons.engineering_rounded},
-      {'name': 'Others', 'icon': Icons.grid_view_rounded},
-    ];
-
     return Obx(() {
-      final String selectedCategory = controller.selectedSkillCategory.value; // Read synchronously for Obx
+      if (controller.isSkillsLoading.value) {
+        return const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        );
+      }
+      final skills = controller.skillCategories;
+      if (skills.isEmpty) {
+        return Text(
+          'No skills available',
+          style: AppTextStyles.ts12w500color808080(),
+        );
+      }
+      final String selectedCategory =
+          controller.selectedSkillCategory.value; // Read synchronously for Obx
 
       return GridView.builder(
         shrinkWrap: true,
@@ -28,18 +30,24 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
         ),
         itemBuilder: (context, index) {
           final skill = skills[index];
-          final String name = skill['name'] as String;
+          final String name = skill['name']!;
           final bool isSelected = selectedCategory == name;
 
           return GestureDetector(
-            onTap: () => controller.setSkillCategory(name),
+            onTap: () => controller.setSkillCategory(skill),
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 8.rh, horizontal: 4.rw),
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.yellowBg : AppColors.white,
-                borderRadius: BorderRadius.circular(10.rr), // 10px radius Figma spec
+                borderRadius: BorderRadius.circular(
+                  10.rr,
+                ), // 10px radius Figma spec
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : const Color(0xffD0D0D0), // #FFCC00 vs #D0D0D0 Figma spec
+                  color: isSelected
+                      ? AppColors.primary
+                      : const Color(
+                          0xffD0D0D0,
+                        ), // #FFCC00 vs #D0D0D0 Figma spec
                   width: 1.rsp,
                 ),
               ),
@@ -47,7 +55,7 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    skill['icon'] as IconData,
+                    Icons.handyman_rounded,
                     size: 26.rsp,
                     color: isSelected ? AppColors.primary : AppColors.black,
                   ),
@@ -59,7 +67,9 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.ts12w500colorBlack().copyWith(
                       color: isSelected ? AppColors.primary : AppColors.black,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w600,
                       fontSize: 11.rsp,
                     ),
                   ),
@@ -79,6 +89,56 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
         skillCategoryGrid(controller),
         sizedboxHeight(16),
         sectionCard(
+          title: "Select Services",
+          children: [
+            Obx(() {
+              if (controller.isSkillServicesLoading.value) {
+                return const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                );
+              }
+              if (controller.skillServices.isEmpty) {
+                return Text(
+                  "No services available",
+                  style: AppTextStyles.ts12w500color808080(),
+                );
+              }
+              return Wrap(
+                spacing: 8.rw,
+                runSpacing: 8.rh,
+                children: controller.skillServices.map((service) {
+                  final String id = service['id']!;
+                  final bool selected = controller.selectedServiceIds.contains(
+                    id,
+                  );
+                  return FilterChip(
+                    label: Text(
+                      service['name']!,
+                      style: AppTextStyles.ts12w500colorBlack().copyWith(
+                        color: AppColors.black,
+                        fontWeight: selected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                      ),
+                    ),
+                    selected: selected,
+                    onSelected: (_) => controller.toggleSkillService(id),
+                    selectedColor: AppColors.yellowBg,
+                    backgroundColor: AppColors.white,
+                    checkmarkColor: AppColors.primary,
+                    side: BorderSide(
+                      color: selected
+                          ? AppColors.primary
+                          : AppColors.borderDBDBDB,
+                    ),
+                  );
+                }).toList(),
+              );
+            }),
+          ],
+        ),
+        sizedboxHeight(16),
+        sectionCard(
           title: "Experience Details",
           children: [
             inputLabelField(
@@ -86,6 +146,12 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
               hintText: "Enter",
               controller: controller.experienceYearsController,
               keyboardType: TextInputType.number,
+            ),
+            sizedboxHeight(14),
+            inputLabelField(
+              label: "Description / About Work",
+              hintText: "Enter",
+              controller: controller.workDescriptionController,
             ),
             sizedboxHeight(14),
             inputLabelField(
@@ -129,9 +195,9 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
                   ),
                   sizedboxWidth(6),
                   Text(
-                    "Required",
+                    "Optional",
                     style: AppTextStyles.ts12w500color808080().copyWith(
-                      color: Colors.redAccent,
+                      color: AppColors.color7D7D7D,
                       fontSize: 11.rsp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -143,11 +209,15 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
                 () => uploadFileField(
                   label: "ITI",
                   fileName: controller.itiCertPath.value,
-                  onUpload: () => controller.pickImageOrDocument(controller.itiCertPath),
+                  onUpload: () =>
+                      controller.pickImageOrDocument(controller.itiCertPath),
                   onView: () => controller.showDocumentPreviewDialog(
                     title: "ITI Certificate",
                     fileName: controller.itiCertPath.value,
-                    onReupload: () => controller.pickImageOrDocument(controller.itiCertPath),
+                    onReupload: () =>
+                        controller.pickImageOrDocument(controller.itiCertPath),
+                    onRemove: () =>
+                        controller.itiCertPath.value = 'certificate.pdf',
                   ),
                 ),
               ),
@@ -156,11 +226,15 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
                 () => uploadFileField(
                   label: "NSDC",
                   fileName: controller.nsdcCertPath.value,
-                  onUpload: () => controller.pickImageOrDocument(controller.nsdcCertPath),
+                  onUpload: () =>
+                      controller.pickImageOrDocument(controller.nsdcCertPath),
                   onView: () => controller.showDocumentPreviewDialog(
                     title: "NSDC Certificate",
                     fileName: controller.nsdcCertPath.value,
-                    onReupload: () => controller.pickImageOrDocument(controller.nsdcCertPath),
+                    onReupload: () =>
+                        controller.pickImageOrDocument(controller.nsdcCertPath),
+                    onRemove: () =>
+                        controller.nsdcCertPath.value = 'certificate.pdf',
                   ),
                 ),
               ),
@@ -169,11 +243,15 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
                 () => uploadFileField(
                   label: "Government Certificate",
                   fileName: controller.govtCertPath.value,
-                  onUpload: () => controller.pickImageOrDocument(controller.govtCertPath),
+                  onUpload: () =>
+                      controller.pickImageOrDocument(controller.govtCertPath),
                   onView: () => controller.showDocumentPreviewDialog(
                     title: "Government Certificate",
                     fileName: controller.govtCertPath.value,
-                    onReupload: () => controller.pickImageOrDocument(controller.govtCertPath),
+                    onReupload: () =>
+                        controller.pickImageOrDocument(controller.govtCertPath),
+                    onRemove: () =>
+                        controller.govtCertPath.value = 'certificate.pdf',
                   ),
                 ),
               ),
@@ -182,11 +260,16 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
                 () => uploadFileField(
                   label: "Other Certificates",
                   fileName: controller.otherCertPath.value,
-                  onUpload: () => controller.pickImageOrDocument(controller.otherCertPath),
+                  onUpload: () =>
+                      controller.pickImageOrDocument(controller.otherCertPath),
                   onView: () => controller.showDocumentPreviewDialog(
                     title: "Other Certificate",
                     fileName: controller.otherCertPath.value,
-                    onReupload: () => controller.pickImageOrDocument(controller.otherCertPath),
+                    onReupload: () => controller.pickImageOrDocument(
+                      controller.otherCertPath,
+                    ),
+                    onRemove: () =>
+                        controller.otherCertPath.value = 'certificate.pdf',
                   ),
                 ),
               ),
@@ -199,4 +282,3 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
 
   // Step 7: Availability (Matching Image 1)
 }
-

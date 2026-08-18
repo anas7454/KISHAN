@@ -17,34 +17,38 @@ class Bnb5MyProfileScreen extends StatelessWidget with Bnb5MyProfileWidgets {
       body: Column(
         children: [
           // Fixed Top Location Header
-          profileHeader(context),
+          profileHeader(context, controller),
           Expanded(
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Column(
-                children: [
-                  sizedboxHeight(14),
-                  // Profile Body Content
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.rw),
-                    child: Column(
-                      children: [
-                        // User Profile Card
-                        userProfileCard(),
-                        sizedboxHeight(14),
-                        // Quick Stats Row (My Orders / My Booking)
-                        quickStatsRow(),
-                        sizedboxHeight(18),
-                        // Account Info Section
-                        accountInfoSection(controller),
-                        sizedboxHeight(18),
-                        // General Section
-                        generalSection(),
-                        sizedboxHeight(30),
-                      ],
+            child: RefreshIndicator(
+              color: AppColors.primary,
+              onRefresh: controller.refreshData,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    sizedboxHeight(14),
+                    // Profile Body Content
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.rw),
+                      child: Column(
+                        children: [
+                          // User Profile Card
+                          userProfileCard(controller),
+                          sizedboxHeight(14),
+                          // Quick Stats Row (My Orders / My Booking)
+                          quickStatsRow(controller),
+                          sizedboxHeight(18),
+                          // Account Info Section
+                          accountInfoSection(controller),
+                          sizedboxHeight(18),
+                          // General Section
+                          generalSection(),
+                          sizedboxHeight(30),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

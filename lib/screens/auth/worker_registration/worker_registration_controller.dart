@@ -1,18 +1,21 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:constructo_worker/networking/api/endpoints/worker_kyc_api_services.dart';
+import 'package:constructo_worker/networking/api/endpoints/skills_api_services.dart';
 import 'package:constructo_worker/networking/dialogs/api_error_show_dialogs.dart';
 import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
 import 'package:constructo_worker/networking/helper_methods/multipart_image.dart';
 import 'package:constructo_worker/networking/user/controllers/user_controller.dart';
 import 'package:constructo_worker/routes/app_routes.dart';
 import 'package:constructo_worker/routes/route_arguments.dart';
-import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb3_home/bnb3_home_controller.dart';
+import 'package:constructo_worker/screens/auth/worker_registration/worker_kyc_status_model.dart';
 import 'package:constructo_worker/utils/theme/app_colors.dart';
 import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
 import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:constructo_worker/utils/toast/custom_tost_for_mobile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -23,21 +26,126 @@ class WorkerRegistrationController extends GetxController {
   final int totalSteps = 8;
   final ImagePicker _picker = ImagePicker();
   final RxBool isPreviewMode = false.obs;
+  final RxString kycStatus = 'NOT_STARTED'.obs;
+  late final bool isCorrectionMode;
+  final RxInt completedKycSections = 0.obs;
+  final RxInt totalKycSections = 8.obs;
+  final RxList<WorkerKycSectionStatus> kycProgressSections =
+      <WorkerKycSectionStatus>[].obs;
+  final RxBool isKycStatusLoading = false.obs;
+  final RxString kycStatusError = ''.obs;
+  final RxBool hasLoadedKycStatus = false.obs;
+  bool _isReviewDataLoading = false;
+  bool _hasLoadedReviewData = false;
 
   @override
   void onInit() {
     super.onInit();
+    final int? requestedInitialStep = RouteArguments.get<int>('initialStep');
     isPreviewMode.value = RouteArguments.getOrDefault<bool>(
       'previewMode',
       false,
     );
-    if (isPreviewMode.value) {
-      currentStep.value = RouteArguments.getOrDefault<int>(
-        'previewStep',
-        1,
+    currentStep.value = requestedInitialStep ?? 1;
+    kycStatus.value = RouteArguments.getOrDefault<String>(
+      'kycStatus',
+      'NOT_STARTED',
+    );
+    isCorrectionMode = kycStatus.value.toUpperCase() == 'REJECTED';
+    completedKycSections.value = RouteArguments.getOrDefault<int>(
+      'completedSections',
+      0,
+    );
+    totalKycSections.value = RouteArguments.getOrDefault<int>(
+      'totalSections',
+      8,
+    );
+    final dynamic routeArgs = Get.arguments;
+    final dynamic rawSections = routeArgs is Map
+        ? routeArgs['kycSections']
+        : null;
+    if (rawSections is List) {
+      kycProgressSections.assignAll(
+        rawSections.whereType<Map>().map(WorkerKycSectionStatus.fromMap),
       );
-      loadPreviewData();
     }
+    if (!isPreviewMode.value &&
+        requestedInitialStep == null &&
+        kycProgressSections.isNotEmpty) {
+      final WorkerKycSectionStatus? nextSection = kycProgressSections
+          .firstWhereOrNull((section) => !section.isCompleted && section.canOpen);
+      if (nextSection != null) {
+        currentStep.value = localStepForKycKey(nextSection.stepKey);
+      }
+    }
+    if (isPreviewMode.value) {
+      currentStep.value = RouteArguments.getOrDefault<int>('previewStep', 1);
+      loadPreviewData();
+    } else if (isCorrectionMode) {
+      // A rejected section is an isolated correction flow. Load its saved
+      // values, allow re-upload, and do not advance through onboarding steps.
+      loadPreviewData();
+    } else {
+      if (currentStep.value != 8) loadSkills();
+      if (kycProgressSections.isEmpty) refreshKycProgress(navigate: true);
+      if (currentStep.value == 8) loadReviewData();
+    }
+  }
+
+  Future<bool> refreshKycProgress({bool navigate = false}) async {
+    isKycStatusLoading.value = true;
+    kycStatusError.value = '';
+    final Map response = await WorkerKycApiServices.getWorkerKycStatus();
+    isKycStatusLoading.value = false;
+    hasLoadedKycStatus.value = true;
+    if (!apiResponseSuccess(response)) {
+      kycStatusError.value = apiPeramString(
+        response['message'] ?? response['msg'],
+        initialValue: 'Unable to load KYC progress',
+      );
+      return false;
+    }
+    final WorkerKycStatusModel result = WorkerKycStatusModel.fromResponse(
+      response,
+    );
+    debugPrint(
+      '[KYC_FLOW] status=${result.status}, '
+      'completed=${result.completedSections}/${result.totalSections}, '
+      'nextStep=${result.nextStepKey}, '
+      'missingDocuments=${result.missingDocuments}, navigate=$navigate',
+    );
+    debugPrint(
+      '[KYC_FLOW] sections=${result.sections.map((section) => '${section.stepKey}:${section.isCompleted}').join(', ')}',
+    );
+    kycStatus.value = result.status;
+    completedKycSections.value = result.completedSections;
+    totalKycSections.value = result.totalSections == 0
+        ? 8
+        : result.totalSections;
+    kycProgressSections.assignAll(result.sections);
+
+    if (result.status == 'APPROVED') {
+      await AppRoutes.bottomNavBarScreen();
+      return true;
+    }
+    if (result.status == 'UNDER_REVIEW') {
+      await AppRoutes.workerVerificationStatusRootScreen();
+      return true;
+    }
+    if (navigate && result.nextStepKey.isNotEmpty) {
+      currentStep.value = localStepForKycKey(result.nextStepKey);
+      if (currentStep.value == 8) await loadReviewData();
+    }
+    return true;
+  }
+
+  void openKycProgressSection(WorkerKycSectionStatus section) {
+    if (!section.canOpen) return;
+    currentStep.value = localStepForKycKey(section.stepKey);
+  }
+
+  void closeApp() {
+    SystemNavigator.pop();
   }
 
   Future<void> loadPreviewData() async {
@@ -56,14 +164,50 @@ class WorkerRegistrationController extends GetxController {
       await showdialogApiError(respMap: response);
       return;
     }
-    _fillPreviewFields(apiPeramMap(response['data']));
+    _fillFieldsForStep(currentStep.value, apiPeramMap(response['data']));
+    if (currentStep.value == 6) await loadSkills();
   }
 
-  void _fillPreviewFields(Map data) {
-    switch (currentStep.value) {
+  Future<void> loadReviewData() async {
+    if (_isReviewDataLoading || _hasLoadedReviewData) return;
+    _isReviewDataLoading = true;
+    isLoading.value = true;
+    try {
+      final List<Map> responses = await Future.wait(<Future<Map>>[
+        WorkerKycApiServices.getPersonalInfo(),
+        WorkerKycApiServices.getBankInfo(),
+        WorkerKycApiServices.getIdentityDocuments(),
+        WorkerKycApiServices.getLiveSelfie(),
+        WorkerKycApiServices.getSkillsExperience(),
+        WorkerKycApiServices.getAvailability(),
+      ]);
+
+      const List<int> steps = <int>[1, 2, 3, 5, 6, 7];
+      for (int index = 0; index < responses.length; index++) {
+        final Map response = responses[index];
+        if (apiResponseSuccess(response)) {
+          _fillFieldsForStep(steps[index], apiPeramMap(response['data']));
+        }
+      }
+      await loadSkills();
+      _syncSelectedServiceNames();
+      _hasLoadedReviewData = true;
+    } finally {
+      _isReviewDataLoading = false;
+      isLoading.value = false;
+    }
+  }
+
+  void _fillFieldsForStep(int step, Map data) {
+    final bool isReuploading =
+        !isPreviewMode.value && kycStatus.value.toUpperCase() == 'REJECTED';
+
+    switch (step) {
       case 1:
         fullNameController.text = apiPeramString(data['fullName']);
-        final DateTime? dob = DateTime.tryParse(apiPeramString(data['dateOfBirth']));
+        final DateTime? dob = DateTime.tryParse(
+          apiPeramString(data['dateOfBirth']),
+        );
         dobController.text = dob == null
             ? apiPeramString(data['dateOfBirth'])
             : DateFormat('dd/MM/yyyy').format(dob);
@@ -75,38 +219,81 @@ class WorkerRegistrationController extends GetxController {
         stateController.text = apiPeramString(data['state']);
         cityController.text = apiPeramString(data['city']);
         pincodeController.text = apiPeramString(data['pincode']);
-        addressProofPath.value = apiPeramString(data['addressProof']);
+        addressProofPath.value =
+            isReuploading ? '' : apiPeramString(data['addressProof']);
       case 2:
         accountHolderNameController.text = apiPeramString(
           data['bankAccountName'],
           initialValue: apiPeramString(data['accountHolderName']),
         );
-        accountNumberController.text = apiPeramString(data['bankAccountNumber']);
+        accountNumberController.text = apiPeramString(
+          data['bankAccountNumber'],
+        );
         confirmAccountNumberController.text = accountNumberController.text;
         ifscCodeController.text = apiPeramString(data['bankIfscCode']);
         branchNameController.text = apiPeramString(data['branchName']);
-        passbookProofPath.value = apiPeramString(data['bankPassbook']);
+        passbookProofPath.value =
+            isReuploading ? '' : apiPeramString(data['bankPassbook']);
       case 3:
-        idFrontPath.value = apiPeramString(data['identityFront']);
-        idBackPath.value = apiPeramString(data['identityBack']);
-        panCardPath.value = apiPeramString(data['panCard']);
-        policeCertPath.value = apiPeramString(data['policeCertificate']);
+        idFrontPath.value =
+            isReuploading ? '' : apiPeramString(data['identityFront']);
+        idBackPath.value =
+            isReuploading ? '' : apiPeramString(data['identityBack']);
+        panCardPath.value =
+            isReuploading ? '' : apiPeramString(data['panCard']);
+        policeCertPath.value =
+            isReuploading ? '' : apiPeramString(data['policeCertificate']);
       case 4:
       case 5:
-        liveSelfiePath.value = apiPeramString(data['liveSelfie']);
+        liveSelfiePath.value =
+            isReuploading ? '' : apiPeramString(data['liveSelfie']);
       case 6:
         final Map skill = apiPeramMap(data['skill']);
+        selectedSkillId.value = apiPeramString(skill['id'] ?? data['skillId']);
         selectedSkillCategory.value = apiPeramString(
-          skill['name'],
+          data['skillCategory'] ?? skill['name'],
           initialValue: apiPeramString(data['skillName']),
         );
-        experienceYearsController.text = apiPeramString(data['experienceYears']);
-        previousCompanyController.text = apiPeramString(data['previousCompany']);
+        final dynamic rawSavedServices =
+            data['selectedSkillServiceIds'] ??
+            data['skillServiceIds'] ??
+            data['serviceIds'] ??
+            data['services'];
+        List savedServices = <dynamic>[];
+        if (rawSavedServices is String && rawSavedServices.isNotEmpty) {
+          try {
+            savedServices = apiPeramList(jsonDecode(rawSavedServices));
+          } catch (_) {
+            savedServices = <dynamic>[];
+          }
+        } else {
+          savedServices = apiPeramList(rawSavedServices);
+        }
+        selectedServiceIds.assignAll(
+          savedServices
+              .map(
+                (service) => service is Map
+                    ? apiPeramString(service['id'] ?? service['serviceId'])
+                    : apiPeramString(service),
+              )
+              .where((id) => id.isNotEmpty),
+        );
+        experienceYearsController.text = apiPeramString(
+          data['experienceYears'],
+        );
+        previousCompanyController.text = apiPeramString(
+          data['previousCompany'],
+        );
         dailyWageController.text = apiPeramString(data['dailyWageExpectation']);
-        itiCertPath.value = apiPeramString(data['itiCertificate']);
-        nsdcCertPath.value = apiPeramString(data['nsdcCertificate']);
-        govtCertPath.value = apiPeramString(data['govtCertificate']);
-        otherCertPath.value = apiPeramString(data['otherCertificate']);
+        workDescriptionController.text = apiPeramString(data['description']);
+        itiCertPath.value =
+            isReuploading ? '' : apiPeramString(data['itiCertificate']);
+        nsdcCertPath.value =
+            isReuploading ? '' : apiPeramString(data['nsdcCertificate']);
+        govtCertPath.value =
+            isReuploading ? '' : apiPeramString(data['govtCertificate']);
+        otherCertPath.value =
+            isReuploading ? '' : apiPeramString(data['otherCertificate']);
       case 7:
         final String mode = apiPeramString(data['availabilityMode']);
         workTypeController.text = switch (mode) {
@@ -122,6 +309,14 @@ class WorkerRegistrationController extends GetxController {
     }
   }
 
+  void _syncSelectedServiceNames() {
+    selectedServicesController.text = skillServices
+        .where((service) => selectedServiceIds.contains(service['id']))
+        .map((service) => service['name'] ?? '')
+        .where((name) => name.isNotEmpty)
+        .join(', ');
+  }
+
   // Step 1: Personal Info
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
@@ -133,43 +328,265 @@ class WorkerRegistrationController extends GetxController {
   final TextEditingController stateController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController fullAddressController = TextEditingController();
-  final RxString addressProofPath = 'proof.pdf'.obs;
+  final RxString addressProofPath = ''.obs;
 
   // Step 2: Bank Info
-  final TextEditingController accountHolderNameController = TextEditingController();
+  final TextEditingController accountHolderNameController =
+      TextEditingController();
   final TextEditingController accountNumberController = TextEditingController();
-  final TextEditingController confirmAccountNumberController = TextEditingController();
+  final TextEditingController confirmAccountNumberController =
+      TextEditingController();
   final TextEditingController ifscCodeController = TextEditingController();
   final TextEditingController branchNameController = TextEditingController();
-  final RxString passbookProofPath = 'proof.pdf'.obs;
+  final RxString passbookProofPath = ''.obs;
 
   // Step 3: Document's Upload
-  final RxString idFrontPath = 'front.pdf'.obs;
-  final RxString idBackPath = 'front.pdf'.obs;
-  final RxString panCardPath = 'front.pdf'.obs;
-  final RxString policeCertPath = 'certificate.pdf'.obs;
+  final RxString idFrontPath = ''.obs;
+  final RxString idBackPath = ''.obs;
+  final RxString panCardPath = ''.obs;
+  final RxString policeCertPath = ''.obs;
 
   // Step 4 & 5: Live Selfie Verification
   final RxString liveSelfiePath = ''.obs;
 
   // Step 6: Skills & Experience / Certificate Info
   final RxString selectedSkillCategory = 'Mason'.obs;
-  final TextEditingController experienceYearsController = TextEditingController();
-  final TextEditingController previousCompanyController = TextEditingController();
+  final RxString selectedSkillId = ''.obs;
+  final RxList<Map<String, String>> skillCategories =
+      <Map<String, String>>[].obs;
+  final RxList<Map<String, String>> skillServices = <Map<String, String>>[].obs;
+  final RxSet<String> selectedServiceIds = <String>{}.obs;
+  final RxBool isSkillsLoading = false.obs;
+  final RxBool isSkillServicesLoading = false.obs;
+  int _servicesRequest = 0;
+  final TextEditingController experienceYearsController =
+      TextEditingController();
+  final TextEditingController previousCompanyController =
+      TextEditingController();
   final TextEditingController dailyWageController = TextEditingController();
-  final RxString itiCertPath = 'certificate.pdf'.obs;
-  final RxString nsdcCertPath = 'certificate.pdf'.obs;
-  final RxString govtCertPath = 'certificate.pdf'.obs;
-  final RxString otherCertPath = 'certificate.pdf'.obs;
+  final TextEditingController workDescriptionController =
+      TextEditingController();
+  final TextEditingController selectedServicesController =
+      TextEditingController();
+  final RxString itiCertPath = ''.obs;
+  final RxString nsdcCertPath = ''.obs;
+  final RxString govtCertPath = ''.obs;
+  final RxString otherCertPath = ''.obs;
 
-  void setSkillCategory(String category) {
-    selectedSkillCategory.value = category;
+  Future<void> setSkillCategory(Map<String, String> skill) async {
+    final String id = skill['id'] ?? '';
+    if (id.isEmpty || selectedSkillId.value == id) return;
+    selectedSkillId.value = id;
+    selectedSkillCategory.value = skill['name'] ?? '';
+    selectedServiceIds.clear();
+    selectedServicesController.clear();
+    await loadSkillServices(id);
+  }
+
+  Future<void> loadSkills() async {
+    if (isSkillsLoading.value) return;
+    isSkillsLoading.value = true;
+    final Map response = await SkillsApiServices.getSkills();
+    isSkillsLoading.value = false;
+    if (!apiResponseSuccess(response)) return;
+
+    final dynamic rawData = response['data'];
+    final List skills = rawData is List
+        ? rawData
+        : apiPeramList(
+            rawData is Map
+                ? rawData['skills'] ?? rawData['items'] ?? rawData['data']
+                : null,
+          );
+    skillCategories.assignAll(
+      skills
+          .whereType<Map>()
+          .map((skill) {
+            return <String, String>{
+              'id': apiPeramString(
+                skill['id'] ?? skill['skillId'] ?? skill['_id'],
+              ),
+              'name': apiPeramString(
+                skill['name'] ?? skill['skillName'] ?? skill['title'],
+                initialValue: 'Skill',
+              ),
+              'image': apiPeramString(skill['image'] ?? skill['icon']),
+            };
+          })
+          .where((skill) => skill['id']!.isNotEmpty),
+    );
+    if (skillCategories.isEmpty) return;
+
+    final Map<String, String>? saved = skillCategories.firstWhereOrNull(
+      (skill) => skill['id'] == selectedSkillId.value,
+    );
+    final Map<String, String> active = saved ?? skillCategories.first;
+    selectedSkillId.value = active['id']!;
+    selectedSkillCategory.value = active['name']!;
+    await loadSkillServices(active['id']!);
+  }
+
+  Future<void> loadSkillServices(String skillId) async {
+    final int request = ++_servicesRequest;
+    isSkillServicesLoading.value = true;
+    skillServices.clear();
+    final Map response = await SkillsApiServices.getServices(skillId);
+    if (request != _servicesRequest) return;
+    isSkillServicesLoading.value = false;
+    if (!apiResponseSuccess(response)) return;
+
+    final dynamic rawData = response['data'];
+    final List services = rawData is List
+        ? rawData
+        : apiPeramList(
+            rawData is Map
+                ? rawData['services'] ?? rawData['items'] ?? rawData['data']
+                : null,
+          );
+    skillServices.assignAll(
+      services
+          .whereType<Map>()
+          .map((service) {
+            return <String, String>{
+              'id': apiPeramString(
+                service['id'] ?? service['serviceId'] ?? service['_id'],
+              ),
+              'name': apiPeramString(
+                service['name'] ?? service['serviceName'] ?? service['title'],
+                initialValue: 'Service',
+              ),
+            };
+          })
+          .where((service) => service['id']!.isNotEmpty),
+    );
+  }
+
+  void toggleSkillService(String serviceId) {
+    if (selectedServiceIds.contains(serviceId)) {
+      selectedServiceIds.remove(serviceId);
+    } else {
+      selectedServiceIds.add(serviceId);
+    }
+    selectedServicesController.text = skillServices
+        .where((service) => selectedServiceIds.contains(service['id']))
+        .map((service) => service['name']!)
+        .join(', ');
+  }
+
+  void openSkillServicesBottomSheet() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    if (skillServices.isEmpty || isSkillServicesLoading.value) return;
+    Get.bottomSheet(
+      Container(
+        constraints: BoxConstraints(maxHeight: Get.height * 0.72),
+        padding: EdgeInsets.symmetric(horizontal: 20.rw, vertical: 14.rh),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24.rr),
+            topRight: Radius.circular(24.rr),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 36.rw,
+                height: 4.rh,
+                decoration: BoxDecoration(
+                  color: AppColors.colorC4C4C4,
+                  borderRadius: BorderRadius.circular(2.rr),
+                ),
+              ),
+            ),
+            sizedboxHeight(14),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Select Services',
+                  style: AppTextStyles.ts18w700color000000(),
+                ),
+                IconButton(
+                  onPressed: () => Get.back<void>(),
+                  icon: const Icon(Icons.close_rounded),
+                ),
+              ],
+            ),
+            Text(
+              'You can select multiple services',
+              style: AppTextStyles.ts12w500color808080(),
+            ),
+            sizedboxHeight(14),
+            Flexible(
+              child: Obx(
+                () => ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: skillServices.length,
+                  separatorBuilder: (_, _) => sizedboxHeight(8),
+                  itemBuilder: (_, index) {
+                    final service = skillServices[index];
+                    final id = service['id']!;
+                    final selected = selectedServiceIds.contains(id);
+                    return InkWell(
+                      onTap: () => toggleSkillService(id),
+                      borderRadius: BorderRadius.circular(10.rr),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.rw,
+                          vertical: 12.rh,
+                        ),
+                        decoration: BoxDecoration(
+                          color: selected
+                              ? AppColors.yellowBg
+                              : AppColors.white,
+                          borderRadius: BorderRadius.circular(10.rr),
+                          border: Border.all(
+                            color: selected
+                                ? AppColors.primary
+                                : AppColors.borderDBDBDB,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                service['name']!,
+                                style: AppTextStyles.ts14w600colorBlack(),
+                              ),
+                            ),
+                            Icon(
+                              selected
+                                  ? Icons.check_circle_rounded
+                                  : Icons.radio_button_unchecked_rounded,
+                              color: selected
+                                  ? AppColors.primary
+                                  : AppColors.color7D7D7D,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
   }
 
   // Step 7: Availability
   final TextEditingController workTypeController = TextEditingController();
-  final TextEditingController immediateJoiningController = TextEditingController();
-  final TextEditingController workingRadiusController = TextEditingController(text: "10 km");
+  final TextEditingController immediateJoiningController =
+      TextEditingController();
+  final TextEditingController workingRadiusController = TextEditingController(
+    text: "10 km",
+  );
 
   // Step 8: Review All Details Expandable Sections Tracker
   final RxSet<int> expandedSections = <int>{}.obs;
@@ -266,7 +683,11 @@ class WorkerRegistrationController extends GetxController {
                       color: AppColors.colorF5F5F5,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.close_rounded, size: 18.rsp, color: AppColors.black),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 18.rsp,
+                      color: AppColors.black,
+                    ),
                   ),
                 ),
               ],
@@ -287,12 +708,19 @@ class WorkerRegistrationController extends GetxController {
                           Get.back<void>();
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 14.rw, vertical: 12.rh),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 14.rw,
+                            vertical: 12.rh,
+                          ),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.yellowBg : AppColors.white,
+                            color: isSelected
+                                ? AppColors.yellowBg
+                                : AppColors.white,
                             borderRadius: BorderRadius.circular(10.rr),
                             border: Border.all(
-                              color: isSelected ? AppColors.primary : AppColors.borderE6E6E6,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.borderE6E6E6,
                               width: isSelected ? 1.5.rsp : 1.rsp,
                             ),
                           ),
@@ -304,17 +732,22 @@ class WorkerRegistrationController extends GetxController {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? AppColors.primary
-                                      : AppColors.primary.withValues(alpha: 0.12),
+                                      : AppColors.primary.withValues(
+                                          alpha: 0.12,
+                                        ),
                                   shape: BoxShape.circle,
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   item['code']!,
-                                  style: AppTextStyles.ts12w600color000000().copyWith(
-                                    color: isSelected ? AppColors.black : AppColors.primary,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 11.5.rsp,
-                                  ),
+                                  style: AppTextStyles.ts12w600color000000()
+                                      .copyWith(
+                                        color: isSelected
+                                            ? AppColors.black
+                                            : AppColors.primary,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 11.5.rsp,
+                                      ),
                                 ),
                               ),
                               sizedboxWidth(12),
@@ -324,14 +757,18 @@ class WorkerRegistrationController extends GetxController {
                                   children: [
                                     Text(
                                       optTitle,
-                                      style: AppTextStyles.ts14w600colorBlack().copyWith(
-                                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                      ),
+                                      style: AppTextStyles.ts14w600colorBlack()
+                                          .copyWith(
+                                            fontWeight: isSelected
+                                                ? FontWeight.w700
+                                                : FontWeight.w600,
+                                          ),
                                     ),
                                     sizedboxHeight(2),
                                     Text(
                                       item['subtitle']!,
-                                      style: AppTextStyles.ts12w500color808080(),
+                                      style:
+                                          AppTextStyles.ts12w500color808080(),
                                     ),
                                   ],
                                 ),
@@ -437,7 +874,11 @@ class WorkerRegistrationController extends GetxController {
                       color: AppColors.colorF5F5F5,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.close_rounded, size: 18.rsp, color: AppColors.black),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 18.rsp,
+                      color: AppColors.black,
+                    ),
                   ),
                 ),
               ],
@@ -449,7 +890,8 @@ class WorkerRegistrationController extends GetxController {
                 child: Column(
                   children: options.map((item) {
                     final String optTitle = item['title']!;
-                    final bool isSelected = immediateJoiningController.text == optTitle;
+                    final bool isSelected =
+                        immediateJoiningController.text == optTitle;
                     return Padding(
                       padding: EdgeInsets.only(bottom: 10.rh),
                       child: GestureDetector(
@@ -458,12 +900,19 @@ class WorkerRegistrationController extends GetxController {
                           Get.back<void>();
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 14.rw, vertical: 12.rh),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 14.rw,
+                            vertical: 12.rh,
+                          ),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.yellowBg : AppColors.white,
+                            color: isSelected
+                                ? AppColors.yellowBg
+                                : AppColors.white,
                             borderRadius: BorderRadius.circular(10.rr),
                             border: Border.all(
-                              color: isSelected ? AppColors.primary : AppColors.borderE6E6E6,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.borderE6E6E6,
                               width: isSelected ? 1.5.rsp : 1.rsp,
                             ),
                           ),
@@ -475,17 +924,22 @@ class WorkerRegistrationController extends GetxController {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? AppColors.primary
-                                      : AppColors.primary.withValues(alpha: 0.12),
+                                      : AppColors.primary.withValues(
+                                          alpha: 0.12,
+                                        ),
                                   shape: BoxShape.circle,
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   item['code']!,
-                                  style: AppTextStyles.ts12w600color000000().copyWith(
-                                    color: isSelected ? AppColors.black : AppColors.primary,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 11.5.rsp,
-                                  ),
+                                  style: AppTextStyles.ts12w600color000000()
+                                      .copyWith(
+                                        color: isSelected
+                                            ? AppColors.black
+                                            : AppColors.primary,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 11.5.rsp,
+                                      ),
                                 ),
                               ),
                               sizedboxWidth(12),
@@ -495,14 +949,18 @@ class WorkerRegistrationController extends GetxController {
                                   children: [
                                     Text(
                                       optTitle,
-                                      style: AppTextStyles.ts14w600colorBlack().copyWith(
-                                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                      ),
+                                      style: AppTextStyles.ts14w600colorBlack()
+                                          .copyWith(
+                                            fontWeight: isSelected
+                                                ? FontWeight.w700
+                                                : FontWeight.w600,
+                                          ),
                                     ),
                                     sizedboxHeight(2),
                                     Text(
                                       item['subtitle']!,
-                                      style: AppTextStyles.ts12w500color808080(),
+                                      style:
+                                          AppTextStyles.ts12w500color808080(),
                                     ),
                                   ],
                                 ),
@@ -613,7 +1071,11 @@ class WorkerRegistrationController extends GetxController {
                       color: AppColors.colorF5F5F5,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.close_rounded, size: 18.rsp, color: AppColors.black),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 18.rsp,
+                      color: AppColors.black,
+                    ),
                   ),
                 ),
               ],
@@ -625,7 +1087,8 @@ class WorkerRegistrationController extends GetxController {
                 child: Column(
                   children: options.map((item) {
                     final String optTitle = item['title']!;
-                    final bool isSelected = workingRadiusController.text == optTitle;
+                    final bool isSelected =
+                        workingRadiusController.text == optTitle;
                     return Padding(
                       padding: EdgeInsets.only(bottom: 10.rh),
                       child: GestureDetector(
@@ -634,12 +1097,19 @@ class WorkerRegistrationController extends GetxController {
                           Get.back<void>();
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 14.rw, vertical: 12.rh),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 14.rw,
+                            vertical: 12.rh,
+                          ),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.yellowBg : AppColors.white,
+                            color: isSelected
+                                ? AppColors.yellowBg
+                                : AppColors.white,
                             borderRadius: BorderRadius.circular(10.rr),
                             border: Border.all(
-                              color: isSelected ? AppColors.primary : AppColors.borderE6E6E6,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.borderE6E6E6,
                               width: isSelected ? 1.5.rsp : 1.rsp,
                             ),
                           ),
@@ -651,17 +1121,22 @@ class WorkerRegistrationController extends GetxController {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? AppColors.primary
-                                      : AppColors.primary.withValues(alpha: 0.12),
+                                      : AppColors.primary.withValues(
+                                          alpha: 0.12,
+                                        ),
                                   shape: BoxShape.circle,
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   item['code']!,
-                                  style: AppTextStyles.ts12w600color000000().copyWith(
-                                    color: isSelected ? AppColors.black : AppColors.primary,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 11.5.rsp,
-                                  ),
+                                  style: AppTextStyles.ts12w600color000000()
+                                      .copyWith(
+                                        color: isSelected
+                                            ? AppColors.black
+                                            : AppColors.primary,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 11.5.rsp,
+                                      ),
                                 ),
                               ),
                               sizedboxWidth(12),
@@ -671,14 +1146,18 @@ class WorkerRegistrationController extends GetxController {
                                   children: [
                                     Text(
                                       optTitle,
-                                      style: AppTextStyles.ts14w600colorBlack().copyWith(
-                                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                      ),
+                                      style: AppTextStyles.ts14w600colorBlack()
+                                          .copyWith(
+                                            fontWeight: isSelected
+                                                ? FontWeight.w700
+                                                : FontWeight.w600,
+                                          ),
                                     ),
                                     sizedboxHeight(2),
                                     Text(
                                       item['subtitle']!,
-                                      style: AppTextStyles.ts12w500color808080(),
+                                      style:
+                                          AppTextStyles.ts12w500color808080(),
                                     ),
                                   ],
                                 ),
@@ -867,7 +1346,11 @@ class WorkerRegistrationController extends GetxController {
                       color: AppColors.colorF5F5F5,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.close_rounded, size: 18.rsp, color: AppColors.black),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 18.rsp,
+                      color: AppColors.black,
+                    ),
                   ),
                 ),
               ],
@@ -883,7 +1366,11 @@ class WorkerRegistrationController extends GetxController {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search_rounded, color: AppColors.color7D7D7D, size: 20.rsp),
+                  Icon(
+                    Icons.search_rounded,
+                    color: AppColors.color7D7D7D,
+                    size: 20.rsp,
+                  ),
                   sizedboxWidth(8),
                   Expanded(
                     child: TextField(
@@ -905,7 +1392,9 @@ class WorkerRegistrationController extends GetxController {
             Expanded(
               child: Obx(() {
                 final query = searchRx.value.toLowerCase().trim();
-                final filtered = statesList.where((s) => s.toLowerCase().contains(query)).toList();
+                final filtered = statesList
+                    .where((s) => s.toLowerCase().contains(query))
+                    .toList();
 
                 if (filtered.isEmpty) {
                   return Center(
@@ -923,7 +1412,9 @@ class WorkerRegistrationController extends GetxController {
                   itemBuilder: (context, index) {
                     final stateName = filtered[index];
                     final bool isSelected = stateController.text == stateName;
-                    final String stateCode = stateName.length >= 2 ? stateName.substring(0, 2).toUpperCase() : 'ST';
+                    final String stateCode = stateName.length >= 2
+                        ? stateName.substring(0, 2).toUpperCase()
+                        : 'ST';
 
                     return GestureDetector(
                       onTap: () {
@@ -931,12 +1422,19 @@ class WorkerRegistrationController extends GetxController {
                         Get.back<void>();
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 14.rw, vertical: 10.rh),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.rw,
+                          vertical: 10.rh,
+                        ),
                         decoration: BoxDecoration(
-                          color: isSelected ? AppColors.yellowBg : AppColors.white,
+                          color: isSelected
+                              ? AppColors.yellowBg
+                              : AppColors.white,
                           borderRadius: BorderRadius.circular(10.rr),
                           border: Border.all(
-                            color: isSelected ? AppColors.primary : AppColors.borderE6E6E6,
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.borderE6E6E6,
                             width: isSelected ? 1.5.rsp : 1.rsp,
                           ),
                         ),
@@ -954,11 +1452,14 @@ class WorkerRegistrationController extends GetxController {
                               alignment: Alignment.center,
                               child: Text(
                                 stateCode,
-                                style: AppTextStyles.ts12w600color000000().copyWith(
-                                  color: isSelected ? AppColors.black : AppColors.primary,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 11.rsp,
-                                ),
+                                style: AppTextStyles.ts12w600color000000()
+                                    .copyWith(
+                                      color: isSelected
+                                          ? AppColors.black
+                                          : AppColors.primary,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 11.rsp,
+                                    ),
                               ),
                             ),
                             sizedboxWidth(12),
@@ -968,9 +1469,12 @@ class WorkerRegistrationController extends GetxController {
                                 children: [
                                   Text(
                                     stateName,
-                                    style: AppTextStyles.ts14w600colorBlack().copyWith(
-                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                    ),
+                                    style: AppTextStyles.ts14w600colorBlack()
+                                        .copyWith(
+                                          fontWeight: isSelected
+                                              ? FontWeight.w700
+                                              : FontWeight.w600,
+                                        ),
                                   ),
                                   Text(
                                     "State",
@@ -1110,7 +1614,11 @@ class WorkerRegistrationController extends GetxController {
                       color: AppColors.colorF5F5F5,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.close_rounded, size: 18.rsp, color: AppColors.black),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 18.rsp,
+                      color: AppColors.black,
+                    ),
                   ),
                 ),
               ],
@@ -1126,7 +1634,11 @@ class WorkerRegistrationController extends GetxController {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search_rounded, color: AppColors.color7D7D7D, size: 20.rsp),
+                  Icon(
+                    Icons.search_rounded,
+                    color: AppColors.color7D7D7D,
+                    size: 20.rsp,
+                  ),
                   sizedboxWidth(8),
                   Expanded(
                     child: TextField(
@@ -1148,7 +1660,9 @@ class WorkerRegistrationController extends GetxController {
             Expanded(
               child: Obx(() {
                 final query = searchRx.value.toLowerCase().trim();
-                final filtered = citiesList.where((c) => c.toLowerCase().contains(query)).toList();
+                final filtered = citiesList
+                    .where((c) => c.toLowerCase().contains(query))
+                    .toList();
 
                 if (filtered.isEmpty) {
                   return Center(
@@ -1166,7 +1680,9 @@ class WorkerRegistrationController extends GetxController {
                   itemBuilder: (context, index) {
                     final cityName = filtered[index];
                     final bool isSelected = cityController.text == cityName;
-                    final String cityCode = cityName.length >= 2 ? cityName.substring(0, 2).toUpperCase() : 'CT';
+                    final String cityCode = cityName.length >= 2
+                        ? cityName.substring(0, 2).toUpperCase()
+                        : 'CT';
 
                     return GestureDetector(
                       onTap: () {
@@ -1174,12 +1690,19 @@ class WorkerRegistrationController extends GetxController {
                         Get.back<void>();
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 14.rw, vertical: 10.rh),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.rw,
+                          vertical: 10.rh,
+                        ),
                         decoration: BoxDecoration(
-                          color: isSelected ? AppColors.yellowBg : AppColors.white,
+                          color: isSelected
+                              ? AppColors.yellowBg
+                              : AppColors.white,
                           borderRadius: BorderRadius.circular(10.rr),
                           border: Border.all(
-                            color: isSelected ? AppColors.primary : AppColors.borderE6E6E6,
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.borderE6E6E6,
                             width: isSelected ? 1.5.rsp : 1.rsp,
                           ),
                         ),
@@ -1197,11 +1720,14 @@ class WorkerRegistrationController extends GetxController {
                               alignment: Alignment.center,
                               child: Text(
                                 cityCode,
-                                style: AppTextStyles.ts12w600color000000().copyWith(
-                                  color: isSelected ? AppColors.black : AppColors.primary,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 11.rsp,
-                                ),
+                                style: AppTextStyles.ts12w600color000000()
+                                    .copyWith(
+                                      color: isSelected
+                                          ? AppColors.black
+                                          : AppColors.primary,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 11.rsp,
+                                    ),
                               ),
                             ),
                             sizedboxWidth(12),
@@ -1211,12 +1737,17 @@ class WorkerRegistrationController extends GetxController {
                                 children: [
                                   Text(
                                     cityName,
-                                    style: AppTextStyles.ts14w600colorBlack().copyWith(
-                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                    ),
+                                    style: AppTextStyles.ts14w600colorBlack()
+                                        .copyWith(
+                                          fontWeight: isSelected
+                                              ? FontWeight.w700
+                                              : FontWeight.w600,
+                                        ),
                                   ),
                                   Text(
-                                    stateController.text.isNotEmpty ? stateController.text : "City",
+                                    stateController.text.isNotEmpty
+                                        ? stateController.text
+                                        : "City",
                                     style: AppTextStyles.ts12w500color808080(),
                                   ),
                                 ],
@@ -1314,7 +1845,11 @@ class WorkerRegistrationController extends GetxController {
                       color: AppColors.colorF5F5F5,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.close_rounded, size: 18.rsp, color: AppColors.black),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 18.rsp,
+                      color: AppColors.black,
+                    ),
                   ),
                 ),
               ],
@@ -1331,7 +1866,11 @@ class WorkerRegistrationController extends GetxController {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search_rounded, color: AppColors.color7D7D7D, size: 20.rsp),
+                  Icon(
+                    Icons.search_rounded,
+                    color: AppColors.color7D7D7D,
+                    size: 20.rsp,
+                  ),
                   sizedboxWidth(8),
                   Expanded(
                     child: TextField(
@@ -1374,8 +1913,11 @@ class WorkerRegistrationController extends GetxController {
                   separatorBuilder: (context, index) => sizedboxHeight(8),
                   itemBuilder: (context, index) {
                     final item = filteredList[index];
-                    final String displayString = "${item['name']} (${item['native']})";
-                    final bool isSelected = selectedLanguage.value.startsWith(item['name']!);
+                    final String displayString =
+                        "${item['name']} (${item['native']})";
+                    final bool isSelected = selectedLanguage.value.startsWith(
+                      item['name']!,
+                    );
 
                     return GestureDetector(
                       onTap: () {
@@ -1383,12 +1925,19 @@ class WorkerRegistrationController extends GetxController {
                         Get.back<void>();
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 14.rw, vertical: 10.rh),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.rw,
+                          vertical: 10.rh,
+                        ),
                         decoration: BoxDecoration(
-                          color: isSelected ? AppColors.yellowBg : AppColors.white,
+                          color: isSelected
+                              ? AppColors.yellowBg
+                              : AppColors.white,
                           borderRadius: BorderRadius.circular(10.rr),
                           border: Border.all(
-                            color: isSelected ? AppColors.primary : AppColors.borderE6E6E6,
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.borderE6E6E6,
                             width: isSelected ? 1.5.rsp : 1.rsp,
                           ),
                         ),
@@ -1406,11 +1955,14 @@ class WorkerRegistrationController extends GetxController {
                               alignment: Alignment.center,
                               child: Text(
                                 item['code']!,
-                                style: AppTextStyles.ts12w600color000000().copyWith(
-                                  color: isSelected ? AppColors.black : AppColors.primary,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 11.rsp,
-                                ),
+                                style: AppTextStyles.ts12w600color000000()
+                                    .copyWith(
+                                      color: isSelected
+                                          ? AppColors.black
+                                          : AppColors.primary,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 11.rsp,
+                                    ),
                               ),
                             ),
                             sizedboxWidth(12),
@@ -1420,9 +1972,12 @@ class WorkerRegistrationController extends GetxController {
                                 children: [
                                   Text(
                                     item['name']!,
-                                    style: AppTextStyles.ts14w600colorBlack().copyWith(
-                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                    ),
+                                    style: AppTextStyles.ts14w600colorBlack()
+                                        .copyWith(
+                                          fontWeight: isSelected
+                                              ? FontWeight.w700
+                                              : FontWeight.w600,
+                                        ),
                                   ),
                                   Text(
                                     item['native']!,
@@ -1509,7 +2064,10 @@ class WorkerRegistrationController extends GetxController {
                         decoration: BoxDecoration(
                           color: AppColors.colorF5F5F5,
                           borderRadius: BorderRadius.circular(16.rr),
-                          border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
+                          border: Border.all(
+                            color: AppColors.borderE6E6E6,
+                            width: 1.rsp,
+                          ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1522,9 +2080,8 @@ class WorkerRegistrationController extends GetxController {
                             sizedboxHeight(8),
                             Text(
                               "Camera",
-                              style: AppTextStyles.ts14w600colorBlack().copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: AppTextStyles.ts14w600colorBlack()
+                                  .copyWith(fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
@@ -1550,7 +2107,10 @@ class WorkerRegistrationController extends GetxController {
                         decoration: BoxDecoration(
                           color: AppColors.colorF5F5F5,
                           borderRadius: BorderRadius.circular(16.rr),
-                          border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
+                          border: Border.all(
+                            color: AppColors.borderE6E6E6,
+                            width: 1.rsp,
+                          ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1563,9 +2123,8 @@ class WorkerRegistrationController extends GetxController {
                             sizedboxHeight(8),
                             Text(
                               "Gallery",
-                              style: AppTextStyles.ts14w600colorBlack().copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: AppTextStyles.ts14w600colorBlack()
+                                  .copyWith(fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
@@ -1588,11 +2147,18 @@ class WorkerRegistrationController extends GetxController {
     required String title,
     required String fileName,
     VoidCallback? onReupload,
+    VoidCallback? onRemove,
   }) {
     FocusManager.instance.primaryFocus?.unfocus();
+    final bool canEdit = !isPreviewMode.value &&
+        kycStatus.value.toUpperCase() != 'UNDER_REVIEW' &&
+        kycStatus.value.toUpperCase() != 'APPROVED';
+    final VoidCallback? effectiveReupload = canEdit ? onReupload : null;
+    final VoidCallback? effectiveRemove = canEdit ? onRemove : null;
+
     final bool isFileExist = fileName.isNotEmpty && File(fileName).existsSync();
-    final bool isNetworkImage = fileName.startsWith('http://') ||
-        fileName.startsWith('https://');
+    final bool isNetworkImage =
+        fileName.startsWith('http://') || fileName.startsWith('https://');
 
     Get.dialog<void>(
       Scaffold(
@@ -1677,6 +2243,40 @@ class WorkerRegistrationController extends GetxController {
                   ],
                 ),
               ),
+              if (effectiveReupload != null || effectiveRemove != null)
+                Positioned(
+                  left: 16.rw,
+                  right: 16.rw,
+                  bottom: 20.rh,
+                  child: Row(
+                    children: [
+                      if (effectiveRemove != null)
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Get.back<void>();
+                              effectiveRemove();
+                            },
+                            icon: const Icon(Icons.delete_outline_rounded),
+                            label: const Text('Remove'),
+                          ),
+                        ),
+                      if (effectiveRemove != null && effectiveReupload != null)
+                        sizedboxWidth(10),
+                      if (effectiveReupload != null)
+                        Expanded(
+                          child: FilledButton.icon(
+                            onPressed: () {
+                              Get.back<void>();
+                              effectiveReupload();
+                            },
+                            icon: const Icon(Icons.upload_rounded),
+                            label: const Text('Change'),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),
@@ -1765,7 +2365,8 @@ class WorkerRegistrationController extends GetxController {
   bool validateStep2BankInfo() {
     final String holderName = accountHolderNameController.text.trim();
     final String accountNumber = accountNumberController.text.trim();
-    final String confirmAccountNumber = confirmAccountNumberController.text.trim();
+    final String confirmAccountNumber = confirmAccountNumberController.text
+        .trim();
     final String ifscCode = ifscCodeController.text.trim().toUpperCase();
     ifscCodeController.text = ifscCode;
     final String branchName = branchNameController.text.trim();
@@ -1913,17 +2514,25 @@ class WorkerRegistrationController extends GetxController {
   }
 
   bool validateStep6SkillsExperience() {
-    if (experienceYearsController.text.trim().isEmpty) {
+    if (selectedSkillId.value.isEmpty) {
       showCustomWidthSnackBar(
-        "Please enter Years of Experience",
+        "Please select a skill",
         customWidth: 340.rw,
         bgColor: Colors.redAccent,
       );
       return false;
     }
-    if (previousCompanyController.text.trim().isEmpty) {
+    if (skillServices.isNotEmpty && selectedServiceIds.isEmpty) {
       showCustomWidthSnackBar(
-        "Please enter Previous Company",
+        "Please select at least one service",
+        customWidth: 340.rw,
+        bgColor: Colors.redAccent,
+      );
+      return false;
+    }
+    if (experienceYearsController.text.trim().isEmpty) {
+      showCustomWidthSnackBar(
+        "Please enter Years of Experience",
         customWidth: 340.rw,
         bgColor: Colors.redAccent,
       );
@@ -1937,56 +2546,75 @@ class WorkerRegistrationController extends GetxController {
       );
       return false;
     }
-
-    bool isUploaded(String path) =>
-        path.isNotEmpty &&
-        path != 'proof.pdf' &&
-        path != 'front.pdf' &&
-        path != 'certificate.pdf';
-
-    if (!isUploaded(itiCertPath.value)) {
-      showCustomWidthSnackBar(
-        "Please upload ITI Certificate",
-        customWidth: 340.rw,
-        bgColor: Colors.redAccent,
-      );
-      return false;
-    }
-    if (!isUploaded(nsdcCertPath.value)) {
-      showCustomWidthSnackBar(
-        "Please upload NSDC Certificate",
-        customWidth: 340.rw,
-        bgColor: Colors.redAccent,
-      );
-      return false;
-    }
-    if (!isUploaded(govtCertPath.value)) {
-      showCustomWidthSnackBar(
-        "Please upload Government Certificate",
-        customWidth: 340.rw,
-        bgColor: Colors.redAccent,
-      );
-      return false;
-    }
-    if (!isUploaded(otherCertPath.value)) {
-      showCustomWidthSnackBar(
-        "Please upload Other Certificates",
-        customWidth: 340.rw,
-        bgColor: Colors.redAccent,
-      );
-      return false;
-    }
-
     return true;
   }
 
+  bool _isLocalUpload(String path) {
+    final String value = path.trim();
+    if (value.isEmpty ||
+        value.startsWith('http://') ||
+        value.startsWith('https://')) {
+      return false;
+    }
+    return File(value).existsSync();
+  }
+
+  Future<dynamic> _getFileOrUrlPayload(String path) async {
+    final String trimmed = path.trim();
+    if (trimmed.isEmpty) return null;
+    if (_isLocalUpload(trimmed)) {
+      return await getMultipartFileFromXFile(XFile(trimmed));
+    }
+    if (trimmed.startsWith('http://') ||
+        trimmed.startsWith('https://') ||
+        trimmed.startsWith('/uploads/') ||
+        trimmed.startsWith('uploads/')) {
+      return trimmed;
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>> _getIdentityDocPayloadMap() async {
+    final Map<String, dynamic> payload = <String, dynamic>{};
+
+    final dynamic f1 = await _getFileOrUrlPayload(idFrontPath.value);
+    if (f1 != null) {
+      payload['identityFront'] = f1;
+    }
+
+    final dynamic b1 = await _getFileOrUrlPayload(idBackPath.value);
+    if (b1 != null) {
+      payload['identityBack'] = b1;
+    }
+
+    final dynamic p1 = await _getFileOrUrlPayload(panCardPath.value);
+    if (p1 != null) {
+      payload['panCard'] = p1;
+    }
+
+    final dynamic pc1 = await _getFileOrUrlPayload(policeCertPath.value);
+    if (pc1 != null) {
+      payload['policeCertificate'] = pc1;
+    }
+
+    return payload;
+  }
+
   Future<bool> _sendCurrentStep() async {
+    if (isPreviewMode.value ||
+        kycStatus.value.toUpperCase() == 'UNDER_REVIEW' ||
+        kycStatus.value.toUpperCase() == 'APPROVED') {
+      return true;
+    }
+
     final user = Get.find<UserController>().userData.value;
-    final Map response;
+    Map response;
 
     switch (currentStep.value) {
       case 1:
         final dob = DateFormat('dd/MM/yyyy').parse(dobController.text.trim());
+        final dynamic addressProofVal =
+            await _getFileOrUrlPayload(addressProofPath.value);
         response = await WorkerKycApiServices.personalInfo({
           'fullName': fullNameController.text.trim(),
           'dateOfBirth': DateFormat('yyyy-MM-dd').format(dob),
@@ -1999,36 +2627,48 @@ class WorkerRegistrationController extends GetxController {
           'pincode': pincodeController.text.trim(),
           if (user.mobile.isNotEmpty) 'phone': user.mobile,
           if (user.email.isNotEmpty) 'email': user.email,
-          'addressProof': await getMultipartFileFromXFile(XFile(addressProofPath.value)),
+          'addressProof': ?addressProofVal,
         });
       case 2:
+        final dynamic passbookVal =
+            await _getFileOrUrlPayload(passbookProofPath.value);
         response = await WorkerKycApiServices.bankInfo({
           'bankAccountName': accountHolderNameController.text.trim(),
           'bankAccountNumber': accountNumberController.text.trim(),
           'bankIfscCode': ifscCodeController.text.trim(),
-          'bankPassbook': await getMultipartFileFromXFile(XFile(passbookProofPath.value)),
+          'branchName': branchNameController.text.trim(),
+          'bankPassbook': ?passbookVal,
         });
       case 3:
-        response = await WorkerKycApiServices.identityDocuments({
-          'identityFront': await getMultipartFileFromXFile(XFile(idFrontPath.value)),
-          'identityBack': await getMultipartFileFromXFile(XFile(idBackPath.value)),
-          'panCard': await getMultipartFileFromXFile(XFile(panCardPath.value)),
-          'policeCertificate': await getMultipartFileFromXFile(XFile(policeCertPath.value)),
-        });
+        final Map<String, dynamic> idDocMap =
+            await _getIdentityDocPayloadMap();
+        response = await WorkerKycApiServices.identityDocuments(idDocMap);
       case 5:
+        final dynamic liveSelfieVal =
+            await _getFileOrUrlPayload(liveSelfiePath.value);
         response = await WorkerKycApiServices.liveSelfie({
-          'liveSelfie': await getMultipartFileFromXFile(XFile(liveSelfiePath.value)),
+          'liveSelfie': ?liveSelfieVal,
         });
       case 6:
+        final dynamic itiCertVal = await _getFileOrUrlPayload(itiCertPath.value);
+        final dynamic nsdcCertVal = await _getFileOrUrlPayload(nsdcCertPath.value);
+        final dynamic govtCertVal = await _getFileOrUrlPayload(govtCertPath.value);
+        final dynamic otherCertVal =
+            await _getFileOrUrlPayload(otherCertPath.value);
         response = await WorkerKycApiServices.skillsExperience({
-          'skillId': '68cffb64-7914-4569-9a0d-726f7578bcfd',
+          // Keep both deployed and newer API field names for compatibility.
+          'skillId': selectedSkillId.value,
+          'skillCategory': selectedSkillCategory.value,
+          'skillServiceIds': jsonEncode(selectedServiceIds.toList()),
+          'selectedSkillServiceIds': jsonEncode(selectedServiceIds.toList()),
           'experienceYears': experienceYearsController.text.trim(),
           'previousCompany': previousCompanyController.text.trim(),
           'dailyWageExpectation': dailyWageController.text.trim(),
-          'itiCertificate': await getMultipartFileFromXFile(XFile(itiCertPath.value)),
-          'nsdcCertificate': await getMultipartFileFromXFile(XFile(nsdcCertPath.value)),
-          'govtCertificate': await getMultipartFileFromXFile(XFile(govtCertPath.value)),
-          'otherCertificate': await getMultipartFileFromXFile(XFile(otherCertPath.value)),
+          'description': workDescriptionController.text.trim(),
+          'itiCertificate': ?itiCertVal,
+          'nsdcCertificate': ?nsdcCertVal,
+          'govtCertificate': ?govtCertVal,
+          'otherCertificate': ?otherCertVal,
         });
       case 7:
         response = await WorkerKycApiServices.availability({
@@ -2037,25 +2677,117 @@ class WorkerRegistrationController extends GetxController {
             'Both (Flexible)' => 'FLEXIBLE',
             _ => 'FULL_TIME',
           },
-          'immediateJoining': immediateJoiningController.text == 'Yes (Immediate)',
-          'workingRadiusKm': int.tryParse(
+          'immediateJoining':
+              immediateJoiningController.text == 'Yes (Immediate)',
+          'workingRadiusKm':
+              int.tryParse(
                 workingRadiusController.text.replaceAll(RegExp(r'[^0-9]'), ''),
               ) ??
               10,
         });
       case 8:
         response = await WorkerKycApiServices.submit();
+        if (!apiResponseSuccess(response)) {
+          final String msg = apiPeramString(
+            response['message'] ?? response['msg'],
+          ).toUpperCase();
+          if (msg.contains('AADHAAR_CARD') || msg.contains('PAN_CARD')) {
+            Map<String, dynamic> idDocMap =
+                await _getIdentityDocPayloadMap();
+
+            if (idDocMap.isEmpty) {
+              final Map idDocResp =
+                  await WorkerKycApiServices.getIdentityDocuments();
+              if (apiResponseSuccess(idDocResp)) {
+                _fillFieldsForStep(3, apiPeramMap(idDocResp['data']));
+                idDocMap = await _getIdentityDocPayloadMap();
+              }
+            }
+
+            if (idDocMap.isNotEmpty) {
+              await WorkerKycApiServices.identityDocuments(idDocMap);
+              response = await WorkerKycApiServices.submit();
+            }
+          } else if (msg.contains('ADDRESS_PROOF')) {
+            dynamic addressProofVal =
+                await _getFileOrUrlPayload(addressProofPath.value);
+            if (addressProofVal == null) {
+              final Map personalInfoResp =
+                  await WorkerKycApiServices.getPersonalInfo();
+              if (apiResponseSuccess(personalInfoResp)) {
+                _fillFieldsForStep(1, apiPeramMap(personalInfoResp['data']));
+                addressProofVal =
+                    await _getFileOrUrlPayload(addressProofPath.value);
+              }
+            }
+            if (addressProofVal != null) {
+              DateTime dob;
+              try {
+                dob = DateFormat('dd/MM/yyyy').parse(dobController.text.trim());
+              } catch (_) {
+                dob = DateTime(2000, 1, 1);
+              }
+              await WorkerKycApiServices.personalInfo({
+                'fullName': fullNameController.text.trim(),
+                'dateOfBirth': DateFormat('yyyy-MM-dd').format(dob),
+                'gender': selectedGender.value,
+                'language': languageController.text.trim().split(' ').first,
+                'addressLine1': houseNoController.text.trim(),
+                'addressLine2': fullAddressController.text.trim(),
+                'state': stateController.text.trim(),
+                'city': cityController.text.trim(),
+                'pincode': pincodeController.text.trim(),
+                if (user.mobile.isNotEmpty) 'phone': user.mobile,
+                if (user.email.isNotEmpty) 'email': user.email,
+                'addressProof': addressProofVal,
+              });
+              response = await WorkerKycApiServices.submit();
+            }
+          }
+        }
       default:
         return true;
     }
 
+    debugPrint(
+      '[KYC_FLOW] PUT step=${currentStep.value}, '
+      'success=${apiResponseSuccess(response)}, response=$response',
+    );
     if (apiResponseSuccess(response)) return true;
-    await showdialogApiError(respMap: response);
+
+    if (currentStep.value == 8) {
+      final String message = apiPeramString(
+        response['message'] ?? response['msg'],
+      ).toUpperCase();
+      if (message.contains('ALREADY UNDER REVIEW') ||
+          message.contains('ALREADY_UNDER_REVIEW') ||
+          message.contains('ALREADY SUBMITTED') ||
+          message.contains('UNDER REVIEW') ||
+          message.contains('UNDER_REVIEW')) {
+        return true;
+      }
+      await showdialogApiError(respMap: response);
+      if (message.contains('AADHAAR_CARD') || message.contains('PAN_CARD')) {
+        currentStep.value = 3;
+      } else if (message.contains('LIVE_SELFIE')) {
+        currentStep.value = 4;
+      } else if (message.contains('DAILYWAGEEXPECTATION')) {
+        currentStep.value = 6;
+      }
+      debugPrint(
+        '[KYC_FLOW] Submit incomplete; opened missing-data step='
+        '${currentStep.value}',
+      );
+    } else {
+      await showdialogApiError(respMap: response);
+    }
     return false;
   }
 
   Future<void> nextStep() async {
     if (isLoading.value) return;
+    final int submittedStep = currentStep.value;
+    debugPrint('[KYC_FLOW] Continue clicked on step=$submittedStep');
     if (currentStep.value == 1) {
       if (!validateStep1PersonalInfo()) {
         return;
@@ -2079,19 +2811,54 @@ class WorkerRegistrationController extends GetxController {
     isLoading.value = false;
     if (!success) return;
 
+    if (isCorrectionMode && submittedStep != 4 && submittedStep != 8) {
+      currentStep.value = 8;
+      _hasLoadedReviewData = false;
+      await loadReviewData();
+      return;
+    }
+
+    if (isCorrectionMode && submittedStep == 8) {
+      await AppRoutes.workerVerificationStatusRootScreen();
+      return;
+    }
+
     if (returnToStep.value > 0) {
       currentStep.value = returnToStep.value;
       returnToStep.value = 0;
       return;
     }
 
-    if (currentStep.value < 9) {
-      currentStep.value++;
-    } else {
-      // Set to Under Review state to show the newly built pending screen
-      Get.put(Bnb3HomeController()).isUnderReview.value = true;
-      AppRoutes.bottomNavBarScreen();
+    // Live selfie uses a local capture step followed by its upload/preview step.
+    if (currentStep.value == 4) {
+      currentStep.value = 5;
+      return;
     }
+    await refreshKycProgress(navigate: true);
+
+    // During active onboarding, always open the next screen in sequence. The
+    // backend status can lag briefly and otherwise skip or reopen local steps.
+    if (kycStatus.value != 'APPROVED' && kycStatus.value != 'UNDER_REVIEW') {
+      final int? expectedNextStep = switch (submittedStep) {
+        1 => 2,
+        2 => 3,
+        3 => 4,
+        5 => 6,
+        6 => 7,
+        7 => 8,
+        _ => null,
+      };
+      if (expectedNextStep != null) {
+        currentStep.value = expectedNextStep;
+      }
+    }
+    if (currentStep.value == 8) {
+      await loadReviewData();
+    }
+    debugPrint(
+      '[KYC_FLOW] submittedStep=$submittedStep, '
+      'openedStep=${currentStep.value}, status=${kycStatus.value}',
+    );
   }
 
   void previousStep() {
@@ -2147,6 +2914,11 @@ class WorkerRegistrationController extends GetxController {
     confirmAccountNumberController.dispose();
     ifscCodeController.dispose();
     branchNameController.dispose();
+    experienceYearsController.dispose();
+    previousCompanyController.dispose();
+    dailyWageController.dispose();
+    workDescriptionController.dispose();
+    selectedServicesController.dispose();
     super.onClose();
   }
 }

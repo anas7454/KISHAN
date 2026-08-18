@@ -34,29 +34,33 @@ class Bnb2MaterialScreen extends StatelessWidget with Bnb2MaterialWidgets {
           // Fixed Top Location Header
           requestsHeader(context, ctrl, title: title),
           Expanded(
-            child: SingleChildScrollView(
-              controller: ScrollController(),
-              child: Column(
-                children: [
-                  sizedboxHeight(14),
-                  // Body Container
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.rw),
-                    child: Column(
-                      children: [
-                        // My Work tab gets history status filters.
-                        if (mode == RequestsScreenMode.myWork)
-                          ...([
-                            filterTabsRow(ctrl, showAll: false),
-                            sizedboxHeight(14),
-                          ]),
-                        // Cards List
-                        requestsList(ctrl),
-                        sizedboxHeight(20),
-                      ],
+            child: RefreshIndicator(
+              color: AppColors.primary,
+              onRefresh: ctrl.refreshData,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    sizedboxHeight(14),
+                    // Body Container
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.rw),
+                      child: Column(
+                        children: [
+                          // My Work tab gets history status filters.
+                          if (mode == RequestsScreenMode.myWork)
+                            ...([
+                              filterTabsRow(ctrl, showAll: false),
+                              sizedboxHeight(14),
+                            ]),
+                          // Cards List
+                          requestsList(ctrl),
+                          sizedboxHeight(20),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

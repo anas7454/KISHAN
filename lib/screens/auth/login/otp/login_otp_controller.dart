@@ -8,7 +8,6 @@ import 'package:constructo_worker/networking/user/controllers/user_controller.da
 import 'package:constructo_worker/routes/app_routes.dart';
 import 'package:constructo_worker/routes/arguments.dart';
 import 'package:constructo_worker/routes/route_arguments.dart';
-import 'package:constructo_worker/screens/auth/login/otp/otp_verified_dialog.dart';
 import 'package:constructo_worker/utils/toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,18 +44,18 @@ class LoginOtpController extends GetxController {
       "otp": apiSendTextController(otpController),
     };
     final response = await AuthApiServices.verifyOtpLogin(rawData);
-    isLoading.value = false;
 
     if (apiResponseSuccess(response)) {
       await Get.find<UserController>().setLoginData(
         apiPeramMap(response['data']),
       );
-      await showOtpVerifiedDialog();
-      AppRoutes.workerRegistrationScreen();
+      await Get.find<UserController>().routeAfterAuthentication();
+      isLoading.value = false;
       return;
     }
 
-    showdialogApiError(respMap: response);
+    isLoading.value = false;
+    await showdialogApiError(respMap: response);
   }
 
   Future<void> resendOtp() async {

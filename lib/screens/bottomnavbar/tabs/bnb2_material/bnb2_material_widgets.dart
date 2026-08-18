@@ -97,18 +97,22 @@ mixin Bnb2MaterialWidgets {
           ),
           sizedboxWidth(8),
           // Notification button
-          Container(
-            width: 36.rw,
-            height: 36.rh,
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
-            ),
-            child: Icon(
-              Icons.notifications_none_rounded,
-              color: AppColors.black,
-              size: 20.rsp,
+          InkWell(
+            onTap: AppRoutes.notificationsScreen,
+            customBorder: const CircleBorder(),
+            child: Container(
+              width: 36.rw,
+              height: 36.rh,
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
+              ),
+              child: Icon(
+                Icons.notifications_none_rounded,
+                color: AppColors.black,
+                size: 20.rsp,
+              ),
             ),
           ),
         ],
@@ -166,38 +170,68 @@ mixin Bnb2MaterialWidgets {
         );
       } else {
         // My Work tab: Accepted, Rejected and Pending history.
-        return Row(
-          children: [
-            Expanded(
-              child: _filterPill(
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            border: Border(bottom: BorderSide(color: Color(0xffE6E6E6))),
+          ),
+          child: Row(
+            children: [
+              _workTab(
                 controller,
-                "Accepted",
+                'Accepted',
                 RequestFilterTab.accepted,
                 currentFilter == RequestFilterTab.accepted,
               ),
-            ),
-            sizedboxWidth(8),
-            Expanded(
-              child: _filterPill(
+              _workTab(
                 controller,
-                "Rejected",
+                'Rejected',
                 RequestFilterTab.rejected,
                 currentFilter == RequestFilterTab.rejected,
               ),
-            ),
-            sizedboxWidth(8),
-            Expanded(
-              child: _filterPill(
+              _workTab(
                 controller,
-                "Pending",
+                'Pending',
                 RequestFilterTab.pending,
                 currentFilter == RequestFilterTab.pending,
               ),
-            ),
-          ],
+            ],
+          ),
         );
       }
     });
+  }
+
+  Widget _workTab(
+    Bnb2MaterialController controller,
+    String label,
+    RequestFilterTab tab,
+    bool isSelected,
+  ) {
+    return Expanded(
+      child: InkWell(
+        onTap: () => controller.changeFilter(tab),
+        child: Container(
+          height: 44.rh,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: isSelected ? AppColors.primary : Colors.transparent,
+                width: 3.rsp,
+              ),
+            ),
+          ),
+          child: Text(
+            label,
+            style: AppTextStyles.ts12w500colorBlack().copyWith(
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              color: isSelected ? AppColors.black : AppColors.color7D7D7D,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _filterPill(
@@ -248,7 +282,8 @@ mixin Bnb2MaterialWidgets {
   // Requests List
   Widget requestsList(Bnb2MaterialController controller) {
     return Obx(() {
-      if (controller.isMyWork && controller.isHistoryLoading.value) {
+      if (controller.isHistoryLoading.value ||
+          controller.isRequestsLoading.value) {
         return Padding(
           padding: EdgeInsets.symmetric(vertical: 40.rh),
           child: const Center(child: CircularProgressIndicator()),
@@ -256,16 +291,52 @@ mixin Bnb2MaterialWidgets {
       }
       final requests = controller.filteredRequests;
       if (requests.isEmpty) {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 40.rh),
+        final bool isMyWork = controller.isMyWork;
+        return SizedBox(
+          height: 360.rh,
+          width: double.infinity,
           child: Center(
-            child: Text(
-              controller.isMyWork
-                  ? "No work history found"
-                  : "No requests found",
-              style: AppTextStyles.ts14w600colorBlack().copyWith(
-                color: AppColors.color7D7D7D,
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 72.rw,
+                  height: 72.rw,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFFF7D6),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isMyWork
+                        ? Icons.work_history_outlined
+                        : Icons.inbox_outlined,
+                    size: 34.rsp,
+                    color: AppColors.primary,
+                  ),
+                ),
+                sizedboxHeight(16),
+                Text(
+                  isMyWork ? "No work available" : "No new requests",
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.ts16w600color000000().copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                sizedboxHeight(6),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 28.rw),
+                  child: Text(
+                    isMyWork
+                        ? "Your accepted, pending or completed work will appear here."
+                        : "New work requests will appear here when they become available.",
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.ts12w500color808080().copyWith(
+                      color: AppColors.color7D7D7D,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -280,14 +351,16 @@ mixin Bnb2MaterialWidgets {
             amount: item.amount,
             address: item.address,
             status: item.status,
-            onTap: () =>
-                AppRoutes.requestDetailsScreen(bookingId: item.bookingId),
-            onAccept: () {
-              Get.snackbar("Request Accepted", "Accepted ${item.title}");
-            },
-            onReject: () {
-              Get.snackbar("Request Rejected", "Rejected ${item.title}");
-            },
+            onTap: () => AppRoutes.requestDetailsScreen(
+              bookingId: item.bookingId,
+              status: item.status == WorkerRequestStatus.accepted
+                  ? 'ACCEPTED'
+                  : item.status == WorkerRequestStatus.rejected
+                  ? 'REJECTED'
+                  : 'PENDING',
+            ),
+            onAccept: () => controller.acceptRequest(item),
+            onReject: () => controller.rejectRequest(item),
             onViewMap: () {},
           );
         }).toList(),

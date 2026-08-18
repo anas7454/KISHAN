@@ -38,7 +38,6 @@ class UserDataPref {
   // }
 
   static bool isJwtExpired(String token) {
-    printDebugCustom("isJwtExpired token -->$token");
     try {
       if (token.isEmpty) {
         return true;
@@ -55,7 +54,6 @@ class UserDataPref {
 
       final expiry = DateTime.fromMillisecondsSinceEpoch(decoded['exp'] * 1000);
       printDebugCustom("Token expires at: $expiry"); // Print expiry datetime
-      printDebugCustom("Token =>$token"); // Print expiry datetime
       return DateTime.now().isAfter(expiry);
     } catch (e) {
       return true; // in case of any error, treat as expired

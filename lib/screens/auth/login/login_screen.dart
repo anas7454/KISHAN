@@ -64,8 +64,6 @@ class LoginScreen extends StatelessWidget with LoginWidgets {
             ),
             SizedBox(height: 15.rh),
             socialLoginBtns(socialLoginController),
-            SizedBox(height: 26.rh),
-            signupText(),
           ],
         ),
       ),

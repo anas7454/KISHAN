@@ -1,4 +1,5 @@
 import 'package:constructo_worker/screens/request_details/request_details_controller.dart';
+import 'package:constructo_worker/screens/bottomnavbar/widgets/request_card_widget.dart';
 import 'package:constructo_worker/utils/buttons/back_button_custom.dart';
 import 'package:constructo_worker/utils/theme/app_colors.dart';
 import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
@@ -7,6 +8,25 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 mixin RequestDetailsWidgets {
+  Widget requestDetailsSkeleton() {
+    Widget card(double height) => Container(
+      width: double.infinity,
+      height: height,
+      margin: EdgeInsets.only(bottom: 12.rh),
+      decoration: BoxDecoration(
+        color: const Color(0xffE8E8E8),
+        borderRadius: BorderRadius.circular(8.rr),
+      ),
+    );
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 16.rw, vertical: 14.rh),
+      child: Column(
+        children: [card(150.rh), card(145.rh), card(210.rh), card(150.rh)],
+      ),
+    );
+  }
+
   // Top Yellow Header with Back Button
   Widget requestDetailsHeader(BuildContext context) {
     return Container(
@@ -94,44 +114,36 @@ mixin RequestDetailsWidgets {
                         ),
                       ),
                       sizedboxHeight(6),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.rw, vertical: 3.rh),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffFFF9DB),
-                          borderRadius: BorderRadius.circular(4.rr),
-                        ),
-                        child: Text(
-                          "New Request",
-                          style: AppTextStyles.ts10w500colorBlack().copyWith(
-                            fontSize: 10.rsp,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xff856404),
-                          ),
-                        ),
-                      ),
+                      finalStatusBadge(controller.status.value),
                     ],
                   ),
                 ),
                 // Requested on
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Requested on",
-                      style: AppTextStyles.ts10w500colorBlack().copyWith(
-                        fontSize: 10.rsp,
-                        color: AppColors.color7D7D7D,
+                SizedBox(
+                  width: 105.rw,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Requested on",
+                        style: AppTextStyles.ts10w500colorBlack().copyWith(
+                          fontSize: 10.rsp,
+                          color: AppColors.color7D7D7D,
+                        ),
                       ),
-                    ),
-                    sizedboxHeight(2),
-                    Text(
-                      controller.date.value,
-                      style: AppTextStyles.ts12w500colorBlack().copyWith(
-                        fontSize: 11.rsp,
-                        fontWeight: FontWeight.w700,
+                      sizedboxHeight(2),
+                      Text(
+                        controller.date.value,
+                        maxLines: 2,
+                        textAlign: TextAlign.end,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.ts12w500colorBlack().copyWith(
+                          fontSize: 11.rsp,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -142,66 +154,80 @@ mixin RequestDetailsWidgets {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Start Date",
-                      style: AppTextStyles.ts10w500colorBlack().copyWith(
-                        fontSize: 10.rsp,
-                        color: AppColors.color7D7D7D,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Start Date",
+                        style: AppTextStyles.ts10w500colorBlack().copyWith(
+                          fontSize: 10.rsp,
+                          color: AppColors.color7D7D7D,
+                        ),
                       ),
-                    ),
-                    sizedboxHeight(2),
-                    Text(
-                      controller.startDate.value,
-                      style: AppTextStyles.ts12w500colorBlack().copyWith(
-                        fontSize: 11.rsp,
-                        fontWeight: FontWeight.w700,
+                      sizedboxHeight(2),
+                      Text(
+                        controller.startDate.value,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.ts12w500colorBlack().copyWith(
+                          fontSize: 11.rsp,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Payment type",
-                      style: AppTextStyles.ts10w500colorBlack().copyWith(
-                        fontSize: 10.rsp,
-                        color: AppColors.color7D7D7D,
+                sizedboxWidth(8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Payment type",
+                        style: AppTextStyles.ts10w500colorBlack().copyWith(
+                          fontSize: 10.rsp,
+                          color: AppColors.color7D7D7D,
+                        ),
                       ),
-                    ),
-                    sizedboxHeight(2),
-                    Text(
-                      controller.paymentType.value,
-                      style: AppTextStyles.ts12w500colorBlack().copyWith(
-                        fontSize: 11.rsp,
-                        fontWeight: FontWeight.w700,
+                      sizedboxHeight(2),
+                      Text(
+                        controller.paymentType.value,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.ts12w500colorBlack().copyWith(
+                          fontSize: 11.rsp,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Total Amount",
-                      style: AppTextStyles.ts10w500colorBlack().copyWith(
-                        fontSize: 10.rsp,
-                        color: AppColors.color7D7D7D,
+                sizedboxWidth(8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Total Amount",
+                        style: AppTextStyles.ts10w500colorBlack().copyWith(
+                          fontSize: 10.rsp,
+                          color: AppColors.color7D7D7D,
+                        ),
                       ),
-                    ),
-                    sizedboxHeight(2),
-                    Text(
-                      controller.amount.value,
-                      style: AppTextStyles.ts14w600colorBlack().copyWith(
-                        fontSize: 13.rsp,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xff16A34A),
+                      sizedboxHeight(2),
+                      Text(
+                        controller.amount.value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.ts14w600colorBlack().copyWith(
+                          fontSize: 13.rsp,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xff16A34A),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -209,6 +235,38 @@ mixin RequestDetailsWidgets {
         ),
       );
     });
+  }
+
+  Widget finalStatusBadge(WorkerRequestStatus status) {
+    final bool accepted = status == WorkerRequestStatus.accepted;
+    final bool rejected = status == WorkerRequestStatus.rejected;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.rw, vertical: 3.rh),
+      decoration: BoxDecoration(
+        color: accepted
+            ? const Color(0xffE6F5E9)
+            : rejected
+            ? const Color(0xffFFEBEE)
+            : const Color(0xffFFF9DB),
+        borderRadius: BorderRadius.circular(4.rr),
+      ),
+      child: Text(
+        accepted
+            ? 'Accepted'
+            : rejected
+            ? 'Rejected'
+            : 'New Request',
+        style: AppTextStyles.ts10w500colorBlack().copyWith(
+          fontSize: 10.rsp,
+          fontWeight: FontWeight.w600,
+          color: accepted
+              ? const Color(0xff35AF30)
+              : rejected
+              ? const Color(0xffD32F2F)
+              : const Color(0xff856404),
+        ),
+      ),
+    );
   }
 
   // Card 2: Customer / Client Info Card
@@ -333,10 +391,16 @@ mixin RequestDetailsWidgets {
                   onTap: controller.openMap,
                   borderRadius: BorderRadius.circular(2.rr),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6.rw, vertical: 4.rh),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6.rw,
+                      vertical: 4.rh,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(2.rr),
-                      border: Border.all(color: const Color(0xff0167FA), width: 0.5.rsp),
+                      border: Border.all(
+                        color: const Color(0xff0167FA),
+                        width: 0.5.rsp,
+                      ),
                     ),
                     child: Text(
                       "View on Map",
@@ -500,10 +564,16 @@ mixin RequestDetailsWidgets {
                   onTap: controller.openMap,
                   borderRadius: BorderRadius.circular(2.rr),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6.rw, vertical: 4.rh),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6.rw,
+                      vertical: 4.rh,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(2.rr),
-                      border: Border.all(color: const Color(0xff0167FA), width: 0.5.rsp),
+                      border: Border.all(
+                        color: const Color(0xff0167FA),
+                        width: 0.5.rsp,
+                      ),
                     ),
                     child: Text(
                       "View on Map",
@@ -647,72 +717,101 @@ mixin RequestDetailsWidgets {
 
   // Sticky Bottom Action Bar
   Widget stickyBottomActionBar(RequestDetailsController controller) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.rw, vertical: 12.rh),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Accept Request Button
-          SizedBox(
-            width: double.infinity,
-            height: 44.rh,
-            child: ElevatedButton(
-              onPressed: controller.acceptRequest,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.black,
-                foregroundColor: AppColors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22.rr),
-                ),
+    return Obx(() {
+      if (controller.isLoading.value) return const SizedBox.shrink();
+      if (controller.status.value != WorkerRequestStatus.newRequest) {
+        final bool accepted =
+            controller.status.value == WorkerRequestStatus.accepted;
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.rw, vertical: 14.rh),
+          color: AppColors.white,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                accepted ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                color: accepted
+                    ? const Color(0xff35AF30)
+                    : const Color(0xffD32F2F),
               ),
-              child: Text(
-                "Accept Request",
-                style: TextStyle(
-                  fontSize: 14.rsp,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.white,
+              sizedboxWidth(8),
+              Text(
+                accepted
+                    ? 'This request has been accepted'
+                    : 'This request has been rejected',
+                style: AppTextStyles.ts14w600colorBlack(),
+              ),
+            ],
+          ),
+        );
+      }
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.rw, vertical: 12.rh),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.08),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Accept Request Button
+            SizedBox(
+              width: double.infinity,
+              height: 44.rh,
+              child: ElevatedButton(
+                onPressed: controller.acceptRequest,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.black,
+                  foregroundColor: AppColors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(22.rr),
+                  ),
+                ),
+                child: Text(
+                  "Accept Request",
+                  style: TextStyle(
+                    fontSize: 14.rsp,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.white,
+                  ),
                 ),
               ),
             ),
-          ),
-          sizedboxHeight(10),
-          // Reject Button
-          SizedBox(
-            width: double.infinity,
-            height: 44.rh,
-            child: ElevatedButton(
-              onPressed: controller.rejectRequest,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xffFFF9DB),
-                foregroundColor: AppColors.black,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22.rr),
+            sizedboxHeight(10),
+            // Reject Button
+            SizedBox(
+              width: double.infinity,
+              height: 44.rh,
+              child: ElevatedButton(
+                onPressed: controller.rejectRequest,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xffFFF9DB),
+                  foregroundColor: AppColors.black,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(22.rr),
+                  ),
                 ),
-              ),
-              child: Text(
-                "Reject",
-                style: TextStyle(
-                  fontSize: 14.rsp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff333333),
+                child: Text(
+                  "Reject",
+                  style: TextStyle(
+                    fontSize: 14.rsp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff333333),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 }

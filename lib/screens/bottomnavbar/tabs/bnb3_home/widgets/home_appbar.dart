@@ -60,8 +60,7 @@ mixin HomeAppbar {
         SizedBox(width: 10.rw),
         iconButtonCustomRounded(
           CommonIconsUtility.notification,
-
-          onPressed: () {},
+          onPressed: AppRoutes.notificationsScreen,
         ),
       ],
     );

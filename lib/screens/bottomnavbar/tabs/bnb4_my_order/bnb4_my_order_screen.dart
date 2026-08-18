@@ -7,7 +7,8 @@ import 'package:constructo_worker/utils/theme/sizes/responsive_size_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class Bnb4MyOrderScreen extends StatelessWidget with Bnb4MyOrderWidgets, Bnb3HomeWidgets {
+class Bnb4MyOrderScreen extends StatelessWidget
+    with Bnb4MyOrderWidgets, Bnb3HomeWidgets {
   Bnb4MyOrderScreen({super.key});
 
   final Bnb4MyOrderController controller = Get.find();
@@ -41,9 +42,9 @@ class Bnb4MyOrderScreen extends StatelessWidget with Bnb4MyOrderWidgets, Bnb3Hom
                         workerStatusActionCard(homeController),
                       ],
                       sizedboxHeight(12),
-                      workerKeyStatsGrid(),
+                      workerKeyStatsGrid(homeController),
                       sizedboxHeight(12),
-                      ongoingProjectCard(),
+                      ongoingProjectCard(homeController),
                       sizedboxHeight(16),
                       myVendorRequestedSection(homeController),
                       sizedboxHeight(20),

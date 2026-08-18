@@ -71,9 +71,6 @@ class AppApiServices {
     if ((res.statusCode == 403 || res.statusCode == 401) &&
         isSessionExpire == false) {
       isSessionExpire = true;
-      printDebugCustom(
-        'jwt token ==>${_authController.userData.value.jwtToken}',
-      );
       printDebugCustom("Session Expire -->$printApiPath");
 
       showToastError("Session Expire code ${res.statusCode}");
@@ -195,9 +192,6 @@ class AppApiServices {
       await isSesssionExpired(response, printApiPath);
 
       if (isPrint) {
-        printDebugCustom(
-          '$apiTypeString jwt token ==>${_authController.userData.value.jwtToken}',
-        );
         printDebugCustom(printApiPath);
         // printDebugCustom("response ===> ${response.data}");
       } else {

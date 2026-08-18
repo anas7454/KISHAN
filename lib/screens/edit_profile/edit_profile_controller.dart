@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:constructo_worker/networking/api/endpoints/worker_profile_api_services.dart';
+import 'package:constructo_worker/networking/helper_methods/api_get_helper.dart';
 import 'package:constructo_worker/utils/theme/app_colors.dart';
 import 'package:constructo_worker/utils/theme/styles/app_textstyles.dart';
 import 'package:constructo_worker/utils/toast/custom_tost_for_mobile.dart';
@@ -11,20 +13,64 @@ import 'package:intl/intl.dart';
 
 class EditProfileController extends GetxController {
   // Form Controllers
-  final TextEditingController fullNameController = TextEditingController(text: "Adity Birla");
-  final TextEditingController phoneController = TextEditingController(text: "+91 9876543210");
-  final TextEditingController emailController = TextEditingController(text: "abidsf@gmail.com");
-  final TextEditingController dobController = TextEditingController(text: "15/08/1996");
-  final TextEditingController languageController = TextEditingController(text: "Hindi");
-  final TextEditingController stateController = TextEditingController(text: "Bihar");
-  final TextEditingController cityController = TextEditingController(text: "Patna");
-  final TextEditingController addressController = TextEditingController(text: "Boring Road, Patna, Bihar - 800001");
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController dobController = TextEditingController();
+  final TextEditingController languageController = TextEditingController();
+  final TextEditingController stateController = TextEditingController();
+  final TextEditingController cityController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
 
   // Reactive Variables
   final RxString profileImagePath = ''.obs;
   final RxString selectedGender = 'Male'.obs;
 
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadProfile();
+  }
+
+  Future<void> loadProfile() async {
+    final Map response = await WorkerProfileApiServices.getProfile();
+    if (!apiResponseSuccess(response)) return;
+    final Map rawData = apiPeramMap(response['data']);
+    final Map responseData = rawData.isEmpty ? response : rawData;
+    final Map nested = apiPeramMap(
+      responseData['worker'] ??
+          responseData['workerProfile'] ??
+          responseData['profile'] ??
+          responseData['user'],
+    );
+    final Map data = nested.isEmpty ? responseData : nested;
+    final String firstName = apiPeramString(data['firstName']);
+    final String lastName = apiPeramString(data['lastName']);
+    fullNameController.text = apiPeramString(
+      data['name'] ?? data['fullName'],
+      initialValue: '$firstName $lastName'.trim(),
+    );
+    phoneController.text = apiPeramString(data['phone'] ?? data['mobile']);
+    emailController.text = apiPeramString(data['email']);
+    dobController.text = apiPeramString(data['dateOfBirth'] ?? data['dob']);
+    languageController.text = apiPeramString(
+      data['language'] ?? data['preferredLanguage'],
+    );
+    stateController.text = apiPeramString(data['state']);
+    cityController.text = apiPeramString(data['city']);
+    addressController.text = apiPeramString(
+      data['address'] ?? data['fullAddress'],
+    );
+    selectedGender.value = apiPeramString(
+      data['gender'],
+      initialValue: selectedGender.value,
+    );
+    profileImagePath.value = apiPeramString(
+      data['profileImage'] ?? data['selfieImage'],
+    );
+  }
 
   void setGender(String gender) {
     selectedGender.value = gender;
@@ -99,7 +145,10 @@ class EditProfileController extends GetxController {
                         decoration: BoxDecoration(
                           color: AppColors.colorF5F5F5,
                           borderRadius: BorderRadius.circular(16.rr),
-                          border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
+                          border: Border.all(
+                            color: AppColors.borderE6E6E6,
+                            width: 1.rsp,
+                          ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -112,9 +161,8 @@ class EditProfileController extends GetxController {
                             sizedboxHeight(8),
                             Text(
                               "Camera",
-                              style: AppTextStyles.ts14w600colorBlack().copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: AppTextStyles.ts14w600colorBlack()
+                                  .copyWith(fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
@@ -134,7 +182,10 @@ class EditProfileController extends GetxController {
                         decoration: BoxDecoration(
                           color: AppColors.white,
                           borderRadius: BorderRadius.circular(12.rr),
-                          border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
+                          border: Border.all(
+                            color: AppColors.borderE6E6E6,
+                            width: 1.rsp,
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -153,9 +204,8 @@ class EditProfileController extends GetxController {
                             sizedboxHeight(8),
                             Text(
                               "Choose from Gallery",
-                              style: AppTextStyles.ts12w500colorBlack().copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: AppTextStyles.ts12w500colorBlack()
+                                  .copyWith(fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),

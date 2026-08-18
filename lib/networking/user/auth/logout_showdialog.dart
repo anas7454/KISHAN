@@ -20,10 +20,11 @@ Future<void> clickLogoutBtn() async {
 }
 
 Future<bool> _showdialogLogout() async {
+  final UserController userController = Get.find<UserController>();
   final showPopUp = await showDialog(
     context: Get.context!,
     builder: (BuildContext context) {
-      return AlertDialog(
+      return Obx(() => AlertDialog(
         backgroundColor: AppColors.cardBg,
         titlePadding: EdgeInsets.all(0),
         contentPadding: EdgeInsets.all(0),
@@ -55,7 +56,7 @@ Future<bool> _showdialogLogout() async {
                     alignment: Alignment.topRight,
                     child: clearTextfildeIconBtn(
                       onTap: () {
-                        Get.back();
+                        if (!userController.isLoggingOut.value) Get.back();
                       },
                     ),
                   ),
@@ -84,7 +85,9 @@ Future<bool> _showdialogLogout() async {
                           width: 130.rw,
                           height: 44.rh,
                           onPressed: () {
-                            Navigator.of(context).pop(true);
+                            if (!userController.isLoggingOut.value) {
+                              Navigator.of(context).pop(true);
+                            }
                           },
                           name: 'Not Now',
                           btnType: EnumButtonType.outline,
@@ -96,10 +99,9 @@ Future<bool> _showdialogLogout() async {
                         Button(
                           width: 130.rw,
                           height: 44.rh,
-                          onPressed: () {
-                            Navigator.of(context).pop(true);
-                            final UserController userController = Get.find();
-                            userController.logout();
+                          isLoading: userController.isLoggingOut.value,
+                          onPressed: () async {
+                            await userController.logout(isApiCall: true);
                           },
                           name: 'Yes, Logout',
                           btnColor: Colors.red,
@@ -115,7 +117,7 @@ Future<bool> _showdialogLogout() async {
             ],
           ),
         ),
-      );
+      ));
     },
   );
 

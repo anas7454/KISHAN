@@ -32,7 +32,10 @@ class Bnb3HomeScreen extends StatelessWidget with Bnb3HomeWidgets {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.rw),
                       child: Obx(() {
-                        final bool isUnderReview = controller.isUnderReview.value;
+                        final bool isUnderReview =
+                            controller.isUnderReview.value;
+                        final bool hasPendingRequests =
+                            controller.pendingBookings.isNotEmpty;
                         return Column(
                           children: [
                             // 1. Worker Profile Header Card
@@ -44,9 +47,11 @@ class Bnb3HomeScreen extends StatelessWidget with Bnb3HomeWidgets {
                               verificationStepsList(),
                             ] else ...[
                               sizedboxHeight(12),
-                              workerKeyStatsGrid(),
+                              workerKeyStatsGrid(controller),
                               sizedboxHeight(12),
-                              ongoingProjectCard(),
+                              ongoingProjectCard(controller),
+                            ],
+                            if (!isUnderReview || hasPendingRequests) ...[
                               sizedboxHeight(16),
                               newRequestsSection(controller),
                             ],

@@ -1,4 +1,6 @@
 import 'package:constructo_worker/routes/app_routes.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb5_myprofile/bnb5_myprofile_controller.dart';
+import 'package:constructo_worker/screens/bottomnavbar/tabs/bnb5_myprofile/bnb5_myprofile_screen.dart';
 import 'package:constructo_worker/screens/worker_verification_status/worker_verification_status_controller.dart';
 import 'package:constructo_worker/utils/images/cache_network/asset_icon_widget.dart';
 import 'package:constructo_worker/utils/images/cache_network/cachenetwork_image.dart';
@@ -12,7 +14,10 @@ import 'package:get/get.dart';
 
 mixin WorkerVerificationStatusWidgets {
   // Top Location Header
-  Widget verificationHeader(BuildContext context, WorkerVerificationStatusController controller) {
+  Widget verificationHeader(
+    BuildContext context,
+    WorkerVerificationStatusController controller,
+  ) {
     return Container(
       color: AppColors.yellowBg,
       padding: EdgeInsets.only(
@@ -39,16 +44,25 @@ mixin WorkerVerificationStatusWidgets {
                   ),
                   SizedBox(height: 2.rh),
                   Obx(() {
-                    final location = controller.globalController.userLocation.value;
-                    final loading = controller.globalController.isLocationLoading.value;
+                    final location =
+                        controller.globalController.userLocation.value;
+                    final loading =
+                        controller.globalController.isLocationLoading.value;
                     return Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        assetImageWidget(CommonIconsUtility.location, size: 10.rh),
+                        assetImageWidget(
+                          CommonIconsUtility.location,
+                          size: 10.rh,
+                        ),
                         SizedBox(width: 4.rw),
                         Flexible(
                           child: Text(
-                            loading ? 'Finding your location...' : (location.displayAddress.isNotEmpty ? location.displayAddress : 'Patna Bihar, 245768'),
+                            loading
+                                ? 'Finding your location...'
+                                : (location.displayAddress.isNotEmpty
+                                      ? location.displayAddress
+                                      : 'Patna Bihar, 245768'),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTextStyles.ts10w400color7D7D7D().copyWith(
@@ -85,18 +99,22 @@ mixin WorkerVerificationStatusWidgets {
           ),
           sizedboxWidth(8),
           // Notification button
-          Container(
-            width: 36.rw,
-            height: 36.rh,
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
-            ),
-            child: Icon(
-              Icons.notifications_none_rounded,
-              color: AppColors.black,
-              size: 20.rsp,
+          InkWell(
+            onTap: AppRoutes.notificationsScreen,
+            customBorder: const CircleBorder(),
+            child: Container(
+              width: 36.rw,
+              height: 36.rh,
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
+              ),
+              child: Icon(
+                Icons.notifications_none_rounded,
+                color: AppColors.black,
+                size: 20.rsp,
+              ),
             ),
           ),
         ],
@@ -108,6 +126,15 @@ mixin WorkerVerificationStatusWidgets {
   Widget workerProfileCard(WorkerVerificationStatusController controller) {
     return Obx(() {
       final bool isUnderReview = controller.isUnderReview.value;
+      final String overallStatus = controller.overallKycStatus.value;
+      final String overallStatusLabel = switch (overallStatus) {
+        'UNDER_REVIEW' => 'Under Review',
+        'REJECTED' => 'Rejected',
+        'APPROVED' => 'Approved',
+        'NOT_AVAILABLE' => 'Not Available',
+        _ => 'Pending',
+      };
+      final String profileImage = controller.workerProfileImage.value;
       return Container(
         width: double.infinity,
         constraints: BoxConstraints(minHeight: 125.rh),
@@ -118,10 +145,7 @@ mixin WorkerVerificationStatusWidgets {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xffFFF1BA),
-              Color(0xffFFFFFF),
-            ],
+            colors: [Color(0xffFFF1BA), Color(0xffFFFFFF)],
           ),
           image: const DecorationImage(
             image: AssetImage('assets/dummy_images/crane_bg.jpg'),
@@ -133,15 +157,31 @@ mixin WorkerVerificationStatusWidgets {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Worker Selfie Avatar
-            Container(
-              width: 64.rw,
-              height: 64.rh,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xffE2E4E5), width: 1.rsp),
-                image: const DecorationImage(
-                  image: AssetImage('assets/dummy_images/worker_profile.png'),
-                  fit: BoxFit.cover,
+            GestureDetector(
+              onTap: () {
+                if (!Get.isRegistered<Bnb5MyProfileController>()) {
+                  Get.put(Bnb5MyProfileController());
+                }
+                Get.to<void>(() => Bnb5MyProfileScreen());
+              },
+              child: Container(
+                width: 64.rw,
+                height: 64.rh,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xffE2E4E5),
+                    width: 1.rsp,
+                  ),
+                ),
+                child: clipRRectCustom(
+                  profileImage.isNotEmpty
+                      ? profileImage
+                      : 'assets/dummy_images/worker_profile.png',
+                  isCircleWidth: 64.rw,
+                  boxfit: BoxFit.cover,
+                  errorImgasset: 'assets/dummy_images/worker_profile.png',
+                  placeholder: 'assets/dummy_images/worker_profile.png',
                 ),
               ),
             ),
@@ -152,29 +192,43 @@ mixin WorkerVerificationStatusWidgets {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    controller.workerName.value,
+                    controller.workerName.value.isNotEmpty
+                        ? controller.workerName.value
+                        : 'Worker',
                     style: AppTextStyles.ts18w700color000000().copyWith(
                       fontSize: 16.rsp,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  sizedboxHeight(2),
-                  Text(
-                    "${controller.workerRole.value}  ${controller.workerExperience.value}",
-                    style: AppTextStyles.ts12w500color808080().copyWith(
-                      fontSize: 12.rsp,
-                      color: AppColors.color5C5C5C,
+                  if (controller.workerRole.value.isNotEmpty ||
+                      controller.workerExperience.value.isNotEmpty) ...[
+                    sizedboxHeight(2),
+                    Text(
+                      <String>[
+                        controller.workerRole.value,
+                        controller.workerExperience.value,
+                      ].where((value) => value.isNotEmpty).join('  '),
+                      style: AppTextStyles.ts12w500color808080().copyWith(
+                        fontSize: 12.rsp,
+                        color: AppColors.color5C5C5C,
+                      ),
                     ),
-                  ),
+                  ],
                   sizedboxHeight(6),
                   // Status Badge
                   if (isUnderReview)
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8.rw, vertical: 3.rh),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.rw,
+                        vertical: 3.rh,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xffF4F4F4),
                         borderRadius: BorderRadius.circular(4.rr),
-                        border: Border.all(color: const Color(0xffE0E0E0), width: 1.rsp),
+                        border: Border.all(
+                          color: const Color(0xffE0E0E0),
+                          width: 1.rsp,
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -186,7 +240,7 @@ mixin WorkerVerificationStatusWidgets {
                           ),
                           sizedboxWidth(4),
                           Text(
-                            "Pending",
+                            "Overall KYC: $overallStatusLabel",
                             style: AppTextStyles.ts10w500colorBlack().copyWith(
                               fontSize: 11.rsp,
                               fontWeight: FontWeight.w600,
@@ -197,7 +251,12 @@ mixin WorkerVerificationStatusWidgets {
                     )
                   else
                     Container(
-                      padding: EdgeInsets.only(top: 4.rh, bottom: 4.rh, left: 5.rw, right: 6.rw),
+                      padding: EdgeInsets.only(
+                        top: 4.rh,
+                        bottom: 4.rh,
+                        left: 5.rw,
+                        right: 6.rw,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xff35AF30).withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(4.35.rr),
@@ -212,7 +271,7 @@ mixin WorkerVerificationStatusWidgets {
                           ),
                           sizedboxWidth(4),
                           Text(
-                            "Profile Verified",
+                            "Overall KYC: Approved",
                             style: AppTextStyles.ts10w500colorBlack().copyWith(
                               fontSize: 10.5.rsp,
                               fontWeight: FontWeight.w700,
@@ -224,7 +283,9 @@ mixin WorkerVerificationStatusWidgets {
                     ),
                   sizedboxHeight(6),
                   Text(
-                    "You can now connect with vendor and get work",
+                    isUnderReview
+                        ? "Your KYC verification is currently $overallStatusLabel"
+                        : "You can now connect with vendor and get work",
                     style: AppTextStyles.ts10w500colorBlack().copyWith(
                       fontSize: 10.rsp,
                       fontWeight: FontWeight.w500,
@@ -241,46 +302,72 @@ mixin WorkerVerificationStatusWidgets {
     });
   }
 
+  Widget verificationLoadingSkeleton() {
+    Widget skeletonBox({required double height, double radius = 8}) {
+      return Container(
+        width: double.infinity,
+        height: height,
+        decoration: BoxDecoration(
+          color: const Color(0xffE8E8E8),
+          borderRadius: BorderRadius.circular(radius.rr),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        skeletonBox(height: 125.rh, radius: 15),
+        sizedboxHeight(12),
+        ...List<Widget>.generate(
+          6,
+          (_) => Padding(
+            padding: EdgeInsets.only(bottom: 10.rh),
+            child: skeletonBox(height: 58.rh),
+          ),
+        ),
+      ],
+    );
+  }
+
   // Verification Steps List
-  Widget verificationStepsList(
-    WorkerVerificationStatusController controller,
-  ) {
+  Widget verificationStepsList(WorkerVerificationStatusController controller) {
     return Column(
       children: [
         verificationStepTile(
           "Personal Info",
           status: controller.sectionStatus(0),
-          onTap: () => AppRoutes.workerRegistrationPreviewScreen(1),
+          remark: controller.sectionRemark(0),
+          onTap: () => controller.openKycSection(0, 1),
         ),
         verificationStepTile(
           "Bank Info",
           status: controller.sectionStatus(1),
-          onTap: () => AppRoutes.workerRegistrationPreviewScreen(2),
+          remark: controller.sectionRemark(1),
+          onTap: () => controller.openKycSection(1, 2),
         ),
         verificationStepTile(
           "Document's Uploaded",
           status: controller.sectionStatus(2),
-          onTap: () => AppRoutes.workerRegistrationPreviewScreen(3),
-        ),
-        verificationStepTile(
-          "Document's Uploaded",
-          status: controller.sectionStatus(2),
-          onTap: () => AppRoutes.workerRegistrationPreviewScreen(3),
+          remark: controller.sectionRemark(2),
+          onTap: () => controller.openKycSection(2, 3),
         ),
         verificationStepTile(
           "Selfie Verification",
           status: controller.sectionStatus(3),
-          onTap: () => AppRoutes.workerRegistrationPreviewScreen(5),
+          remark: controller.sectionRemark(3),
+          onTap: () => controller.openKycSection(3, 4),
         ),
         verificationStepTile(
           "Skills & Experience / Certificate Info",
           status: controller.sectionStatus(4),
-          onTap: () => AppRoutes.workerRegistrationPreviewScreen(6),
+          remark: controller.sectionRemark(4),
+          onTap: () => controller.openKycSection(4, 6),
         ),
         verificationStepTile(
           "Availability",
           status: controller.sectionStatus(5),
-          onTap: () => AppRoutes.workerRegistrationPreviewScreen(7),
+          remark: controller.sectionRemark(5),
+          onTap: () => controller.openKycSection(5, 7),
         ),
       ],
     );
@@ -290,10 +377,12 @@ mixin WorkerVerificationStatusWidgets {
   Widget verificationStepTile(
     String title, {
     required String status,
+    String remark = '',
     VoidCallback? onTap,
   }) {
     final String normalizedStatus = status.toUpperCase();
-    final bool isVerified = normalizedStatus == 'APPROVED' ||
+    final bool isVerified =
+        normalizedStatus == 'APPROVED' ||
         normalizedStatus == 'VERIFIED' ||
         normalizedStatus == 'COMPLETED';
     final bool isRejected = normalizedStatus == 'REJECTED';
@@ -304,68 +393,87 @@ mixin WorkerVerificationStatusWidgets {
       'NOT_AVAILABLE' => 'Not Available',
       _ => 'Pending',
     };
+    final bool isUnderReview = normalizedStatus == 'UNDER_REVIEW';
     final Color statusColor = isVerified
         ? const Color(0xff35AF30)
         : isRejected
-            ? const Color(0xffD32F2F)
-            : const Color(0xff7D7D7D);
+        ? const Color(0xffD32F2F)
+        : isUnderReview
+        ? const Color(0xffD97706)
+        : const Color(0xff7D7D7D);
     final Color statusBackground = isVerified
         ? const Color(0xffE6F5E9)
         : isRejected
-            ? const Color(0xffFFEBEE)
-            : const Color(0xffF4F4F4);
+        ? const Color(0xffFFEBEE)
+        : isUnderReview
+        ? const Color(0xffFEF3C7)
+        : const Color(0xffF4F4F4);
     return GestureDetector(
       onTap: onTap,
       child: Container(
-      margin: EdgeInsets.only(bottom: 10.rh),
-      padding: EdgeInsets.symmetric(horizontal: 16.rw, vertical: 14.rh),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(8.rr),
-        border: Border.all(color: AppColors.borderDBDBDB, width: 1.rsp),
-      ),
+        margin: EdgeInsets.only(bottom: 10.rh),
+        padding: EdgeInsets.symmetric(horizontal: 16.rw, vertical: 14.rh),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(8.rr),
+          border: Border.all(color: AppColors.borderDBDBDB, width: 1.rsp),
+        ),
         child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: AppTextStyles.ts14w600colorBlack().copyWith(
-                fontWeight: FontWeight.w700,
-                fontSize: 13.rsp,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyles.ts14w600colorBlack().copyWith(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.rsp,
+                    ),
+                  ),
+                  if (isRejected && remark.isNotEmpty) ...[
+                    sizedboxHeight(3),
+                    Text(
+                      remark,
+                      style: AppTextStyles.ts10w500colorBlack().copyWith(
+                        color: const Color(0xffD32F2F),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-          ),
-          if (isRejected) ...[
+            if (isRejected) ...[
+              Icon(
+                Icons.mode_edit_outline_outlined,
+                color: const Color(0xffD32F2F),
+                size: 20.rsp,
+              ),
+              sizedboxWidth(12),
+            ],
+            // Status Badge
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.rw, vertical: 4.rh),
+              decoration: BoxDecoration(
+                color: statusBackground,
+                borderRadius: BorderRadius.circular(4.rr),
+              ),
+              child: Text(
+                isRejected ? 'Re-upload' : statusText,
+                style: AppTextStyles.ts10w500colorBlack().copyWith(
+                  fontSize: 10.rsp,
+                  fontWeight: FontWeight.w600,
+                  color: statusColor,
+                ),
+              ),
+            ),
+            sizedboxWidth(8),
             Icon(
-              Icons.mode_edit_outline_outlined,
-              color: const Color(0xffD32F2F),
-              size: 20.rsp,
+              Icons.visibility_outlined,
+              color: const Color(0xffFFBC07),
+              size: 19.rsp,
             ),
-            sizedboxWidth(12),
           ],
-          // Status Badge
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.rw, vertical: 4.rh),
-            decoration: BoxDecoration(
-              color: statusBackground,
-              borderRadius: BorderRadius.circular(4.rr),
-            ),
-            child: Text(
-              statusText,
-              style: AppTextStyles.ts10w500colorBlack().copyWith(
-                fontSize: 10.rsp,
-                fontWeight: FontWeight.w600,
-                color: statusColor,
-              ),
-            ),
-          ),
-          sizedboxWidth(8),
-          Icon(
-            Icons.visibility_outlined,
-            color: const Color(0xffFFBC07),
-            size: 19.rsp,
-          ),
-        ],
         ),
       ),
     );
@@ -378,7 +486,8 @@ mixin WorkerVerificationStatusWidgets {
   ) async {
     await controller.ensureSectionDataLoaded();
     final Map<String, dynamic> data = controller.sectionData(sectionIndex);
-    final List<MapEntry<String, dynamic>> details = <MapEntry<String, dynamic>>[];
+    final List<MapEntry<String, dynamic>> details =
+        <MapEntry<String, dynamic>>[];
     _flattenDetails(data, details);
 
     Get.bottomSheet<void>(
@@ -431,7 +540,7 @@ mixin WorkerVerificationStatusWidgets {
                   : ListView.separated(
                       shrinkWrap: true,
                       itemCount: details.length,
-                      separatorBuilder: (_, __) =>
+                      separatorBuilder: (_, index) =>
                           Divider(color: AppColors.borderE6E6E6),
                       itemBuilder: (_, int index) =>
                           _previewDetail(details[index]),
@@ -475,9 +584,11 @@ mixin WorkerVerificationStatusWidgets {
 
   Widget _previewDetail(MapEntry<String, dynamic> detail) {
     final String value = detail.value?.toString().trim() ?? '';
-    final bool isUrl = value.startsWith('http://') || value.startsWith('https://');
+    final bool isUrl =
+        value.startsWith('http://') || value.startsWith('https://');
     final String cleanUrl = value.split('?').first.toLowerCase();
-    final bool isImage = isUrl &&
+    final bool isImage =
+        isUrl &&
         <String>['.jpg', '.jpeg', '.png', '.webp'].any(cleanUrl.endsWith);
 
     return Padding(
@@ -485,7 +596,10 @@ mixin WorkerVerificationStatusWidgets {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(_fieldLabel(detail.key), style: AppTextStyles.ts12w500color808080()),
+          Text(
+            _fieldLabel(detail.key),
+            style: AppTextStyles.ts12w500color808080(),
+          ),
           sizedboxHeight(5),
           if (isImage)
             clipRRectCustom(

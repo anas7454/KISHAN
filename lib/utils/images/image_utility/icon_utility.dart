@@ -3,15 +3,8 @@ class IconUtility {
 
   static const String homeSearch = 'assets/icons/home_search.png';
 
-  static const String homeMaterials = 'assets/icons/home_materials.png';
-  static const String homeWorkers = 'assets/icons/home_workers.png';
-  static const String homeBulkOrders = 'assets/icons/home_bulk_orders.png';
-  static const String homeVendors = 'assets/icons/home_vendors.png';
 
   // Bottom navigation assets. Add the final icons at these paths.
-  static const String bottomNavWorkers = 'assets/icons/bottom_nav_workers.png';
-  static const String bottomNavWorkersSelected =
-      'assets/icons/bottom_nav_workers_selected.png';
 
   static const String bottomNavMaterials =
       'assets/icons/bottom_nav_materials.png';

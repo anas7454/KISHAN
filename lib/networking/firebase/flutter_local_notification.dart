@@ -98,7 +98,6 @@ class LocalNotificationService {
 Future<String?> getToken() async {
   try {
     String fcmtoken = await FirebaseMessaging.instance.getToken() ?? "";
-    printDebugCustom("run fcm token -->$fcmtoken");
     return fcmtoken;
   } catch (e) {
     printDebugCustom('FCM Token error: $e');

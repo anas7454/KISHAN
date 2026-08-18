@@ -41,11 +41,7 @@ mixin WorkerRegistrationWidgets {
         leadingWidth: 44.rw,
         leading: Padding(
           padding: EdgeInsets.only(left: 12.rw),
-          child: Center(
-            child: BackButtonCustom(
-              onTap: onBack,
-            ),
-          ),
+          child: Center(child: BackButtonCustom(onTap: onBack)),
         ),
         titleSpacing: 4.rw,
         title: Column(
@@ -83,6 +79,7 @@ mixin WorkerRegistrationWidgets {
     required VoidCallback onContinue,
     required VoidCallback onSaveDraft,
     bool isContinueEnabled = true,
+    bool isLoading = false,
     String continueButtonText = "Continue",
     bool showSaveDraft = true,
   }) {
@@ -104,8 +101,11 @@ mixin WorkerRegistrationWidgets {
         children: [
           Button(
             name: continueButtonText,
+            isLoading: isLoading,
             onPressed: isContinueEnabled ? onContinue : () {},
-            btnColor: isContinueEnabled ? AppColors.black : const Color(0xff8D8D8D),
+            btnColor: isContinueEnabled
+                ? AppColors.black
+                : const Color(0xff8D8D8D),
             textColor: AppColors.white,
             height: 40.rh,
             borderRadiusDouble: 100.rh,
@@ -117,7 +117,9 @@ mixin WorkerRegistrationWidgets {
             Button(
               name: "Save as Draft",
               onPressed: onSaveDraft,
-              btnColor: AppColors.primary.withValues(alpha: 0.10), // #FFCC00 10%
+              btnColor: AppColors.primary.withValues(
+                alpha: 0.10,
+              ), // #FFCC00 10%
               textColor: AppColors.black,
               height: 40.rh,
               borderRadiusDouble: 100.rh,
@@ -132,10 +134,7 @@ mixin WorkerRegistrationWidgets {
   }
 
   // Common White Section Card Container (Figma Frame Specs: 8px radius, 1px #DBDBDB border, 12px padding, 12px gap)
-  Widget sectionCard({
-    required String title,
-    required List<Widget> children,
-  }) {
+  Widget sectionCard({required String title, required List<Widget> children}) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(12.rw),
@@ -208,7 +207,10 @@ mixin WorkerRegistrationWidgets {
                 ),
               ],
               borderRadius: BorderRadius.circular(10.rr),
-              border: Border.all(color: AppColors.borderTextfiled, width: 1.rsp), // #D7D7D7
+              border: Border.all(
+                color: AppColors.borderTextfiled,
+                width: 1.rsp,
+              ), // #D7D7D7
             ),
             child: Row(
               children: [
@@ -249,7 +251,8 @@ mixin WorkerRegistrationWidgets {
     VoidCallback? onView,
     String defaultPlaceholder = 'proof.pdf',
   }) {
-    final bool isUploaded = fileName.isNotEmpty &&
+    final bool isUploaded =
+        fileName.isNotEmpty &&
         fileName != 'proof.pdf' &&
         fileName != 'front.pdf' &&
         fileName != 'certificate.pdf';
@@ -286,7 +289,9 @@ mixin WorkerRegistrationWidgets {
               ),
               borderRadius: BorderRadius.circular(10.rr),
               border: Border.all(
-                color: isUploaded ? AppColors.primary : AppColors.borderTextfiled,
+                color: isUploaded
+                    ? AppColors.primary
+                    : AppColors.borderTextfiled,
                 width: 1.rsp,
               ),
             ),
@@ -304,8 +309,12 @@ mixin WorkerRegistrationWidgets {
                   child: Text(
                     shortFileName,
                     style: AppTextStyles.ts14w500color7D7D7D().copyWith(
-                      color: isUploaded ? AppColors.black : AppColors.color7D7D7D,
-                      fontWeight: isUploaded ? FontWeight.w600 : FontWeight.w500,
+                      color: isUploaded
+                          ? AppColors.black
+                          : AppColors.color7D7D7D,
+                      fontWeight: isUploaded
+                          ? FontWeight.w600
+                          : FontWeight.w500,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -350,35 +359,60 @@ mixin WorkerRegistrationWidgets {
                     ),
                   )
                 else
-                  InkWell(
-                    onTap: onView,
-                    borderRadius: BorderRadius.circular(15.rr),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.rw, vertical: 4.rh),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12.rr),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        onTap: onView,
+                        borderRadius: BorderRadius.circular(15.rr),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.rw,
+                            vertical: 4.rh,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12.rr),
+                          ),
+                          child: Icon(
                             Icons.visibility_rounded,
-                            size: 15.rsp,
+                            size: 16.rsp,
                             color: AppColors.black,
                           ),
-                          sizedboxWidth(4),
-                          Text(
-                            "View",
-                            style: AppTextStyles.ts12w600color000000().copyWith(
-                              color: AppColors.black,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12.rsp,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      sizedboxWidth(6),
+                      InkWell(
+                        onTap: onUpload,
+                        borderRadius: BorderRadius.circular(15.rr),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 9.rw,
+                            vertical: 4.rh,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(12.rr),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.sync_rounded,
+                                size: 14.rsp,
+                                color: AppColors.black,
+                              ),
+                              sizedboxWidth(3),
+                              Text(
+                                'Change',
+                                style: AppTextStyles.ts12w600color000000()
+                                    .copyWith(fontSize: 11.rsp),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
               ],
             ),
@@ -411,13 +445,20 @@ mixin WorkerRegistrationWidgets {
                   onTap: () => controller.setGender(gender),
                   child: Container(
                     height: 32.rh,
-                    margin: EdgeInsets.only(right: gender != 'Other' ? 8.rw : 0),
-                    padding: EdgeInsets.symmetric(horizontal: 8.rw, vertical: 6.rh),
+                    margin: EdgeInsets.only(
+                      right: gender != 'Other' ? 8.rw : 0,
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.rw,
+                      vertical: 6.rh,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.white,
                       borderRadius: BorderRadius.circular(4.rr),
                       border: Border.all(
-                        color: isSelected ? AppColors.primary : AppColors.borderTextfiled, // #D7D7D7
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.borderTextfiled, // #D7D7D7
                         width: 1.rsp,
                       ),
                     ),
@@ -430,7 +471,9 @@ mixin WorkerRegistrationWidgets {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isSelected ? AppColors.primary : AppColors.colorBFBFBF,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.colorBFBFBF,
                               width: 1.2.rsp,
                             ),
                           ),
@@ -448,8 +491,12 @@ mixin WorkerRegistrationWidgets {
                         Text(
                           gender,
                           style: AppTextStyles.ts12w500colorBlack().copyWith(
-                            color: isSelected ? AppColors.primary : AppColors.black,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.black,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w500,
                           ),
                         ),
                       ],
