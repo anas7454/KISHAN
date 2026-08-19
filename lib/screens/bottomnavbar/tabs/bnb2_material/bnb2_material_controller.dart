@@ -33,6 +33,8 @@ class RequestItemModel {
 }
 
 class Bnb2MaterialController extends GetxController {
+  final RxString processingBookingId = ''.obs;
+  final RxString processingAction = ''.obs;
   Bnb2MaterialController({this.isMyWork = false});
 
   final bool isMyWork;
@@ -62,7 +64,7 @@ class Bnb2MaterialController extends GetxController {
 
   void _startRequestsPolling() {
     _requestsPollingTimer?.cancel();
-    _requestsPollingTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+    _requestsPollingTimer = Timer.periodic(const Duration(seconds: 3), (_) {
       getPendingRequests(showError: false, showLoading: false);
     });
   }
@@ -181,10 +183,19 @@ class Bnb2MaterialController extends GetxController {
   }
 
   Future<void> acceptRequest(RequestItemModel request) async {
-    if (request.bookingId.isEmpty) return;
-    final Map response = await WorkerBookingApiServices.acceptBooking(
-      request.bookingId,
-    );
+    if (request.bookingId.isEmpty || processingBookingId.value.isNotEmpty)
+      return;
+    processingBookingId.value = request.bookingId;
+    processingAction.value = 'accept';
+    final Map response;
+    try {
+      response = await WorkerBookingApiServices.acceptBooking(
+        request.bookingId,
+      );
+    } finally {
+      processingBookingId.value = '';
+      processingAction.value = '';
+    }
     if (!apiResponseSuccess(response)) {
       await showdialogApiError(respMap: response);
       return;
@@ -195,10 +206,19 @@ class Bnb2MaterialController extends GetxController {
   }
 
   Future<void> rejectRequest(RequestItemModel request) async {
-    if (request.bookingId.isEmpty) return;
-    final Map response = await WorkerBookingApiServices.rejectBooking(
-      request.bookingId,
-    );
+    if (request.bookingId.isEmpty || processingBookingId.value.isNotEmpty)
+      return;
+    processingBookingId.value = request.bookingId;
+    processingAction.value = 'reject';
+    final Map response;
+    try {
+      response = await WorkerBookingApiServices.rejectBooking(
+        request.bookingId,
+      );
+    } finally {
+      processingBookingId.value = '';
+      processingAction.value = '';
+    }
     if (!apiResponseSuccess(response)) {
       await showdialogApiError(respMap: response);
       return;

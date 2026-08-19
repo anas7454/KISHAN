@@ -81,18 +81,22 @@ mixin Bnb3HomeWidgets {
             ),
           ),
           // Wallet / Passbook button
-          Container(
-            width: 36.rw,
-            height: 36.rh,
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
-            ),
-            child: Icon(
-              Icons.account_balance_wallet_outlined,
-              color: AppColors.black,
-              size: 19.rsp,
+          InkWell(
+            onTap: AppRoutes.walletScreen,
+            customBorder: const CircleBorder(),
+            child: Container(
+              width: 36.rw,
+              height: 36.rh,
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.borderE6E6E6, width: 1.rsp),
+              ),
+              child: Icon(
+                Icons.account_balance_wallet_outlined,
+                color: AppColors.black,
+                size: 19.rsp,
+              ),
             ),
           ),
           sizedboxWidth(8),
@@ -467,67 +471,71 @@ mixin Bnb3HomeWidgets {
           sizedboxWidth(8),
           // Card 2: Enring (Earnings)
           Expanded(
-            child: Container(
-              height: 118.rh, // 118px height Figma spec
-              padding: EdgeInsets.all(12.rw), // 12px padding Figma spec
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(
-                  8.rr,
-                ), // 8px radius Figma spec
-                border: Border.all(
-                  color: AppColors.borderDBDBDB,
-                  width: 1.rsp,
-                ), // 1px #DBDBDB border Figma spec
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 32.rw,
-                    height: 32.rh,
-                    decoration: const BoxDecoration(
-                      color: Color(0xffE8F5E9),
-                      shape: BoxShape.circle,
+            child: InkWell(
+              onTap: AppRoutes.walletScreen,
+              borderRadius: BorderRadius.circular(8.rr),
+              child: Container(
+                height: 118.rh, // 118px height Figma spec
+                padding: EdgeInsets.all(12.rw), // 12px padding Figma spec
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(
+                    8.rr,
+                  ), // 8px radius Figma spec
+                  border: Border.all(
+                    color: AppColors.borderDBDBDB,
+                    width: 1.rsp,
+                  ), // 1px #DBDBDB border Figma spec
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 32.rw,
+                      height: 32.rh,
+                      decoration: const BoxDecoration(
+                        color: Color(0xffE8F5E9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.account_balance_wallet_outlined,
+                        color: const Color(0xff16A34A),
+                        size: 18.rsp,
+                      ),
                     ),
-                    child: Icon(
-                      Icons.account_balance_wallet_outlined,
-                      color: const Color(0xff16A34A),
-                      size: 18.rsp,
+                    sizedboxHeight(6), // 6px gap Figma spec
+                    Text(
+                      '₹${controller.workerTotalEarnings.value.toStringAsFixed(0)}',
+                      style: AppTextStyles.ts18w700color000000().copyWith(
+                        fontSize: 16.rsp,
+                        fontWeight: FontWeight.w800,
+                        height: 1.1,
+                      ),
                     ),
-                  ),
-                  sizedboxHeight(6), // 6px gap Figma spec
-                  Text(
-                    '₹${controller.workerTotalEarnings.value.toStringAsFixed(0)}',
-                    style: AppTextStyles.ts18w700color000000().copyWith(
-                      fontSize: 16.rsp,
-                      fontWeight: FontWeight.w800,
-                      height: 1.1,
+                    sizedboxHeight(6), // 6px gap Figma spec
+                    Text(
+                      "Earnings",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.ts12w500colorBlack().copyWith(
+                        fontSize: 10.5.rsp,
+                        fontWeight: FontWeight.w700,
+                        height: 1.1,
+                      ),
                     ),
-                  ),
-                  sizedboxHeight(6), // 6px gap Figma spec
-                  Text(
-                    "Earnings",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.ts12w500colorBlack().copyWith(
-                      fontSize: 10.5.rsp,
-                      fontWeight: FontWeight.w700,
-                      height: 1.1,
+                    sizedboxHeight(6), // 6px gap Figma spec
+                    Text(
+                      "View Wallet",
+                      style: AppTextStyles.ts10w500colorBlack().copyWith(
+                        fontSize: 10.rsp,
+                        color: const Color(0xff16A34A),
+                        fontWeight: FontWeight.w600,
+                        height: 1.1,
+                      ),
                     ),
-                  ),
-                  sizedboxHeight(6), // 6px gap Figma spec
-                  Text(
-                    "View Wallet",
-                    style: AppTextStyles.ts10w500colorBlack().copyWith(
-                      fontSize: 10.rsp,
-                      color: const Color(0xff16A34A),
-                      fontWeight: FontWeight.w600,
-                      height: 1.1,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -984,6 +992,12 @@ mixin Bnb3HomeWidgets {
                   AppRoutes.requestDetailsScreen(bookingId: booking.id),
               onAccept: () => controller.acceptBooking(booking),
               onReject: () => controller.rejectBooking(booking),
+              isAccepting:
+                  controller.processingBookingId.value == booking.id &&
+                  controller.processingAction.value == 'accept',
+              isRejecting:
+                  controller.processingBookingId.value == booking.id &&
+                  controller.processingAction.value == 'reject',
               onViewMap: () {},
             ),
           ),

@@ -1,7 +1,10 @@
 part of '../worker_registration_widgets.dart';
 
 mixin Step1PersonalInfoWidgets on WorkerRegistrationWidgets {
-  Widget step1PersonalInfo(BuildContext context, WorkerRegistrationController controller) {
+  Widget step1PersonalInfo(
+    BuildContext context,
+    WorkerRegistrationController controller,
+  ) {
     return Column(
       children: [
         sectionCard(
@@ -9,13 +12,13 @@ mixin Step1PersonalInfoWidgets on WorkerRegistrationWidgets {
           children: [
             inputLabelField(
               label: "Full Name",
-              hintText: "Enter",
+              hintText: "Enter full name",
               controller: controller.fullNameController,
             ),
             sizedboxHeight(14),
             inputLabelField(
               label: "Date of Birth",
-              hintText: "Select Date",
+              hintText: "Select date of birth",
               controller: controller.dobController,
               readOnly: true,
               onTap: () => controller.pickDateOfBirth(context),
@@ -30,7 +33,7 @@ mixin Step1PersonalInfoWidgets on WorkerRegistrationWidgets {
             sizedboxHeight(14),
             inputLabelField(
               label: "Language",
-              hintText: "Select",
+              hintText: "Select language",
               controller: controller.languageController,
               readOnly: true,
               suffixIcon: Icon(
@@ -52,7 +55,7 @@ mixin Step1PersonalInfoWidgets on WorkerRegistrationWidgets {
                 Expanded(
                   child: inputLabelField(
                     label: "State",
-                    hintText: "Select",
+                    hintText: "Select state",
                     controller: controller.stateController,
                     readOnly: true,
                     onTap: controller.openStateBottomSheet,
@@ -67,7 +70,7 @@ mixin Step1PersonalInfoWidgets on WorkerRegistrationWidgets {
                 Expanded(
                   child: inputLabelField(
                     label: "City",
-                    hintText: "Select",
+                    hintText: "Select city",
                     controller: controller.cityController,
                     readOnly: true,
                     onTap: controller.openCityBottomSheet,
@@ -87,16 +90,21 @@ mixin Step1PersonalInfoWidgets on WorkerRegistrationWidgets {
                 Expanded(
                   child: inputLabelField(
                     label: "Pincode",
-                    hintText: "Enter",
+                    hintText: "Enter pincode",
                     controller: controller.pincodeController,
                     keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(6),
+                    ],
                   ),
                 ),
                 sizedboxWidth(10),
                 Expanded(
                   child: inputLabelField(
                     label: "House/Plot No.",
-                    hintText: "Enter",
+                    hintText: "Enter house/plot no.",
                     controller: controller.houseNoController,
                   ),
                 ),
@@ -106,7 +114,7 @@ mixin Step1PersonalInfoWidgets on WorkerRegistrationWidgets {
             // 5. Full Address
             inputLabelField(
               label: "Full Address",
-              hintText: "Enter",
+              hintText: "Enter full address",
               controller: controller.fullAddressController,
             ),
             sizedboxHeight(14),
@@ -115,12 +123,15 @@ mixin Step1PersonalInfoWidgets on WorkerRegistrationWidgets {
               () => uploadFileField(
                 label: "Address Proof Upload",
                 fileName: controller.addressProofPath.value,
-                defaultPlaceholder: "proof.pdf",
-                onUpload: () => controller.pickImageOrDocument(controller.addressProofPath),
+                defaultPlaceholder: "Upload Document",
+                onUpload: () =>
+                    controller.pickImageOrDocument(controller.addressProofPath),
                 onView: () => controller.showDocumentPreviewDialog(
                   title: "Address Proof Document",
                   fileName: controller.addressProofPath.value,
-                  onReupload: () => controller.pickImageOrDocument(controller.addressProofPath),
+                  onReupload: () => controller.pickImageOrDocument(
+                    controller.addressProofPath,
+                  ),
                 ),
               ),
             ),
@@ -132,4 +143,3 @@ mixin Step1PersonalInfoWidgets on WorkerRegistrationWidgets {
 
   // Step 2: Bank Info
 }
-

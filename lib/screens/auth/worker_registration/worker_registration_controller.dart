@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:constructo_worker/networking/api/endpoints/location_api_services.dart';
 import 'package:constructo_worker/networking/api/endpoints/worker_kyc_api_services.dart';
 import 'package:constructo_worker/networking/api/endpoints/skills_api_services.dart';
 import 'package:constructo_worker/networking/dialogs/api_error_show_dialogs.dart';
@@ -73,7 +74,9 @@ class WorkerRegistrationController extends GetxController {
         requestedInitialStep == null &&
         kycProgressSections.isNotEmpty) {
       final WorkerKycSectionStatus? nextSection = kycProgressSections
-          .firstWhereOrNull((section) => !section.isCompleted && section.canOpen);
+          .firstWhereOrNull(
+            (section) => !section.isCompleted && section.canOpen,
+          );
       if (nextSection != null) {
         currentStep.value = localStepForKycKey(nextSection.stepKey);
       }
@@ -201,26 +204,39 @@ class WorkerRegistrationController extends GetxController {
   void _fillFieldsForStep(int step, Map data) {
     final bool isReuploading =
         !isPreviewMode.value && kycStatus.value.toUpperCase() == 'REJECTED';
+    String fieldValue(dynamic value) {
+      final String text = apiPeramString(value);
+      const Set<String> placeholderValues = <String>{
+        'enter',
+        'select',
+        'enter full name',
+        'enter pincode',
+        'enter plot no.',
+        'enter full address',
+      };
+      return placeholderValues.contains(text.toLowerCase()) ? '' : text;
+    }
 
     switch (step) {
       case 1:
-        fullNameController.text = apiPeramString(data['fullName']);
+        fullNameController.text = fieldValue(data['fullName']);
         final DateTime? dob = DateTime.tryParse(
-          apiPeramString(data['dateOfBirth']),
+          fieldValue(data['dateOfBirth']),
         );
         dobController.text = dob == null
-            ? apiPeramString(data['dateOfBirth'])
+            ? fieldValue(data['dateOfBirth'])
             : DateFormat('dd/MM/yyyy').format(dob);
-        selectedGender.value = apiPeramString(data['gender']);
-        selectedLanguage.value = apiPeramString(data['language']);
-        languageController.text = apiPeramString(data['language']);
-        houseNoController.text = apiPeramString(data['addressLine1']);
-        fullAddressController.text = apiPeramString(data['addressLine2']);
-        stateController.text = apiPeramString(data['state']);
-        cityController.text = apiPeramString(data['city']);
-        pincodeController.text = apiPeramString(data['pincode']);
-        addressProofPath.value =
-            isReuploading ? '' : apiPeramString(data['addressProof']);
+        selectedGender.value = fieldValue(data['gender']);
+        selectedLanguage.value = fieldValue(data['language']);
+        languageController.text = fieldValue(data['language']);
+        houseNoController.text = fieldValue(data['addressLine1']);
+        fullAddressController.text = fieldValue(data['addressLine2']);
+        stateController.text = fieldValue(data['state']);
+        cityController.text = fieldValue(data['city']);
+        pincodeController.text = fieldValue(data['pincode']);
+        addressProofPath.value = isReuploading
+            ? ''
+            : apiPeramString(data['addressProof']);
       case 2:
         accountHolderNameController.text = apiPeramString(
           data['bankAccountName'],
@@ -232,21 +248,27 @@ class WorkerRegistrationController extends GetxController {
         confirmAccountNumberController.text = accountNumberController.text;
         ifscCodeController.text = apiPeramString(data['bankIfscCode']);
         branchNameController.text = apiPeramString(data['branchName']);
-        passbookProofPath.value =
-            isReuploading ? '' : apiPeramString(data['bankPassbook']);
+        passbookProofPath.value = isReuploading
+            ? ''
+            : apiPeramString(data['bankPassbook']);
       case 3:
-        idFrontPath.value =
-            isReuploading ? '' : apiPeramString(data['identityFront']);
-        idBackPath.value =
-            isReuploading ? '' : apiPeramString(data['identityBack']);
-        panCardPath.value =
-            isReuploading ? '' : apiPeramString(data['panCard']);
-        policeCertPath.value =
-            isReuploading ? '' : apiPeramString(data['policeCertificate']);
+        idFrontPath.value = isReuploading
+            ? ''
+            : apiPeramString(data['identityFront']);
+        idBackPath.value = isReuploading
+            ? ''
+            : apiPeramString(data['identityBack']);
+        panCardPath.value = isReuploading
+            ? ''
+            : apiPeramString(data['panCard']);
+        policeCertPath.value = isReuploading
+            ? ''
+            : apiPeramString(data['policeCertificate']);
       case 4:
       case 5:
-        liveSelfiePath.value =
-            isReuploading ? '' : apiPeramString(data['liveSelfie']);
+        liveSelfiePath.value = isReuploading
+            ? ''
+            : apiPeramString(data['liveSelfie']);
       case 6:
         final Map skill = apiPeramMap(data['skill']);
         selectedSkillId.value = apiPeramString(skill['id'] ?? data['skillId']);
@@ -286,14 +308,18 @@ class WorkerRegistrationController extends GetxController {
         );
         dailyWageController.text = apiPeramString(data['dailyWageExpectation']);
         workDescriptionController.text = apiPeramString(data['description']);
-        itiCertPath.value =
-            isReuploading ? '' : apiPeramString(data['itiCertificate']);
-        nsdcCertPath.value =
-            isReuploading ? '' : apiPeramString(data['nsdcCertificate']);
-        govtCertPath.value =
-            isReuploading ? '' : apiPeramString(data['govtCertificate']);
-        otherCertPath.value =
-            isReuploading ? '' : apiPeramString(data['otherCertificate']);
+        itiCertPath.value = isReuploading
+            ? ''
+            : apiPeramString(data['itiCertificate']);
+        nsdcCertPath.value = isReuploading
+            ? ''
+            : apiPeramString(data['nsdcCertificate']);
+        govtCertPath.value = isReuploading
+            ? ''
+            : apiPeramString(data['govtCertificate']);
+        otherCertPath.value = isReuploading
+            ? ''
+            : apiPeramString(data['otherCertificate']);
       case 7:
         final String mode = apiPeramString(data['availabilityMode']);
         workTypeController.text = switch (mode) {
@@ -327,6 +353,11 @@ class WorkerRegistrationController extends GetxController {
   final TextEditingController pincodeController = TextEditingController();
   final TextEditingController stateController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
+  final RxList<Map<String, String>> states = <Map<String, String>>[].obs;
+  final RxList<Map<String, String>> cities = <Map<String, String>>[].obs;
+  final RxString selectedStateId = ''.obs;
+  final RxBool isStatesLoading = false.obs;
+  final RxBool isCitiesLoading = false.obs;
   final TextEditingController fullAddressController = TextEditingController();
   final RxString addressProofPath = ''.obs;
 
@@ -1259,42 +1290,82 @@ class WorkerRegistrationController extends GetxController {
     }
   }
 
-  // Open State Selection BottomSheet
-  void openStateBottomSheet() {
-    FocusManager.instance.primaryFocus?.unfocus();
-    final RxString searchRx = ''.obs;
+  List _locationItems(Map response, String key) {
+    final dynamic rawData = response['data'];
+    if (rawData is List) return rawData;
+    if (rawData is Map) {
+      return apiPeramList(rawData[key] ?? rawData['items'] ?? rawData['data']);
+    }
+    return const [];
+  }
 
-    final List<String> statesList = [
-      'Andhra Pradesh',
-      'Arunachal Pradesh',
-      'Assam',
-      'Bihar',
-      'Chhattisgarh',
-      'Goa',
-      'Gujarat',
-      'Haryana',
-      'Himachal Pradesh',
-      'Jharkhand',
-      'Karnataka',
-      'Kerala',
-      'Madhya Pradesh',
-      'Maharashtra',
-      'Manipur',
-      'Meghalaya',
-      'Mizoram',
-      'Nagaland',
-      'Odisha',
-      'Punjab',
-      'Rajasthan',
-      'Sikkim',
-      'Tamil Nadu',
-      'Telangana',
-      'Tripura',
-      'Uttar Pradesh',
-      'Uttarakhand',
-      'West Bengal',
-      'Delhi (NCR)',
-    ];
+  Future<bool> loadStates() async {
+    if (isStatesLoading.value) return false;
+    isStatesLoading.value = true;
+    final Map response = await LocationApiServices.getStates();
+    isStatesLoading.value = false;
+    if (!apiResponseSuccess(response)) {
+      showSnakBarBottomCustomRed(
+        apiPeramString(
+          response['message'] ?? response['msg'],
+          initialValue: 'Unable to load states',
+        ),
+      );
+      return false;
+    }
+    states.assignAll(
+      _locationItems(response, 'states')
+          .whereType<Map>()
+          .map(
+            (item) => <String, String>{
+              'id': apiPeramString(
+                item['id'] ?? item['stateId'] ?? item['_id'],
+              ),
+              'name': apiPeramString(
+                item['name'] ?? item['stateName'] ?? item['title'],
+              ),
+            },
+          )
+          .where((item) => item['id']!.isNotEmpty && item['name']!.isNotEmpty),
+    );
+    return true;
+  }
+
+  Future<bool> loadCities(String stateId) async {
+    if (stateId.isEmpty || isCitiesLoading.value) return false;
+    isCitiesLoading.value = true;
+    final Map response = await LocationApiServices.getCities(stateId);
+    isCitiesLoading.value = false;
+    if (!apiResponseSuccess(response)) {
+      showSnakBarBottomCustomRed(
+        apiPeramString(
+          response['message'] ?? response['msg'],
+          initialValue: 'Unable to load cities',
+        ),
+      );
+      return false;
+    }
+    cities.assignAll(
+      _locationItems(response, 'cities')
+          .whereType<Map>()
+          .map(
+            (item) => <String, String>{
+              'id': apiPeramString(item['id'] ?? item['cityId'] ?? item['_id']),
+              'name': apiPeramString(
+                item['name'] ?? item['cityName'] ?? item['title'],
+              ),
+            },
+          )
+          .where((item) => item['name']!.isNotEmpty),
+    );
+    return true;
+  }
+
+  // Open State Selection BottomSheet
+  Future<void> openStateBottomSheet() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    if (states.isEmpty && !await loadStates()) return;
+    final RxString searchRx = ''.obs;
 
     Get.bottomSheet(
       Container(
@@ -1392,8 +1463,11 @@ class WorkerRegistrationController extends GetxController {
             Expanded(
               child: Obx(() {
                 final query = searchRx.value.toLowerCase().trim();
-                final filtered = statesList
-                    .where((s) => s.toLowerCase().contains(query))
+                final filtered = states
+                    .where(
+                      (state) =>
+                          (state['name'] ?? '').toLowerCase().contains(query),
+                    )
                     .toList();
 
                 if (filtered.isEmpty) {
@@ -1410,7 +1484,8 @@ class WorkerRegistrationController extends GetxController {
                   itemCount: filtered.length,
                   separatorBuilder: (context, index) => sizedboxHeight(8),
                   itemBuilder: (context, index) {
-                    final stateName = filtered[index];
+                    final state = filtered[index];
+                    final stateName = state['name'] ?? '';
                     final bool isSelected = stateController.text == stateName;
                     final String stateCode = stateName.length >= 2
                         ? stateName.substring(0, 2).toUpperCase()
@@ -1418,7 +1493,10 @@ class WorkerRegistrationController extends GetxController {
 
                     return GestureDetector(
                       onTap: () {
+                        selectedStateId.value = state['id'] ?? '';
                         stateController.text = stateName;
+                        cityController.clear();
+                        cities.clear();
                         Get.back<void>();
                       },
                       child: Container(
@@ -1505,64 +1583,27 @@ class WorkerRegistrationController extends GetxController {
   }
 
   // Open City Selection BottomSheet
-  void openCityBottomSheet() {
+  Future<void> openCityBottomSheet() async {
     FocusManager.instance.primaryFocus?.unfocus();
+    if (stateController.text.trim().isEmpty) {
+      showSnakBarBottomCustomRed('Please select a state first');
+      return;
+    }
+    if (selectedStateId.value.isEmpty) {
+      if (states.isEmpty && !await loadStates()) return;
+      final Map<String, String>? selected = states.firstWhereOrNull(
+        (state) =>
+            (state['name'] ?? '').toLowerCase() ==
+            stateController.text.trim().toLowerCase(),
+      );
+      selectedStateId.value = selected?['id'] ?? '';
+    }
+    if (selectedStateId.value.isEmpty) {
+      showSnakBarBottomCustomRed('Please select the state again');
+      return;
+    }
+    if (cities.isEmpty && !await loadCities(selectedStateId.value)) return;
     final RxString searchRx = ''.obs;
-
-    final List<String> citiesList = [
-      'Mumbai',
-      'Delhi',
-      'Bangalore',
-      'Hyderabad',
-      'Ahmedabad',
-      'Chennai',
-      'Kolkata',
-      'Surat',
-      'Pune',
-      'Jaipur',
-      'Lucknow',
-      'Kanpur',
-      'Nagpur',
-      'Indore',
-      'Thane',
-      'Bhopal',
-      'Visakhapatnam',
-      'Patna',
-      'Vadodara',
-      'Ghaziabad',
-      'Ludhiana',
-      'Agra',
-      'Nashik',
-      'Noida',
-      'Faridabad',
-      'Rajkot',
-      'Varanasi',
-      'Srinagar',
-      'Aurangabad',
-      'Dhanbad',
-      'Amritsar',
-      'Navi Mumbai',
-      'Allahabad',
-      'Ranchi',
-      'Howrah',
-      'Coimbatore',
-      'Jabalpur',
-      'Gwalior',
-      'Vijayawada',
-      'Jodhpur',
-      'Madurai',
-      'Raipur',
-      'Kota',
-      'Guwahati',
-      'Chandigarh',
-      'Solapur',
-      'Bareilly',
-      'Moradabad',
-      'Mysore',
-      'Gurgaon',
-      'Aligarh',
-      'Jalandhar',
-    ];
 
     Get.bottomSheet(
       Container(
@@ -1660,8 +1701,11 @@ class WorkerRegistrationController extends GetxController {
             Expanded(
               child: Obx(() {
                 final query = searchRx.value.toLowerCase().trim();
-                final filtered = citiesList
-                    .where((c) => c.toLowerCase().contains(query))
+                final filtered = cities
+                    .where(
+                      (city) =>
+                          (city['name'] ?? '').toLowerCase().contains(query),
+                    )
                     .toList();
 
                 if (filtered.isEmpty) {
@@ -1678,7 +1722,7 @@ class WorkerRegistrationController extends GetxController {
                   itemCount: filtered.length,
                   separatorBuilder: (context, index) => sizedboxHeight(8),
                   itemBuilder: (context, index) {
-                    final cityName = filtered[index];
+                    final cityName = filtered[index]['name'] ?? '';
                     final bool isSelected = cityController.text == cityName;
                     final String cityCode = cityName.length >= 2
                         ? cityName.substring(0, 2).toUpperCase()
@@ -2150,7 +2194,8 @@ class WorkerRegistrationController extends GetxController {
     VoidCallback? onRemove,
   }) {
     FocusManager.instance.primaryFocus?.unfocus();
-    final bool canEdit = !isPreviewMode.value &&
+    final bool canEdit =
+        !isPreviewMode.value &&
         kycStatus.value.toUpperCase() != 'UNDER_REVIEW' &&
         kycStatus.value.toUpperCase() != 'APPROVED';
     final VoidCallback? effectiveReupload = canEdit ? onReupload : null;
@@ -2613,8 +2658,9 @@ class WorkerRegistrationController extends GetxController {
     switch (currentStep.value) {
       case 1:
         final dob = DateFormat('dd/MM/yyyy').parse(dobController.text.trim());
-        final dynamic addressProofVal =
-            await _getFileOrUrlPayload(addressProofPath.value);
+        final dynamic addressProofVal = await _getFileOrUrlPayload(
+          addressProofPath.value,
+        );
         response = await WorkerKycApiServices.personalInfo({
           'fullName': fullNameController.text.trim(),
           'dateOfBirth': DateFormat('yyyy-MM-dd').format(dob),
@@ -2630,8 +2676,9 @@ class WorkerRegistrationController extends GetxController {
           'addressProof': ?addressProofVal,
         });
       case 2:
-        final dynamic passbookVal =
-            await _getFileOrUrlPayload(passbookProofPath.value);
+        final dynamic passbookVal = await _getFileOrUrlPayload(
+          passbookProofPath.value,
+        );
         response = await WorkerKycApiServices.bankInfo({
           'bankAccountName': accountHolderNameController.text.trim(),
           'bankAccountNumber': accountNumberController.text.trim(),
@@ -2640,21 +2687,28 @@ class WorkerRegistrationController extends GetxController {
           'bankPassbook': ?passbookVal,
         });
       case 3:
-        final Map<String, dynamic> idDocMap =
-            await _getIdentityDocPayloadMap();
+        final Map<String, dynamic> idDocMap = await _getIdentityDocPayloadMap();
         response = await WorkerKycApiServices.identityDocuments(idDocMap);
       case 5:
-        final dynamic liveSelfieVal =
-            await _getFileOrUrlPayload(liveSelfiePath.value);
+        final dynamic liveSelfieVal = await _getFileOrUrlPayload(
+          liveSelfiePath.value,
+        );
         response = await WorkerKycApiServices.liveSelfie({
           'liveSelfie': ?liveSelfieVal,
         });
       case 6:
-        final dynamic itiCertVal = await _getFileOrUrlPayload(itiCertPath.value);
-        final dynamic nsdcCertVal = await _getFileOrUrlPayload(nsdcCertPath.value);
-        final dynamic govtCertVal = await _getFileOrUrlPayload(govtCertPath.value);
-        final dynamic otherCertVal =
-            await _getFileOrUrlPayload(otherCertPath.value);
+        final dynamic itiCertVal = await _getFileOrUrlPayload(
+          itiCertPath.value,
+        );
+        final dynamic nsdcCertVal = await _getFileOrUrlPayload(
+          nsdcCertPath.value,
+        );
+        final dynamic govtCertVal = await _getFileOrUrlPayload(
+          govtCertPath.value,
+        );
+        final dynamic otherCertVal = await _getFileOrUrlPayload(
+          otherCertPath.value,
+        );
         response = await WorkerKycApiServices.skillsExperience({
           // Keep both deployed and newer API field names for compatibility.
           'skillId': selectedSkillId.value,
@@ -2692,8 +2746,7 @@ class WorkerRegistrationController extends GetxController {
             response['message'] ?? response['msg'],
           ).toUpperCase();
           if (msg.contains('AADHAAR_CARD') || msg.contains('PAN_CARD')) {
-            Map<String, dynamic> idDocMap =
-                await _getIdentityDocPayloadMap();
+            Map<String, dynamic> idDocMap = await _getIdentityDocPayloadMap();
 
             if (idDocMap.isEmpty) {
               final Map idDocResp =
@@ -2709,15 +2762,17 @@ class WorkerRegistrationController extends GetxController {
               response = await WorkerKycApiServices.submit();
             }
           } else if (msg.contains('ADDRESS_PROOF')) {
-            dynamic addressProofVal =
-                await _getFileOrUrlPayload(addressProofPath.value);
+            dynamic addressProofVal = await _getFileOrUrlPayload(
+              addressProofPath.value,
+            );
             if (addressProofVal == null) {
               final Map personalInfoResp =
                   await WorkerKycApiServices.getPersonalInfo();
               if (apiResponseSuccess(personalInfoResp)) {
                 _fillFieldsForStep(1, apiPeramMap(personalInfoResp['data']));
-                addressProofVal =
-                    await _getFileOrUrlPayload(addressProofPath.value);
+                addressProofVal = await _getFileOrUrlPayload(
+                  addressProofPath.value,
+                );
               }
             }
             if (addressProofVal != null) {

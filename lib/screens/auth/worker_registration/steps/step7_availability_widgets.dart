@@ -7,7 +7,7 @@ mixin Step7AvailabilityWidgets on WorkerRegistrationWidgets {
       children: [
         inputLabelField(
           label: "Full Time / Part Time",
-          hintText: "Select",
+          hintText: "Select work type",
           controller: controller.workTypeController,
           readOnly: true,
           onTap: controller.openWorkTypeBottomSheet,
@@ -20,7 +20,7 @@ mixin Step7AvailabilityWidgets on WorkerRegistrationWidgets {
         sizedboxHeight(14),
         inputLabelField(
           label: "Immediate Joining",
-          hintText: "Select",
+          hintText: "Select joining availability",
           controller: controller.immediateJoiningController,
           readOnly: true,
           onTap: controller.openImmediateJoiningBottomSheet,
@@ -33,7 +33,7 @@ mixin Step7AvailabilityWidgets on WorkerRegistrationWidgets {
         sizedboxHeight(14),
         inputLabelField(
           label: "Preferred Working Radius",
-          hintText: "10 km",
+          hintText: "Select working radius",
           controller: controller.workingRadiusController,
           readOnly: true,
           onTap: controller.openWorkingRadiusBottomSheet,
@@ -49,4 +49,3 @@ mixin Step7AvailabilityWidgets on WorkerRegistrationWidgets {
 
   // Common Review Section Card Widget with Edit Button & Expandable Content
 }
-

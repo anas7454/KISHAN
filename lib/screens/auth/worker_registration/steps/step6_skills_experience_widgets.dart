@@ -105,31 +105,42 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
               }
               return Wrap(
                 spacing: 8.rw,
-                runSpacing: 8.rh,
+                runSpacing: 10.rh,
                 children: controller.skillServices.map((service) {
                   final String id = service['id']!;
                   final bool selected = controller.selectedServiceIds.contains(
                     id,
                   );
-                  return FilterChip(
-                    label: Text(
-                      service['name']!,
-                      style: AppTextStyles.ts12w500colorBlack().copyWith(
-                        color: AppColors.black,
-                        fontWeight: selected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
+                  return GestureDetector(
+                    onTap: () => controller.toggleSkillService(id),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.rw,
+                        vertical: 10.rh,
                       ),
-                    ),
-                    selected: selected,
-                    onSelected: (_) => controller.toggleSkillService(id),
-                    selectedColor: AppColors.yellowBg,
-                    backgroundColor: AppColors.white,
-                    checkmarkColor: AppColors.primary,
-                    side: BorderSide(
-                      color: selected
-                          ? AppColors.primary
-                          : AppColors.borderDBDBDB,
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(22.rr),
+                        border: Border.all(
+                          color: selected
+                              ? AppColors.primary
+                              : const Color(0xffE0E0E0),
+                          width: selected ? 1.5 : 1,
+                        ),
+                      ),
+                      child: Text(
+                        service['name']!,
+                        style: TextStyle(
+                          fontSize: 11.5.rsp,
+                          fontWeight: selected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                          color: selected
+                              ? const Color(0xffD9A000)
+                              : const Color(0xff4C4C4C),
+                        ),
+                      ),
                     ),
                   );
                 }).toList(),
@@ -143,26 +154,26 @@ mixin Step6SkillsExperienceWidgets on WorkerRegistrationWidgets {
           children: [
             inputLabelField(
               label: "Years of Experience",
-              hintText: "Enter",
+              hintText: "Enter years of experience",
               controller: controller.experienceYearsController,
               keyboardType: TextInputType.number,
             ),
             sizedboxHeight(14),
             inputLabelField(
               label: "Description / About Work",
-              hintText: "Enter",
+              hintText: "Describe your work experience",
               controller: controller.workDescriptionController,
             ),
             sizedboxHeight(14),
             inputLabelField(
               label: "Previous Company",
-              hintText: "Enter",
+              hintText: "Enter previous company name",
               controller: controller.previousCompanyController,
             ),
             sizedboxHeight(14),
             inputLabelField(
               label: "Daily Wage Expectation",
-              hintText: "Enter",
+              hintText: "Enter expected daily wage",
               controller: controller.dailyWageController,
               keyboardType: TextInputType.number,
             ),

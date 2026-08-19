@@ -8,11 +8,7 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
 
   String _reviewFile(String path) {
     final String trimmed = path.trim();
-    const placeholders = <String>{
-      'proof.pdf',
-      'front.pdf',
-      'certificate.pdf',
-    };
+    const placeholders = <String>{'proof.pdf', 'front.pdf', 'certificate.pdf'};
     if (trimmed.isEmpty || placeholders.contains(trimmed)) {
       return 'Not uploaded';
     }
@@ -31,7 +27,8 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
       return _reviewDetail(label, 'Not uploaded');
     }
 
-    final bool isNetwork = path.startsWith('http://') || path.startsWith('https://');
+    final bool isNetwork =
+        path.startsWith('http://') || path.startsWith('https://');
     final Widget image = isNetwork
         ? Image.network(
             path,
@@ -40,9 +37,8 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
             fit: BoxFit.cover,
             cacheWidth: 720,
             cacheHeight: 360,
-            loadingBuilder: (context, child, progress) => progress == null
-                ? child
-                : _reviewImageLoading(),
+            loadingBuilder: (context, child, progress) =>
+                progress == null ? child : _reviewImageLoading(),
             errorBuilder: (_, _, _) => _reviewImageError(),
           )
         : Image.file(
@@ -109,16 +105,14 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
   Widget _reviewDetail(String label, String value) {
     return Padding(
       padding: EdgeInsets.only(bottom: 6.rh),
-      child: Text(
-        '$label: $value',
-        style: AppTextStyles.ts12w500colorBlack(),
-      ),
+      child: Text('$label: $value', style: AppTextStyles.ts12w500colorBlack()),
     );
   }
 
   Widget reviewSectionCard({
     required String title,
     required int sectionIndex,
+    required int editStep,
     required WorkerRegistrationController controller,
     required Widget summaryContent,
   }) {
@@ -151,6 +145,27 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
                     ),
                   ),
                 ),
+                if (!controller.isPreviewMode.value)
+                  InkWell(
+                    onTap: () =>
+                        controller.goToStep(editStep, isFromReview: true),
+                    borderRadius: BorderRadius.circular(18.rr),
+                    child: Container(
+                      width: 36.rw,
+                      height: 36.rh,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        color: Color(0xffFFF7D6),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.edit_outlined,
+                        color: AppColors.primary,
+                        size: 18.rsp,
+                      ),
+                    ),
+                  ),
+                sizedboxWidth(4),
                 InkWell(
                   onTap: () => controller.toggleSectionExpanded(sectionIndex),
                   borderRadius: BorderRadius.circular(22.rr),
@@ -187,55 +202,122 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
         reviewSectionCard(
           title: "Personal Info",
           sectionIndex: 1,
+          editStep: 1,
           controller: controller,
           summaryContent: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _reviewDetail('Name', _reviewValue(controller.fullNameController.text)),
+              _reviewDetail(
+                'Name',
+                _reviewValue(controller.fullNameController.text),
+              ),
               _reviewDetail('DOB', _reviewValue(controller.dobController.text)),
-              _reviewDetail('Gender', _reviewValue(controller.selectedGender.value)),
-              _reviewDetail('Language', _reviewValue(controller.languageController.text, fallback: 'Not selected')),
-              _reviewDetail('State', _reviewValue(controller.stateController.text)),
-              _reviewDetail('City', _reviewValue(controller.cityController.text)),
-              _reviewDetail('Pincode', _reviewValue(controller.pincodeController.text)),
-              _reviewDetail('House/Plot No.', _reviewValue(controller.houseNoController.text)),
-              _reviewDetail('Full Address', _reviewValue(controller.fullAddressController.text)),
-              _reviewImage(label: 'Address Proof', path: controller.addressProofPath.value, controller: controller),
+              _reviewDetail(
+                'Gender',
+                _reviewValue(controller.selectedGender.value),
+              ),
+              _reviewDetail(
+                'Language',
+                _reviewValue(
+                  controller.languageController.text,
+                  fallback: 'Not selected',
+                ),
+              ),
+              _reviewDetail(
+                'State',
+                _reviewValue(controller.stateController.text),
+              ),
+              _reviewDetail(
+                'City',
+                _reviewValue(controller.cityController.text),
+              ),
+              _reviewDetail(
+                'Pincode',
+                _reviewValue(controller.pincodeController.text),
+              ),
+              _reviewDetail(
+                'House/Plot No.',
+                _reviewValue(controller.houseNoController.text),
+              ),
+              _reviewDetail(
+                'Full Address',
+                _reviewValue(controller.fullAddressController.text),
+              ),
+              _reviewImage(
+                label: 'Address Proof',
+                path: controller.addressProofPath.value,
+                controller: controller,
+              ),
             ],
           ),
         ),
         reviewSectionCard(
           title: "Bank Info",
           sectionIndex: 2,
+          editStep: 2,
           controller: controller,
           summaryContent: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _reviewDetail('Account Holder', _reviewValue(controller.accountHolderNameController.text)),
-              _reviewDetail('Account Number', _reviewValue(controller.accountNumberController.text)),
-              _reviewDetail('IFSC Code', _reviewValue(controller.ifscCodeController.text)),
-              _reviewDetail('Branch Name', _reviewValue(controller.branchNameController.text)),
-              _reviewImage(label: 'Passbook/Cheque', path: controller.passbookProofPath.value, controller: controller),
+              _reviewDetail(
+                'Account Holder',
+                _reviewValue(controller.accountHolderNameController.text),
+              ),
+              _reviewDetail(
+                'Account Number',
+                _reviewValue(controller.accountNumberController.text),
+              ),
+              _reviewDetail(
+                'IFSC Code',
+                _reviewValue(controller.ifscCodeController.text),
+              ),
+              _reviewDetail(
+                'Branch Name',
+                _reviewValue(controller.branchNameController.text),
+              ),
+              _reviewImage(
+                label: 'Passbook/Cheque',
+                path: controller.passbookProofPath.value,
+                controller: controller,
+              ),
             ],
           ),
         ),
         reviewSectionCard(
           title: "Document's Uploaded",
           sectionIndex: 3,
+          editStep: 3,
           controller: controller,
           summaryContent: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _reviewImage(label: 'Aadhaar Front', path: controller.idFrontPath.value, controller: controller),
-              _reviewImage(label: 'Aadhaar Back', path: controller.idBackPath.value, controller: controller),
-              _reviewImage(label: 'PAN Card', path: controller.panCardPath.value, controller: controller),
-              _reviewImage(label: 'Police Certificate', path: controller.policeCertPath.value, controller: controller),
+              _reviewImage(
+                label: 'Aadhaar Front',
+                path: controller.idFrontPath.value,
+                controller: controller,
+              ),
+              _reviewImage(
+                label: 'Aadhaar Back',
+                path: controller.idBackPath.value,
+                controller: controller,
+              ),
+              _reviewImage(
+                label: 'PAN Card',
+                path: controller.panCardPath.value,
+                controller: controller,
+              ),
+              _reviewImage(
+                label: 'Police Certificate',
+                path: controller.policeCertPath.value,
+                controller: controller,
+              ),
             ],
           ),
         ),
         reviewSectionCard(
           title: "Selfie Verification",
           sectionIndex: 4,
+          editStep: 4,
           controller: controller,
           summaryContent: _reviewImage(
             label: 'Live Selfie',
@@ -246,33 +328,90 @@ mixin Step8ReviewWidgets on WorkerRegistrationWidgets {
         reviewSectionCard(
           title: "Skills & Experience / Certificate Info",
           sectionIndex: 5,
+          editStep: 6,
           controller: controller,
           summaryContent: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _reviewDetail('Category', _reviewValue(controller.selectedSkillCategory.value, fallback: 'Not selected')),
-              _reviewDetail('Services', _reviewValue(controller.selectedServicesController.text, fallback: 'Not selected')),
-              _reviewDetail('Experience (Years)', _reviewValue(controller.experienceYearsController.text)),
-              _reviewDetail('Work Description', _reviewValue(controller.workDescriptionController.text)),
-              _reviewDetail('Previous Company', _reviewValue(controller.previousCompanyController.text)),
-              _reviewDetail('Daily Wage Expectation', _reviewValue(controller.dailyWageController.text)),
-              _reviewImage(label: 'ITI Certificate', path: controller.itiCertPath.value, controller: controller),
-              _reviewImage(label: 'NSDC Certificate', path: controller.nsdcCertPath.value, controller: controller),
-              _reviewImage(label: 'Government Certificate', path: controller.govtCertPath.value, controller: controller),
-              _reviewImage(label: 'Other Certificate', path: controller.otherCertPath.value, controller: controller),
+              _reviewDetail(
+                'Category',
+                _reviewValue(
+                  controller.selectedSkillCategory.value,
+                  fallback: 'Not selected',
+                ),
+              ),
+              _reviewDetail(
+                'Services',
+                _reviewValue(
+                  controller.selectedServicesController.text,
+                  fallback: 'Not selected',
+                ),
+              ),
+              _reviewDetail(
+                'Experience (Years)',
+                _reviewValue(controller.experienceYearsController.text),
+              ),
+              _reviewDetail(
+                'Work Description',
+                _reviewValue(controller.workDescriptionController.text),
+              ),
+              _reviewDetail(
+                'Previous Company',
+                _reviewValue(controller.previousCompanyController.text),
+              ),
+              _reviewDetail(
+                'Daily Wage Expectation',
+                _reviewValue(controller.dailyWageController.text),
+              ),
+              _reviewImage(
+                label: 'ITI Certificate',
+                path: controller.itiCertPath.value,
+                controller: controller,
+              ),
+              _reviewImage(
+                label: 'NSDC Certificate',
+                path: controller.nsdcCertPath.value,
+                controller: controller,
+              ),
+              _reviewImage(
+                label: 'Government Certificate',
+                path: controller.govtCertPath.value,
+                controller: controller,
+              ),
+              _reviewImage(
+                label: 'Other Certificate',
+                path: controller.otherCertPath.value,
+                controller: controller,
+              ),
             ],
           ),
         ),
         reviewSectionCard(
           title: "Availability",
           sectionIndex: 6,
+          editStep: 7,
           controller: controller,
           summaryContent: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _reviewDetail('Work Type', _reviewValue(controller.workTypeController.text, fallback: 'Not selected')),
-              _reviewDetail('Immediate Joining', _reviewValue(controller.immediateJoiningController.text, fallback: 'Not selected')),
-              _reviewDetail('Working Radius', _reviewValue(controller.workingRadiusController.text)),
+              _reviewDetail(
+                'Work Type',
+                _reviewValue(
+                  controller.workTypeController.text,
+                  fallback: 'Not selected',
+                ),
+              ),
+              _reviewDetail(
+                'Immediate Joining',
+                _reviewValue(
+                  controller.immediateJoiningController.text,
+                  fallback: 'Not selected',
+                ),
+              ),
+              _reviewDetail(
+                'Working Radius',
+                _reviewValue(controller.workingRadiusController.text),
+              ),
             ],
           ),
         ),

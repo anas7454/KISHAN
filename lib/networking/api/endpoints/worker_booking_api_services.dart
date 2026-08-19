@@ -58,6 +58,45 @@ class WorkerBookingApiServices {
     );
   }
 
+  static Future<Map> markArrived(String bookingId) =>
+      _updateBookingStatus(bookingId, 'arrived');
+
+  static Future<Map> startInspection(String bookingId) =>
+      _updateBookingStatus(bookingId, 'inspection');
+
+  static Future<Map> startWork(String bookingId) =>
+      _updateBookingStatus(bookingId, 'start');
+
+  static Future<Map> completeWork(String bookingId, {String? comment}) =>
+      _updateBookingStatus(
+        bookingId,
+        'complete',
+        body: comment == null ? null : <String, dynamic>{'comment': comment},
+      );
+
+  static Future<Map> addAdditionalSkillServices(
+    String bookingId,
+    Map<String, dynamic> body,
+  ) {
+    return AppApiServices.apiRequest(
+      '/api/workers/booking/$bookingId/additional-skill-services',
+      apiType: EnumApiType.put,
+      perms: body,
+    );
+  }
+
+  static Future<Map> _updateBookingStatus(
+    String bookingId,
+    String action, {
+    Map<String, dynamic>? body,
+  }) {
+    return AppApiServices.apiRequest(
+      '/api/workers/booking/$bookingId/$action',
+      apiType: EnumApiType.put,
+      perms: body,
+    );
+  }
+
   static void markAccepted(String bookingId) {
     rejectedBookingIds.remove(bookingId);
     acceptedBookingIds.add(bookingId);

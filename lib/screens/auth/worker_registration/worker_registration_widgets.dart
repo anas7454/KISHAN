@@ -243,13 +243,13 @@ mixin WorkerRegistrationWidgets {
     );
   }
 
-  // Reusable File Upload Field (Figma Specs: Group 8857, Width: 81px, Height: 29px, Fill: 0%, Border: 1px #FFBC07 40%)
+  // Shared by every registration screen so upload fields stay consistent.
   Widget uploadFileField({
     required String label,
     required String fileName,
     VoidCallback? onUpload,
     VoidCallback? onView,
-    String defaultPlaceholder = 'proof.pdf',
+    String defaultPlaceholder = 'Upload Document',
   }) {
     final bool isUploaded =
         fileName.isNotEmpty &&
@@ -272,149 +272,174 @@ mixin WorkerRegistrationWidgets {
           ),
         ),
         sizedboxHeight(7),
-        GestureDetector(
-          onTap: isUploaded ? null : onUpload,
-          child: Container(
-            height: 44.rh,
-            width: double.infinity,
-            padding: EdgeInsets.only(left: 10.rw, right: 8.rw),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color.fromRGBO(51, 51, 51, 0.03),
-                  Color.fromRGBO(0, 0, 0, 0.03),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(10.rr),
-              border: Border.all(
-                color: isUploaded
-                    ? AppColors.primary
-                    : AppColors.borderTextfiled,
-                width: 1.rsp,
-              ),
-            ),
-            child: Row(
-              children: [
-                if (isUploaded) ...[
-                  Icon(
-                    Icons.check_circle_rounded,
-                    color: AppColors.primary,
-                    size: 18.rsp,
-                  ),
-                  sizedboxWidth(6),
-                ],
-                Expanded(
-                  child: Text(
-                    shortFileName,
-                    style: AppTextStyles.ts14w500color7D7D7D().copyWith(
-                      color: isUploaded
-                          ? AppColors.black
-                          : AppColors.color7D7D7D,
-                      fontWeight: isUploaded
-                          ? FontWeight.w600
-                          : FontWeight.w500,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onUpload,
+            borderRadius: BorderRadius.circular(10.rr),
+            child: Container(
+              constraints: BoxConstraints(minHeight: 52.rh),
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 12.rw, vertical: 8.rh),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromRGBO(51, 51, 51, 0.03),
+                    Color.fromRGBO(0, 0, 0, 0.03),
+                  ],
                 ),
-                sizedboxWidth(8),
-                if (!isUploaded)
-                  InkWell(
-                    onTap: onUpload,
-                    borderRadius: BorderRadius.circular(15.rr),
-                    child: Container(
-                      width: 81.rw,
-                      height: 29.rh,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(15.rr),
-                        border: Border.all(
-                          color: AppColors.colorFFBC07.withValues(alpha: 0.40),
-                          width: 1.rsp,
+                borderRadius: BorderRadius.circular(10.rr),
+                border: Border.all(
+                  color: isUploaded
+                      ? AppColors.primary
+                      : AppColors.borderTextfiled,
+                  width: 1.rsp,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 32.rsp,
+                    height: 32.rsp,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(
+                        alpha: isUploaded ? 0.18 : 0.10,
+                      ),
+                      borderRadius: BorderRadius.circular(8.rr),
+                    ),
+                    child: Icon(
+                      isUploaded
+                          ? Icons.check_circle_rounded
+                          : Icons.description_outlined,
+                      color: AppColors.colorFFBC07,
+                      size: 18.rsp,
+                    ),
+                  ),
+                  sizedboxWidth(9),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          shortFileName,
+                          style: AppTextStyles.ts14w500color7D7D7D().copyWith(
+                            color: isUploaded
+                                ? AppColors.black
+                                : AppColors.color7D7D7D,
+                            fontWeight: isUploaded
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                            fontStyle: FontStyle.normal,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  sizedboxWidth(8),
+                  if (!isUploaded)
+                    InkWell(
+                      onTap: onUpload,
+                      borderRadius: BorderRadius.circular(15.rr),
+                      child: Container(
+                        width: 81.rw,
+                        height: 29.rh,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(15.rr),
+                          border: Border.all(
+                            color: AppColors.colorFFBC07.withValues(
+                              alpha: 0.40,
+                            ),
+                            width: 1.rsp,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.upload_file_rounded,
+                              size: 14.rsp,
+                              color: AppColors.colorFFBC07,
+                            ),
+                            sizedboxWidth(4),
+                            Text(
+                              "Upload",
+                              style: AppTextStyles.ts12w600color000000()
+                                  .copyWith(
+                                    color: AppColors.colorFFBC07,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12.rsp,
+                                  ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.camera_alt_rounded,
-                            size: 14.rsp,
-                            color: AppColors.colorFFBC07,
-                          ),
-                          sizedboxWidth(4),
-                          Text(
-                            "Upload",
-                            style: AppTextStyles.ts12w600color000000().copyWith(
-                              color: AppColors.colorFFBC07,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12.rsp,
+                    )
+                  else
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        InkWell(
+                          onTap: onView,
+                          borderRadius: BorderRadius.circular(15.rr),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.rw,
+                              vertical: 4.rh,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(12.rr),
+                            ),
+                            child: Icon(
+                              Icons.visibility_rounded,
+                              size: 16.rsp,
+                              color: AppColors.black,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        sizedboxWidth(6),
+                        InkWell(
+                          onTap: onUpload,
+                          borderRadius: BorderRadius.circular(15.rr),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 9.rw,
+                              vertical: 4.rh,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(12.rr),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.sync_rounded,
+                                  size: 14.rsp,
+                                  color: AppColors.black,
+                                ),
+                                sizedboxWidth(3),
+                                Text(
+                                  'Change',
+                                  style: AppTextStyles.ts12w600color000000()
+                                      .copyWith(fontSize: 11.rsp),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  )
-                else
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      InkWell(
-                        onTap: onView,
-                        borderRadius: BorderRadius.circular(15.rr),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.rw,
-                            vertical: 4.rh,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12.rr),
-                          ),
-                          child: Icon(
-                            Icons.visibility_rounded,
-                            size: 16.rsp,
-                            color: AppColors.black,
-                          ),
-                        ),
-                      ),
-                      sizedboxWidth(6),
-                      InkWell(
-                        onTap: onUpload,
-                        borderRadius: BorderRadius.circular(15.rr),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 9.rw,
-                            vertical: 4.rh,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(12.rr),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.sync_rounded,
-                                size: 14.rsp,
-                                color: AppColors.black,
-                              ),
-                              sizedboxWidth(3),
-                              Text(
-                                'Change',
-                                style: AppTextStyles.ts12w600color000000()
-                                    .copyWith(fontSize: 11.rsp),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

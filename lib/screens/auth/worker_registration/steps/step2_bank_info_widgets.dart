@@ -7,13 +7,13 @@ mixin Step2BankInfoWidgets on WorkerRegistrationWidgets {
       children: [
         inputLabelField(
           label: "Account Holder Name",
-          hintText: "Enter",
+          hintText: "Enter account holder name",
           controller: controller.accountHolderNameController,
         ),
         sizedboxHeight(14),
         inputLabelField(
           label: "Account Number",
-          hintText: "Enter (9-18 digits)",
+          hintText: "Enter account number (9-18 digits)",
           controller: controller.accountNumberController,
           keyboardType: TextInputType.number,
           maxLength: 18,
@@ -22,7 +22,7 @@ mixin Step2BankInfoWidgets on WorkerRegistrationWidgets {
         sizedboxHeight(14),
         inputLabelField(
           label: "Confirm Account Number",
-          hintText: "Re-enter Account Number",
+          hintText: "Re-enter account number",
           controller: controller.confirmAccountNumberController,
           keyboardType: TextInputType.number,
           maxLength: 18,
@@ -31,7 +31,7 @@ mixin Step2BankInfoWidgets on WorkerRegistrationWidgets {
         sizedboxHeight(14),
         inputLabelField(
           label: "IFSC Code",
-          hintText: "e.g. SBIN0001234",
+          hintText: "Enter IFSC code (e.g. SBIN0001234)",
           controller: controller.ifscCodeController,
           textCapitalization: TextCapitalization.characters,
           maxLength: 11,
@@ -42,7 +42,7 @@ mixin Step2BankInfoWidgets on WorkerRegistrationWidgets {
         sizedboxHeight(14),
         inputLabelField(
           label: "Branch Name",
-          hintText: "Enter",
+          hintText: "Enter branch name",
           controller: controller.branchNameController,
         ),
         sizedboxHeight(14),
@@ -50,11 +50,13 @@ mixin Step2BankInfoWidgets on WorkerRegistrationWidgets {
           () => uploadFileField(
             label: "Passbook/Cancelled Cheque (Optional)",
             fileName: controller.passbookProofPath.value,
-            onUpload: () => controller.pickImageOrDocument(controller.passbookProofPath),
+            onUpload: () =>
+                controller.pickImageOrDocument(controller.passbookProofPath),
             onView: () => controller.showDocumentPreviewDialog(
               title: "Passbook / Cheque Proof",
               fileName: controller.passbookProofPath.value,
-              onReupload: () => controller.pickImageOrDocument(controller.passbookProofPath),
+              onReupload: () =>
+                  controller.pickImageOrDocument(controller.passbookProofPath),
             ),
           ),
         ),
@@ -64,4 +66,3 @@ mixin Step2BankInfoWidgets on WorkerRegistrationWidgets {
 
   // Step 3: Document's Upload
 }
-

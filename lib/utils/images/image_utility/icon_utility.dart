@@ -3,7 +3,6 @@ class IconUtility {
 
   static const String homeSearch = 'assets/icons/home_search.png';
 
-
   // Bottom navigation assets. Add the final icons at these paths.
 
   static const String bottomNavMaterials =
@@ -27,4 +26,12 @@ class IconUtility {
 
   static const String star = 'assets/icons/star.png';
   static const String bluecheck = 'assets/icons/bluecheck.png';
+
+  static const String reportEmailSupport =
+      'assets/icons/report_email_support.webp';
+  static const String reportPhoneSupport =
+      'assets/icons/report_phone_support.webp';
+  static const String reportWhatsapp = 'assets/icons/report_whatsapp.webp';
+  static const String reportBusinessHours =
+      'assets/icons/report_business_hours.webp';
 }

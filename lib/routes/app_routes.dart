@@ -19,7 +19,9 @@ import 'package:constructo_worker/screens/info_content/info_content_data.dart';
 import 'package:constructo_worker/screens/info_content/info_content_screen.dart';
 import 'package:constructo_worker/screens/notifications/notifications_screen.dart';
 import 'package:constructo_worker/screens/request_details/request_details_screen.dart';
+import 'package:constructo_worker/screens/report_issue/report_issue_screen.dart';
 import 'package:constructo_worker/screens/worker_verification_status/worker_verification_status_screen.dart';
+import 'package:constructo_worker/screens/wallet/wallet_screen.dart';
 
 class AppRoutes {
   static Transition mytransition =
@@ -118,6 +120,13 @@ class AppRoutes {
       transition: mytransition,
       transitionDuration: transitionDuration,
     ),
+    GetPage(
+      name: AppRouteName.walletScreen,
+      page: () => WalletScreen(),
+      participatesInRootNavigator: false,
+      transition: mytransition,
+      transitionDuration: transitionDuration,
+    ),
   ];
 
   static Future<void> onboardingScreen() async {
@@ -199,7 +208,15 @@ class AppRoutes {
 
   static Future<void> notificationsScreen() async {
     return Get.to<void>(
-      () => const NotificationsScreen(),
+      () => NotificationsScreen(),
+      transition: Transition.rightToLeft,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  static Future<void> reportIssueScreen() async {
+    return Get.to<void>(
+      () => ReportIssueScreen(),
       transition: Transition.rightToLeft,
       duration: const Duration(milliseconds: 250),
     );
@@ -245,6 +262,14 @@ class AppRoutes {
     return Get.toNamed(
       AppRouteName.requestDetailsScreen,
       arguments: <String, dynamic>{Arguments.id: bookingId, 'status': status},
+    );
+  }
+
+  static Future<void> walletScreen() async {
+    return Get.to<void>(
+      () => WalletScreen(),
+      transition: Transition.rightToLeft,
+      duration: const Duration(milliseconds: 250),
     );
   }
 }

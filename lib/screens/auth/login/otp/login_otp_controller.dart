@@ -62,15 +62,17 @@ class LoginOtpController extends GetxController {
     if (seconds.value > 0 || isResending.value) return;
 
     isResending.value = true;
-    final Map<String, dynamic> rawData = {"identifier": phoneNumber.value};
-    final response = await AuthApiServices.resendOtpLogin(rawData);
+    final Map response = await AuthApiServices.resendOtpLogin(
+      phoneNumber.value,
+    );
     isResending.value = false;
 
     if (apiResponseSuccess(response)) {
-      showToastSuccess('OTP sent again');
+      otpController.clear();
+      showToastSuccess(response);
       _startTimer();
     } else {
-      showdialogApiError(respMap: response);
+      await showdialogApiError(respMap: response);
     }
   }
 

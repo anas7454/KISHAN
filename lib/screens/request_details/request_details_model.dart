@@ -112,10 +112,13 @@ class WorkerBookingModel {
     subtotal = apiPeramString(data['subtotal'], initialValue: amount);
     discount = apiPeramString(data['discount'], initialValue: '0');
     status = apiPeramString(
-      data['workerStatus'] ??
+      data['bookingStatus'] ??
+          data['status'] ??
+          data['workStatus'] ??
+          data['jobStatus'] ??
+          data['workerStatus'] ??
           data['workerResponseStatus'] ??
-          data['assignmentStatus'] ??
-          data['status'],
+          data['assignmentStatus'],
       initialValue: 'PENDING',
     ).toUpperCase();
   }

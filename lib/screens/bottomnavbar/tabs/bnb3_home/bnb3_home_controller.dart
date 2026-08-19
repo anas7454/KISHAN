@@ -21,6 +21,8 @@ class Bnb3HomeController extends GetxController with WidgetsBindingObserver {
   final RxList<HomeCategoryModel> categories = <HomeCategoryModel>[].obs;
   final RxList<WorkerBookingModel> pendingBookings = <WorkerBookingModel>[].obs;
   final RxBool isBookingsLoading = false.obs;
+  final RxString processingBookingId = ''.obs;
+  final RxString processingAction = ''.obs;
   Timer? _pendingBookingsPollingTimer;
   bool _pendingBookingsInFlight = false;
 
@@ -41,7 +43,7 @@ class Bnb3HomeController extends GetxController with WidgetsBindingObserver {
   void _startPendingBookingsPolling() {
     _pendingBookingsPollingTimer?.cancel();
     _pendingBookingsPollingTimer = Timer.periodic(
-      const Duration(seconds: 10),
+      const Duration(seconds: 3),
       (_) => getPendingBookings(showLoading: false),
     );
   }
@@ -219,6 +221,14 @@ class Bnb3HomeController extends GetxController with WidgetsBindingObserver {
         '${newBooking.title} • ${newBooking.displayRequestedOn}',
         snackPosition: SnackPosition.TOP,
         duration: const Duration(seconds: 6),
+        backgroundColor: const Color(0xff16A34A),
+        colorText: Colors.white,
+        icon: const Icon(
+          Icons.notifications_active_rounded,
+          color: Colors.white,
+        ),
+        margin: const EdgeInsets.all(12),
+        borderRadius: 10,
         mainButton: TextButton(
           onPressed: () {
             Get.closeCurrentSnackbar();
@@ -227,16 +237,26 @@ class Bnb3HomeController extends GetxController with WidgetsBindingObserver {
               status: 'PENDING',
             );
           },
-          child: const Text('View'),
+          child: const Text(
+            'View',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+          ),
         ),
       );
     }
   }
 
   Future<void> acceptBooking(WorkerBookingModel booking) async {
-    final Map response = await WorkerBookingApiServices.acceptBooking(
-      booking.id,
-    );
+    if (processingBookingId.value.isNotEmpty) return;
+    processingBookingId.value = booking.id;
+    processingAction.value = 'accept';
+    final Map response;
+    try {
+      response = await WorkerBookingApiServices.acceptBooking(booking.id);
+    } finally {
+      processingBookingId.value = '';
+      processingAction.value = '';
+    }
     if (!apiResponseSuccess(response)) {
       await showdialogApiError(respMap: response);
       return;
@@ -253,9 +273,16 @@ class Bnb3HomeController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> rejectBooking(WorkerBookingModel booking) async {
-    final Map response = await WorkerBookingApiServices.rejectBooking(
-      booking.id,
-    );
+    if (processingBookingId.value.isNotEmpty) return;
+    processingBookingId.value = booking.id;
+    processingAction.value = 'reject';
+    final Map response;
+    try {
+      response = await WorkerBookingApiServices.rejectBooking(booking.id);
+    } finally {
+      processingBookingId.value = '';
+      processingAction.value = '';
+    }
     if (!apiResponseSuccess(response)) {
       await showdialogApiError(respMap: response);
       return;

@@ -26,12 +26,12 @@ class AuthApiServices {
     );
   }
 
-  static Future<Map> resendOtpLogin(Map<String, dynamic> data) async {
-    const path = "/api/auth/custom/resend-otp";
+  static Future<Map> resendOtpLogin(String identifier) {
+    const String path = '/api/auth/custom/resend-otp';
     return AppApiServices.apiRequest(
       path,
       apiType: EnumApiType.post,
-      perms: data,
+      perms: <String, dynamic>{'identifier': identifier},
     );
   }
 

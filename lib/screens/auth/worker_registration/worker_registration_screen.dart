@@ -240,7 +240,12 @@ class WorkerRegistrationScreen extends StatelessWidget
       return PopScope(
         canPop: controller.isPreviewMode.value,
         onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) controller.closeApp();
+          if (didPop) return;
+          if (controller.returnToStep.value > 0) {
+            controller.previousStep();
+          } else {
+            controller.closeApp();
+          }
         },
         child: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -252,6 +257,8 @@ class WorkerRegistrationScreen extends StatelessWidget
               currentStep: step,
               onBack: controller.isPreviewMode.value
                   ? () => Get.back<void>()
+                  : controller.returnToStep.value > 0
+                  ? controller.previousStep
                   : controller.closeApp,
             ),
             body: SafeArea(
@@ -272,7 +279,10 @@ class WorkerRegistrationScreen extends StatelessWidget
                                 color: AppColors.primary,
                               ),
                             )
-                          : _buildStepBody(context, step),
+                          : IgnorePointer(
+                              ignoring: controller.isPreviewMode.value,
+                              child: _buildStepBody(context, step),
+                            ),
                     ),
                   ),
                   if (!controller.isPreviewMode.value)
