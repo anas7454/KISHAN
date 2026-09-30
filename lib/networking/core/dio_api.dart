@@ -18,8 +18,8 @@ class DioAPI {
   // static const bool isTestAds = kDebugMode ? true : false;
   static const bool isTestAds = false;
 
-  static String androidPackageId = "com.constructo.worker";
-  static String iosBundleId = "com.constructo.worker";
+  static String androidPackageId = "com.kisan.india";
+  static String iosBundleId = "com.kisan.india";
 
   // ------------------ SERVER URLS -----------------------
 

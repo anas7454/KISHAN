@@ -82,6 +82,19 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/farmer_avatar.png
+    - assets/images/smart_farming_banner.png
+    - assets/images/tractor_card.png
+    - assets/images/drone_card.png
+    - assets/images/rotavator_card.png
+    - assets/images/icon_tractor_service.png
+    - assets/images/icon_equipment_service.png
+    - assets/images/icon_spray_service.png
+    - assets/images/icon_product_delivery.png
+    - assets/images/icon_expert_advice.png
+    - assets/images/icon_gift_box.png
+    - assets/images/harvester_card.png
+    - assets/images/trolley_card.png
     - assets/icons/
     - assets/background/
     - assets/dummy_images/

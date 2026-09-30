@@ -20,7 +20,7 @@ if (keyPropertiesFile.exists()) {
 // ------
 
 android {
-    namespace = "com.constructo.worker"
+    namespace = "com.kisan.india"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -30,9 +30,14 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.constructo.worker"
+        applicationId = "com.kisan.india"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

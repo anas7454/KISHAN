@@ -41,40 +41,7 @@ class UserController extends GetxController {
   }
 
   Future<void> routeAfterAuthentication() async {
-    final Map response = await WorkerKycApiServices.getWorkerKycStatus();
-    if (!apiResponseSuccess(response)) {
-      // A temporary API/rate-limit failure does not mean that the worker is
-      // new. Opening Step 1 here can make an already submitted worker restart
-      // onboarding. Keep logged-in users on the safe KYC status screen until
-      // the server becomes available again.
-      await AppRoutes.workerVerificationStatusRootScreen();
-      return;
-    }
-
-    final WorkerKycStatusModel kyc = WorkerKycStatusModel.fromResponse(
-      response,
-    );
-    if (kyc.status == 'APPROVED') {
-      await AppRoutes.bottomNavBarScreen();
-      return;
-    }
-    if (kyc.status == 'REJECTED') {
-      await AppRoutes.workerVerificationStatusRootScreen();
-      return;
-    }
-    if (kyc.status == 'UNDER_REVIEW') {
-      await AppRoutes.workerVerificationStatusRootScreen();
-      return;
-    }
-
-    final int step = localStepForKycKey(kyc.nextStepKey);
-    await AppRoutes.resumeWorkerRegistrationScreen(
-      step: step,
-      status: kyc.status,
-      completedSections: kyc.completedSections,
-      totalSections: kyc.totalSections == 0 ? 8 : kyc.totalSections,
-      sections: kyc.sections.map((section) => section.toMap()).toList(),
-    );
+    await AppRoutes.bottomNavBarScreen();
   }
 
   Future<void> setLoginData(Map data) async {

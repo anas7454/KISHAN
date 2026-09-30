@@ -14,4 +14,10 @@ abstract class AppRouteName {
   static const String workerVerificationStatusScreen =
       '/WorkerVerificationStatusScreen';
   static const String walletScreen = '/WalletScreen';
+  static const String allServicesScreen = '/AllServicesScreen';
+  static const String equipmentListScreen = '/EquipmentListScreen';
+  static const String equipmentDetailScreen = '/EquipmentDetailScreen';
+  static const String providerDetailScreen = '/ProviderDetailScreen';
+  static const String bookingSlotScreen = '/BookingSlotScreen';
+  static const String bookingSummaryScreen = '/BookingSummaryScreen';
 }

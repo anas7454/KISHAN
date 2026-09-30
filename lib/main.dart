@@ -9,6 +9,8 @@ import 'package:constructo_worker/utils/internet_connectivity_service/app_connec
 import 'package:constructo_worker/utils/internet_connectivity_service/app_connectivity_wrapper.dart';
 import 'package:constructo_worker/utils/theme/app_theme/app_theme.dart';
 import 'package:constructo_worker/utils/theme/app_theme/system_ui_overlaystyle_custom.dart';
+import 'package:constructo_worker/utils/localization/app_translations.dart';
+import 'package:constructo_worker/utils/localization/language_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +47,7 @@ void main() async {
 }
 
 Future<void> dependencyInjection() async {
+  Get.put(LanguageController(), permanent: true);
   Get.put(UserController(), permanent: true);
   Get.put(GlobalController(), permanent: true);
 
@@ -69,19 +72,17 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           navigatorKey: rootNavigatorKey,
           debugShowCheckedModeBanner: false,
-          title: 'Constructo Worker',
+          title: 'Kisan Sathi',
+          translations: AppTranslations(),
+          locale: const Locale('hi', 'IN'),
+          fallbackLocale: const Locale('en', 'US'),
           builder: (context, child) {
-            // WidgetsBinding.instance.addPostFrameCallback((_) {
-            //   AppImageCache.precacheAndPinGradientImages(context);
-            //   AppImageCache.precacheAndPinAnimationImages(context);
-            // });
-
             return AnnotatedRegion<SystemUiOverlayStyle>(
               value: systemUiStyle,
               child: MediaQuery(
                 data: MediaQuery.of(context).copyWith(
                   textScaler: const TextScaler.linear(1.0),
-                ), //. mobile font increes pr increse nhi hoga //
+                ),
                 child: AppConnectivityWrapper(
                   child: child ?? const SizedBox.shrink(),
                 ),
@@ -89,10 +90,7 @@ class MyApp extends StatelessWidget {
             );
           },
           theme: AppThemes.lightTheme(context),
-          // darkTheme: AppThemes.darkTheme(context),
-          // themeMode: controller.selectedThemeMode.value,
           initialRoute: AppRouteName.splashScreen,
-
           popGesture: true,
           defaultTransition: Transition.cupertino,
           transitionDuration: const Duration(milliseconds: 450),

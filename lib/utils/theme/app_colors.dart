@@ -8,6 +8,11 @@ class AppColors {
   static const Color color9DB2CE = Color(0xff9DB2CE);
   static const Color color00ABE4 = Color(0xff00ABE4);
   static const Color colorGreenChip = Color(0xff15B955);
+  static const Color kisanPrimary = Color(0xFF1E6E38);
+  static const Color kisanDarkGreen = Color(0xFF0B3B1C);
+  static const Color kisanAccentGreen = Color(0xFF2E7D32);
+  static const Color kisanLightBg = Color(0xFFF4F7F5);
+  static const Color kisanPillBg = Color(0xFFE8F5E9);
 
   // Base
   static const Color white = Colors.white;
